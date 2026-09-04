@@ -104,17 +104,19 @@ textarea{min-height:72px}
     <nav id="nav"></nav>
     <div class="aside-foot">
       Bookmark this page — it keeps working when Grok is closed.<br/>
-      Use <strong>Export</strong> to save a backup of your numbers.
+      Use <strong>Save backup</strong>, then Save to Files — not Claude.
     </div>
   </aside>
   <div class="shell">
     <header class="top">
       <button class="btn ghost small menu-btn" onclick="toggleMenu()">Menu</button>
       <span style="margin-right:auto;font-family:Fraunces,serif;color:var(--navy)" class="menu-btn">Laniya's Touch</span>
-      <button class="btn ghost small" onclick="exportJson()">Export backup</button>
-      <label class="btn ghost small" style="cursor:pointer">Import<input id="imp" type="file" accept="application/json" class="hidden"></label>
+      <button class="btn ghost small" onclick="saveBackup()">Save backup</button>
+      <button class="btn ghost small" onclick="copyBackup()">Copy backup</button>
+      <label class="btn ghost small" style="cursor:pointer">Import<input id="imp" type="file" accept=".txt,.json,text/plain,application/json" class="hidden"></label>
       <button class="btn ghost small" onclick="if(confirm('Reset to the seeded command center?')) resetDemo()">Reset demo</button>
     </header>
+    <p id="note" class="hidden" style="margin:0;padding:10px 16px;background:var(--foam);border-bottom:1px solid var(--line);color:var(--navy);font-size:13px"></p>
     <main><div class="wrap" id="root"></div></main>
   </div>
 </div>
@@ -557,14 +559,44 @@ function render(){
   renderNav();
   document.getElementById("root").innerHTML=VIEWS[view]();
 }
-function exportJson(){
-  const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
-  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="laniya-ops-hub.json"; a.click();
+function flash(msg){
+  const el=document.getElementById("note");
+  el.textContent=msg; el.classList.remove("hidden");
+  clearTimeout(flash._t); flash._t=setTimeout(()=>el.classList.add("hidden"),5000);
+}
+async function saveBackup(){
+  const text=JSON.stringify(state,null,2);
+  const file=new File([text],"Laniyas-Touch-backup.txt",{type:"text/plain"});
+  try{
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:"Laniya's Touch backup"});
+      flash("In the share sheet pick Save to Files — not Claude.");
+      return;
+    }
+  }catch(err){ if(err && err.name==="AbortError") return; }
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([text],{type:"text/plain;charset=utf-8"}));
+  a.download="Laniyas-Touch-backup.txt";
+  a.rel="noopener";
+  document.body.appendChild(a); a.click(); a.remove();
+  flash("Saved as Laniyas-Touch-backup.txt. If Claude opens, close it and Save to Files instead.");
+}
+async function copyBackup(){
+  try{
+    await navigator.clipboard.writeText(JSON.stringify(state,null,2));
+    flash("Backup copied. Paste into Notes, then save that note.");
+  }catch(_){ flash("Could not copy. Use Save backup instead."); }
 }
 function resetDemo(){ state=structuredClone(SEED); save(); render(); }
 document.getElementById("imp").onchange=e=>{
   const f=e.target.files[0]; if(!f) return;
-  f.text().then(t=>{ state=Object.assign({}, structuredClone(SEED), JSON.parse(t)); save(); render(); });
+  f.text().then(t=>{
+    try{
+      state=Object.assign({}, structuredClone(SEED), JSON.parse(t));
+      save(); render(); flash("Backup restored.");
+    }catch(_){ flash("That file is not a Laniya backup."); }
+  });
+  e.target.value="";
 };
 load();
 render();
