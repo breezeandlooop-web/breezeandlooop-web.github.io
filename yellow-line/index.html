@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#0c0b09"/>
+<title>Yellow Line Elite</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect fill='%230c0b09' width='32' height='32'/%3E%3Crect x='4' y='15' width='24' height='2' fill='%23c4a35a'/%3E%3Ccircle cx='16' cy='16' r='2.2' fill='%23c4a35a'/%3E%3C/svg%3E"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:wght@500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0c0b09;--surface:#151310;--elev:#1c1914;--fg:#f4efe4;--muted:#9a9183;
+  --gold:#c4a35a;--gold-fg:#161412;--ok:#7d9a6a;--line:rgba(244,239,228,.1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--fg);font-family:"DM Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:"Fraunces",Georgia,serif;font-weight:500;text-wrap:balance;margin:0}
+button,select,input{font:inherit;color:inherit}
+button:not(:disabled),[role=button]{cursor:pointer}
+.wrap{max-width:960px;margin:0 auto;padding:0 16px 96px}
+header{position:sticky;top:0;z-index:20;background:rgba(12,11,9,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header .row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;max-width:960px;margin:0 auto}
+.mark{width:32px;height:1px;background:var(--gold)}
+.brand{font-family:"Fraunces",Georgia,serif;font-size:18px;line-height:1}
+.sub{margin-top:4px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+nav.top{display:none;gap:4px}
+nav.top button{min-height:44px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:var(--muted)}
+nav.top button.on{background:var(--elev);color:var(--gold)}
+nav.bot{position:fixed;inset:auto 0 0 0;z-index:20;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(12,11,9,.96);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav.bot button{min-height:56px;border:0;background:transparent;color:var(--muted);font-size:12px}
+nav.bot button.on{color:var(--gold)}
+@media(min-width:640px){nav.top{display:flex}nav.bot{display:none}.wrap{padding-bottom:40px}}
+.hero{height:8px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.7}
+h2{font-size:28px;margin-top:4px}
+.kicker{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 24px}
+@media(min-width:640px){.stats{grid-template-columns:repeat(4,1fr)}}
+.card{background:var(--surface);border-radius:20px;padding:16px;box-shadow:0 0 0 1px var(--line)}
+.stat .k{font-size:12px;color:var(--muted)}
+.stat .v{font-family:"Fraunces",Georgia,serif;font-size:24px;margin-top:4px;font-variant-numeric:tabular-nums}
+.gold{color:var(--gold)}
+.jobs{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.job{padding:0}
+.job>button.head{width:100%;text-align:left;background:transparent;border:0;padding:16px;display:flex;flex-direction:column;gap:4px}
+@media(min-width:640px){.job>button.head{flex-direction:row;justify-content:space-between;align-items:center}}
+.when{font-size:13px;color:var(--gold);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted);font-size:13px}
+.pill{display:inline-block;background:var(--elev);border-radius:999px;padding:4px 10px;font-size:12px;color:var(--muted)}
+.body{padding:0 16px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+.rowbtns{display:flex;flex-wrap:wrap;gap:8px}
+.btn{min-height:44px;padding:0 16px;border:0;border-radius:8px;background:var(--gold);color:var(--gold-fg);font-weight:500}
+.btn.g{background:transparent;box-shadow:0 0 0 1px var(--line);color:var(--fg)}
+.btn.q{background:var(--elev);color:var(--fg)}
+.btn:disabled{opacity:.4}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chips button{min-height:44px;padding:0 12px;border:0;border-radius:8px;background:var(--elev);color:var(--muted)}
+.chips button.on{background:var(--gold);color:var(--gold-fg)}
+.grid{display:grid;gap:16px}
+@media(min-width:640px){.grid.two{grid-template-columns:1fr 1fr}}
+label.f{display:flex;flex-direction:column;gap:6px;font-size:14px}
+label.f span{font-size:12px;color:var(--muted);font-weight:500}
+input,select{min-height:44px;width:100%;padding:0 12px;border:0;border-radius:8px;background:var(--bg);box-shadow:0 0 0 1px var(--line);outline:none}
+input:focus,select:focus{box-shadow:0 0 0 1px var(--gold)}
+.quote{font-family:"Fraunces",Georgia,serif;font-size:36px;color:var(--gold)}
+.sec{margin:24px 0}
+.sec h3{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;font-family:"DM Sans",system-ui,sans-serif}
+.list{display:flex;flex-direction:column}
+.list li{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);list-style:none}
+ul.list{margin:0;padding:0}
+.ok{color:var(--ok);font-size:14px}
+.head-actions{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin:20px 0 8px}
+</style>
+</head>
+<body>
+<header>
+  <div class="row">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span class="mark"></span>
+      <div>
+        <div class="brand">Yellow Line Elite</div>
+        <div class="sub">Barbados · private chauffeur</div>
+      </div>
+    </div>
+    <nav class="top" id="navTop"></nav>
+  </div>
+</header>
+<div class="hero"></div>
+<main class="wrap" id="app"></main>
+<nav class="bot" id="navBot"></nav>
+<script>
+(function(){
+const KEY="yl-elite-keep-v1";
+const TABS=[["board","Board"],["book","Book"],["money","Money"],["fleet","Fleet"]];
+const PLACES=["Grantley Adams (BGI)","Cruise Port / Bridgetown","South Coast / St Lawrence","Oistins","Worthing / Accra","Garrison / Bridgetown","Holetown / Limegrove","Sandy Lane / Paynes Bay","Speightstown","Bathsheba / East Coast","The Cliff / St James","Cobblers Cove"];
+const FROM={"Grantley Adams (BGI)":0,"South Coast / St Lawrence":85,"Oistins":90,"Worthing / Accra":95,"Garrison / Bridgetown":110,"Cruise Port / Bridgetown":115,"Sandy Lane / Paynes Bay":155,"Holetown / Limegrove":160,"The Cliff / St James":165,"Cobblers Cove":185,"Speightstown":200,"Bathsheba / East Coast":180};
+const SERVICES=[["airport","Airport"],["dinner","Dinner"],["point","Point to point"],["hourly","By the hour"],["tour","Island tour"],["wedding","Wedding"],["villa-week","Villa week"]];
+const STATUS={quoted:"Quoted",confirmed:"Confirmed",enroute:"En route",arrived:"Arrived",complete:"Complete",paid:"Paid"};
+const NEXT={quoted:"confirmed",confirmed:"enroute",enroute:"arrived",arrived:"complete",complete:"paid"};
+const NOW=new Date("2026-09-04T23:20:00");
+function esc(s){return String(s==null?"":s).replace(/&/g,"&"+"amp;").replace(/</g,"&"+"lt;").replace(/>/g,"&"+"gt;").replace(/"/g,"&"+"quot;");}
+function money(n){return "$"+Math.round(n).toLocaleString("en-BB");}
+function uid(){return "job-"+Math.random().toString(36).slice(2,8)+Date.now().toString(36).slice(-3);}
+function whenLabel(iso){return new Date(iso).toLocaleString("en-BB",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});}
+function transfer(a,b){var d=Math.abs((FROM[a]||120)-(FROM[b]||120));return d===0?70:d;}
+function quote(o){
+  var base=0,k=o.kind;
+  if(o.service==="airport"||o.service==="point") base=transfer(o.pickup,o.drop);
+  else if(o.service==="dinner") base=transfer(o.pickup,o.drop)+40;
+  else if(o.service==="hourly") base=95*Math.max(2,o.hours||2);
+  else if(o.service==="tour") base=380;
+  else if(o.service==="wedding") base=550;
+  else if(o.service==="villa-week") base=1480;
+  if(k==="van") base+=40; if(k==="suv") base+=25; if(o.bags>3) base+=15;
+  var h=new Date(o.when).getHours();
+  if((h>=22||h<6)&&o.service!=="villa-week"&&o.service!=="wedding") base*=1.25;
+  return Math.round(base);
+}
+function total(j){return j.quotedBbd+j.extrasBbd;}
+function due(j){return Math.max(0,total(j)-j.collectedBbd);}
+function groupOf(j){
+  var t=new Date(j.when).getTime();
+  var start=new Date(NOW.getFullYear(),NOW.getMonth(),NOW.getDate()).getTime();
+  var tom=start+86400000;
+  if(j.status==="enroute"||j.status==="arrived") return "live";
+  if(t<start&&(j.status==="paid"||j.status==="complete")) return "closed";
+  if(t<start) return "live";
+  if(t<tom) return "today";
+  return "later";
+}
+const SEED={
+  vehicles:[
+    {id:"v1",name:"Mercedes E-Class",kind:"sedan",plate:"Z 4821",seats:3,bags:3},
+    {id:"v2",name:"Range Rover",kind:"suv",plate:"Z 9104",seats:4,bags:5},
+    {id:"v3",name:"Mercedes V-Class",kind:"van",plate:"ZM 228",seats:6,bags:8}
+  ],
+  chauffeurs:[
+    {id:"c1",name:"Andre Clarke",phone:"246-537-0144",vehicleId:"v1",onDuty:true},
+    {id:"c2",name:"Marcia Weekes",phone:"246-537-0188",vehicleId:"v2",onDuty:true},
+    {id:"c3",name:"Jamal Brathwaite",phone:"246-537-0210",vehicleId:"v3",onDuty:false}
+  ],
+  jobs:[
+    {id:"j1",service:"dinner",client:"Harper party",phone:"246-230-4410",account:"West Coast Villas",pickup:"Sandy Lane / Paynes Bay",drop:"The Cliff / St James",when:"2026-09-04T21:30:00",flight:"",pax:2,bags:0,hours:0,vehicleId:"v2",chauffeurId:"c2",quotedBbd:190,extrasBbd:0,collectedBbd:0,payMethod:"account",status:"enroute",notes:"Wait at The Cliff, return same car."},
+    {id:"j2",service:"airport",client:"Smith · BA2158",phone:"447-700-900123",account:"",pickup:"Grantley Adams (BGI)",drop:"Sandy Lane / Paynes Bay",when:"2026-09-05T14:10:00",flight:"BA2158",pax:3,bags:4,hours:0,vehicleId:"v2",chauffeurId:"c2",quotedBbd:195,extrasBbd:0,collectedBbd:0,payMethod:"",status:"confirmed",notes:"Meet at arrivals with name board. Child seat in Range Rover."},
+    {id:"j3",service:"airport",client:"West Coast Villas · outbound",phone:"246-432-8801",account:"West Coast Villas",pickup:"Cobblers Cove",drop:"Grantley Adams (BGI)",when:"2026-09-05T06:35:00",flight:"VS188",pax:4,bags:6,hours:0,vehicleId:"v3",chauffeurId:"c3",quotedBbd:225,extrasBbd:0,collectedBbd:0,payMethod:"account",status:"confirmed",notes:"06:35 departure — leave villa 05:20. Jamal on early duty."},
+    {id:"j4",service:"dinner",client:"Cumberbatch",phone:"246-253-7712",account:"",pickup:"Holetown / Limegrove",drop:"The Cliff / St James",when:"2026-09-05T19:00:00",flight:"",pax:2,bags:0,hours:0,vehicleId:"v1",chauffeurId:"c1",quotedBbd:90,extrasBbd:0,collectedBbd:0,payMethod:"",status:"confirmed",notes:"Reservation 19:15. Return after."},
+    {id:"j5",service:"wedding",client:"Alleyne / Clarke wedding",phone:"246-266-9033",account:"",pickup:"Garrison / Bridgetown",drop:"Cobblers Cove",when:"2026-09-06T15:00:00",flight:"",pax:6,bags:0,hours:6,vehicleId:"v3",chauffeurId:"c3",quotedBbd:590,extrasBbd:0,collectedBbd:200,payMethod:"transfer",status:"confirmed",notes:"Deposit taken. Ceremony 16:00, photos at Bathsheba, reception Cobblers."},
+    {id:"j6",service:"villa-week",client:"Harper villa week",phone:"246-230-4410",account:"West Coast Villas",pickup:"Grantley Adams (BGI)",drop:"Sandy Lane / Paynes Bay",when:"2026-09-01T16:00:00",flight:"",pax:4,bags:5,hours:0,vehicleId:"v2",chauffeurId:"c2",quotedBbd:1480,extrasBbd:50,collectedBbd:740,payMethod:"account",status:"complete",notes:"Week package half billed. Extra stop Speightstown market."},
+    {id:"j7",service:"tour",client:"Nicholls family",phone:"246-231-6604",account:"",pickup:"South Coast / St Lawrence",drop:"South Coast / St Lawrence",when:"2026-09-07T09:00:00",flight:"",pax:5,bags:0,hours:8,vehicleId:"v3",chauffeurId:"c3",quotedBbd:420,extrasBbd:0,collectedBbd:0,payMethod:"",status:"quoted",notes:"East coast + rum shop lunch. Waiting on confirm."}
+  ]
+};
+var state={tab:"board",open:null,copied:false,done:null,form:null};
+function load(){
+  try{
+    var raw=localStorage.getItem(KEY);
+    if(!raw) return JSON.parse(JSON.stringify(SEED));
+    var p=JSON.parse(raw);
+    if(!p.jobs||!p.jobs.length) return JSON.parse(JSON.stringify(SEED));
+    return {jobs:p.jobs,vehicles:p.vehicles||SEED.vehicles,chauffeurs:p.chauffeurs||SEED.chauffeurs};
+  }catch(e){return JSON.parse(JSON.stringify(SEED));}
+}
+var data=load();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){}}
+function veh(id){return data.vehicles.find(function(v){return v.id===id;})||data.vehicles[0];}
+function ch(id){return data.chauffeurs.find(function(c){return c.id===id;})||data.chauffeurs[0];}
+function navHtml(id){
+  return TABS.map(function(t){return '<button type="button" class="'+(state.tab===t[0]?"on":"")+'" data-tab="'+t[0]+'">'+t[1]+"</button>";}).join("");
+}
+function setTab(t){state.tab=t;state.done=null;render();}
+function wa(j){
+  var c=ch(j.chauffeurId),v=veh(j.vehicleId);
+  var usd=((j.quotedBbd+j.extrasBbd)/2).toFixed(0);
+  return ["Yellow Line Elite — confirmed",whenLabel(j.when),j.pickup+" → "+j.drop,j.flight?("Flight "+j.flight):"",c.name+" · "+v.plate,"BBD $"+ (j.quotedBbd+j.extrasBbd)+" (USD $"+usd+")","Reply if plans change."].filter(Boolean).join("\n");
+}
+function jobCard(j){
+  var c=ch(j.chauffeurId),v=veh(j.vehicleId),d=due(j),open=state.open===j.id,next=NEXT[j.status];
+  var extra=open?'<div class="body">'+
+    '<div class="muted">'+(j.flight?("Flight "+esc(j.flight)+" · "):"")+esc(c.name)+" · "+esc(v.name)+" "+esc(v.plate)+" · "+j.pax+" pax"+(j.account?(" · Account "+esc(j.account)):"")+"</div>"+
+    (j.notes?'<div>'+esc(j.notes)+"</div>":"")+
+    '<label class="f"><span>Chauffeur</span><select data-assign="'+j.id+'">'+data.chauffeurs.map(function(x){return '<option value="'+x.id+'"'+(x.id===j.chauffeurId?" selected":"")+">"+esc(x.name)+(x.onDuty?"":" (off)")+"</option>";}).join("")+"</select></label>"+
+    '<div class="rowbtns">'+
+    (next?'<button class="btn" data-status="'+j.id+'" data-to="'+next+'">Mark '+STATUS[next].toLowerCase()+"</button>":"")+
+    (d>0?'<button class="btn q" data-collect="'+j.id+'">Collect '+money(d)+'</button><button class="btn g" data-account="'+j.id+'">On account</button>':'<span class="ok">Paid</span>')+
+    '<button class="btn g" data-extra="'+j.id+'" data-kind="stop">Extra stop</button>'+
+    '<button class="btn g" data-extra="'+j.id+'" data-kind="wait">Wait hour</button>'+
+    '<button class="btn g" data-wa="'+j.id+'">'+(state.copied?"Copied":"WhatsApp text")+"</button>"+
+    "</div></div>":"";
+  return '<div class="card job"><button type="button" class="head" data-open="'+j.id+'"><div><div class="when">'+esc(whenLabel(j.when))+'</div><div>'+esc(j.client)+'</div><div class="muted">'+esc(j.pickup)+" → "+esc(j.drop)+'</div></div><div><span class="pill">'+STATUS[j.status]+'</span><div style="margin-top:6px">'+money(total(j))+' BBD'+(d>0&&j.status!=="paid"?' <span class="gold">due '+money(d)+"</span>":"")+"</div></div></button>"+extra+"</div>";
+}
+function section(title,list,empty){
+  if(!list.length&&!empty) return "";
+  return '<section class="sec"><h3>'+title+"</h3>"+(list.length?'<div class="jobs">'+list.map(jobCard).join("")+"</div>":'<p class="muted">'+empty+"</p>")+"</section>";
+}
+function board(){
+  var live=[],today=[],later=[],closed=[];
+  data.jobs.slice().sort(function(a,b){return a.when.localeCompare(b.when);}).forEach(function(j){
+    var g=groupOf(j);
+    if(g==="live") live.push(j); else if(g==="today") today.push(j); else if(g==="closed") closed.push(j); else later.push(j);
+  });
+  var outstanding=data.jobs.reduce(function(n,j){return n+due(j);},0);
+  var collected=data.jobs.reduce(function(n,j){return n+j.collectedBbd;},0);
+  return '<div class="head-actions"><div><div class="kicker">Dispatch</div><h2>Today’s board</h2></div><button class="btn" data-tab="book">New booking</button></div>'+
+    '<div class="stats">'+
+    '<div class="card stat"><div class="k">Live / today</div><div class="v">'+(live.length+today.length)+"</div></div>"+
+    '<div class="card stat"><div class="k">On duty</div><div class="v">'+data.chauffeurs.filter(function(c){return c.onDuty;}).length+"</div></div>"+
+    '<div class="card stat"><div class="k">Outstanding</div><div class="v gold">'+money(outstanding)+"</div></div>"+
+    '<div class="card stat"><div class="k">Collected</div><div class="v">'+money(collected)+"</div></div></div>"+
+    section("Live now",live,"Nothing moving.")+
+    (today.length?section("Rest of today",today,""):"")+
+    section("Coming up",later,"Board is clear.")+
+    (closed.length?section("Closed",closed,""):"");
+}
+function defaultForm(){
+  return {service:"airport",client:"",phone:"",account:"",pickup:"Grantley Adams (BGI)",drop:"Sandy Lane / Paynes Bay",date:"2026-09-05",time:"14:10",flight:"BA2158",pax:2,bags:2,hours:2,vehicleId:"v1",chauffeurId:"c1",notes:""};
+}
+function book(){
+  if(state.done){
+    var j=data.jobs.find(function(x){return x.id===state.done;});
+    var c=ch(j.chauffeurId),v=veh(j.vehicleId);
+    return '<div class="card" style="max-width:520px;margin:24px auto"><div class="kicker">Confirmed</div><h2 style="margin-top:8px">On the board.</h2><p class="muted">'+esc(j.client)+" · "+esc(j.pickup)+" to "+esc(j.drop)+"<br>"+esc(c.name)+" in the "+esc(v.name)+" ("+esc(v.plate)+')</p><div class="quote" style="margin-top:12px">'+money(j.quotedBbd)+' BBD</div><div class="muted">USD $'+(j.quotedBbd/2).toFixed(0)+'</div><div class="rowbtns" style="margin-top:16px"><button class="btn" data-another="1">Another booking</button><button class="btn g" data-tab="board">Open board</button></div></div>';
+  }
+  var f=state.form|| (state.form=defaultForm());
+  var kind=veh(f.vehicleId).kind;
+  var when=f.date+"T"+f.time+":00";
+  var q=quote({service:f.service,pickup:f.pickup,drop:f.drop,when:when,hours:f.hours,bags:f.bags,kind:kind});
+  var h=Number(f.time.slice(0,2));
+  var night=h>=22||h<6;
+  function opt(list,val){return list.map(function(p){return "<option"+(p===val?" selected":"")+">"+esc(p)+"</option>";}).join("");}
+  return '<div class="kicker" style="margin-top:20px">Guest booker</div><h2>Quote before they sit.</h2>'+
+    '<div class="chips">'+SERVICES.map(function(s){return '<button type="button" class="'+(f.service===s[0]?"on":"")+'" data-svc="'+s[0]+'">'+s[1]+"</button>";}).join("")+"</div>"+
+    '<div class="grid two">'+
+    '<label class="f"><span>Guest / party</span><input id="f-client" value="'+esc(f.client)+'" placeholder="Name on the board"/></label>'+
+    '<label class="f"><span>WhatsApp</span><input id="f-phone" value="'+esc(f.phone)+'" placeholder="246…"/></label>'+
+    '<label class="f"><span>Account (optional)</span><input id="f-account" value="'+esc(f.account)+'" placeholder="Villa manager or hotel"/></label>'+
+    '<label class="f"><span>Vehicle</span><select id="f-vehicle">'+data.vehicles.map(function(v){return '<option value="'+v.id+'"'+(v.id===f.vehicleId?" selected":"")+">"+esc(v.name)+" · "+esc(v.plate)+"</option>";}).join("")+"</select></label>"+
+    '<label class="f"><span>Pickup</span><select id="f-pickup">'+opt(PLACES,f.pickup)+"</select></label>"+
+    (f.service==="hourly"||f.service==="tour"?"":'<label class="f"><span>Drop</span><select id="f-drop">'+opt(PLACES,f.drop)+"</select></label>")+
+    '<label class="f"><span>Date</span><input id="f-date" type="date" value="'+esc(f.date)+'"/></label>'+
+    '<label class="f"><span>Time</span><input id="f-time" type="time" value="'+esc(f.time)+'"/></label>'+
+    (f.service==="airport"?'<label class="f"><span>Flight</span><input id="f-flight" value="'+esc(f.flight)+'"/></label>':"")+
+    '<label class="f"><span>Passengers</span><input id="f-pax" type="number" min="1" value="'+f.pax+'"/></label>'+
+    '<label class="f"><span>Bags</span><input id="f-bags" type="number" min="0" value="'+f.bags+'"/></label>'+
+    (f.service==="hourly"||f.service==="tour"||f.service==="wedding"?'<label class="f"><span>Hours</span><input id="f-hours" type="number" min="2" value="'+f.hours+'"/></label>':"")+
+    '<label class="f"><span>Chauffeur</span><select id="f-ch">'+data.chauffeurs.map(function(c){return '<option value="'+c.id+'"'+(c.id===f.chauffeurId?" selected":"")+">"+esc(c.name)+(c.onDuty?"":" (off)")+"</option>";}).join("")+"</select></label>"+
+    '<label class="f"><span>Notes</span><input id="f-notes" value="'+esc(f.notes)+'" placeholder="Child seat, wait, return"/></label>'+
+    "</div>"+
+    '<div class="card" style="margin:20px 0"><div class="kicker" style="color:var(--muted)">Live quote</div><div class="quote">'+money(q)+'</div><div class="muted">BBD · USD $'+(q/2).toFixed(0)+"</div><ul class='muted' style='padding-left:18px'><li>Elite private rate, not rank taxi</li>"+(night?"<li>Night rate after 22:00 / before 06:00</li>":"")+"<li>Price locked before they sit</li></ul></div>"+
+    '<button class="btn" id="confirm" '+(f.client.trim()?"":"disabled")+">Confirm booking</button>";
+}
+function moneyView(){
+  var quoted=data.jobs.reduce(function(n,j){return n+total(j);},0);
+  var collected=data.jobs.reduce(function(n,j){return n+j.collectedBbd;},0);
+  var outstanding=data.jobs.reduce(function(n,j){return n+due(j);},0);
+  var extras=data.jobs.reduce(function(n,j){return n+j.extrasBbd;},0);
+  var owing=data.jobs.filter(function(j){return due(j)>0;}).sort(function(a,b){return due(b)-due(a);});
+  return '<div class="kicker" style="margin-top:20px">Money</div><h2>Quoted is not collected.</h2>'+
+    '<div class="stats"><div class="card stat"><div class="k">Quoted</div><div class="v">'+money(quoted)+'</div></div><div class="card stat"><div class="k">Collected</div><div class="v">'+money(collected)+'</div></div><div class="card stat"><div class="k">Outstanding</div><div class="v gold">'+money(outstanding)+'</div></div><div class="card stat"><div class="k">Extras</div><div class="v">'+money(extras)+"</div></div></div>"+
+    '<div class="card"><h3 style="font-family:Fraunces,Georgia,serif;font-size:20px;letter-spacing:0;text-transform:none;color:var(--fg)">Who owes</h3>'+
+    (owing.length?'<ul class="list">'+owing.map(function(j){return "<li><div><div>"+esc(j.client)+'</div><div class="muted">'+(j.account?esc(j.account)+" · ":"")+esc(j.pickup)+" → "+esc(j.drop)+"</div></div><div class='gold'>"+money(due(j))+"</div></li>";}).join("")+"</ul>":'<p class="muted">Nothing outstanding.</p>')+
+    "</div>"+
+    '<div class="card" style="margin-top:16px"><h3 style="font-family:Fraunces,Georgia,serif;font-size:20px;letter-spacing:0;text-transform:none;color:var(--fg)">Keep this board</h3><p class="muted">Backup saves as a text file so it lands in Files, not another app.</p><div class="rowbtns" style="margin-top:12px"><button class="btn" id="backup">Save backup</button><label class="btn g" style="display:inline-flex;align-items:center">Restore<input id="restore" type="file" accept=".txt,text/plain,application/json" style="display:none"/></label><button class="btn g" id="reset">Reset demo</button></div></div>';
+}
+function fleet(){
+  return '<div class="kicker" style="margin-top:20px">Fleet</div><h2>Cars and chauffeurs</h2>'+
+    '<div class="stats" style="grid-template-columns:1fr">'+data.vehicles.map(function(v){
+      var c=data.chauffeurs.find(function(x){return x.vehicleId===v.id;});
+      var live=data.jobs.filter(function(j){return j.vehicleId===v.id&&(j.status==="enroute"||j.status==="arrived");}).length;
+      return '<div class="card"><div class="gold" style="font-size:12px">'+v.kind.toUpperCase()+" · "+esc(v.plate)+'</div><h3 style="font-size:20px;letter-spacing:0;text-transform:none;color:var(--fg);font-family:Fraunces,Georgia,serif">'+esc(v.name)+'</h3><p class="muted">'+v.seats+" seats · "+v.bags+" bags</p><div>"+esc(c?c.name:"Unassigned")+'</div><div class="muted">'+(live?"On a job":c&&c.onDuty?"On duty":"Off duty")+"</div></div>";
+    }).join("")+"</div>"+
+    data.chauffeurs.map(function(c){var v=veh(c.vehicleId);return '<div class="card" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px"><div><div>'+esc(c.name)+'</div><div class="muted">'+esc(v.name)+" · "+esc(v.plate)+" · "+esc(c.phone)+'</div></div><button class="btn '+(c.onDuty?"":"g")+'" data-duty="'+c.id+'">'+(c.onDuty?"On duty":"Off duty")+"</button></div>";}).join("");
+}
+function readForm(){
+  var f=state.form||defaultForm();
+  function val(id,fb){var el=document.getElementById(id);return el?el.value:fb;}
+  f.client=val("f-client",f.client); f.phone=val("f-phone",f.phone); f.account=val("f-account",f.account);
+  f.vehicleId=val("f-vehicle",f.vehicleId); f.pickup=val("f-pickup",f.pickup); f.drop=val("f-drop",f.drop);
+  f.date=val("f-date",f.date); f.time=val("f-time",f.time); f.flight=val("f-flight",f.flight);
+  f.pax=Number(val("f-pax",f.pax))||1; f.bags=Number(val("f-bags",f.bags))||0; f.hours=Number(val("f-hours",f.hours))||2;
+  f.chauffeurId=val("f-ch",f.chauffeurId); f.notes=val("f-notes",f.notes);
+  state.form=f; return f;
+}
+function render(){
+  document.getElementById("navTop").innerHTML=navHtml("top");
+  document.getElementById("navBot").innerHTML=navHtml("bot");
+  var root=document.getElementById("app");
+  if(state.tab==="board") root.innerHTML=board();
+  else if(state.tab==="book") root.innerHTML=book();
+  else if(state.tab==="money") root.innerHTML=moneyView();
+  else root.innerHTML=fleet();
+}
+document.body.addEventListener("click",function(e){
+  var t=e.target.closest("[data-tab],[data-open],[data-status],[data-collect],[data-account],[data-extra],[data-wa],[data-svc],[data-duty],[data-another],#confirm,#backup,#reset");
+  if(!t) return;
+  if(t.id==="confirm"){
+    var f=readForm(); if(!f.client.trim()) return;
+    var kind=veh(f.vehicleId).kind; var when=f.date+"T"+f.time+":00";
+    var q=quote({service:f.service,pickup:f.pickup,drop:f.drop,when:when,hours:f.hours,bags:f.bags,kind:kind});
+    var id=uid();
+    data.jobs.unshift({id:id,service:f.service,client:f.client.trim(),phone:f.phone.trim(),account:f.account.trim(),pickup:f.pickup,drop:(f.service==="hourly"||f.service==="tour")?f.pickup:f.drop,when:when,flight:f.service==="airport"?f.flight.trim():"",pax:f.pax,bags:f.bags,hours:(f.service==="hourly"||f.service==="tour"||f.service==="wedding")?f.hours:0,vehicleId:f.vehicleId,chauffeurId:f.chauffeurId,quotedBbd:q,extrasBbd:0,collectedBbd:0,payMethod:"",status:"confirmed",notes:f.notes.trim()});
+    save(); state.done=id; render(); return;
+  }
+  if(t.id==="backup"){
+    var text=JSON.stringify(data,null,2);
+    var blob=new Blob([text],{type:"text/plain"});
+    var file=new File([blob],"Yellow-Line-backup.txt",{type:"text/plain"});
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file],title:"Yellow Line backup"}).catch(function(){});return;}
+    var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="Yellow-Line-backup.txt"; a.click(); URL.revokeObjectURL(a.href); return;
+  }
+  if(t.id==="reset"){data=JSON.parse(JSON.stringify(SEED)); save(); render(); return;}
+  if(t.getAttribute("data-another")){state.done=null;state.form=defaultForm();render();return;}
+  var tab=t.getAttribute("data-tab"); if(tab){setTab(tab);return;}
+  var open=t.getAttribute("data-open"); if(open){state.open=state.open===open?null:open;render();return;}
+  var st=t.getAttribute("data-status"); if(st){var j=data.jobs.find(function(x){return x.id===st;}); if(j){j.status=t.getAttribute("data-to"); save(); render();} return;}
+  var col=t.getAttribute("data-collect")||t.getAttribute("data-account");
+  if(col){
+    var job=data.jobs.find(function(x){return x.id===col;}); if(!job) return;
+    job.collectedBbd=total(job); job.payMethod=t.getAttribute("data-account")?"account":(job.payMethod||"cash"); job.status="paid"; save(); render(); return;
+  }
+  var ex=t.getAttribute("data-extra"); if(ex){var je=data.jobs.find(function(x){return x.id===ex;}); if(je){je.extrasBbd+=(t.getAttribute("data-kind")==="stop"?25:40); save(); render();} return;}
+  var w=t.getAttribute("data-wa"); if(w){var jw=data.jobs.find(function(x){return x.id===w;}); if(jw){navigator.clipboard.writeText(wa(jw)).then(function(){state.copied=true;render();setTimeout(function(){state.copied=false;render();},1500);}).catch(function(){});} return;}
+  var svc=t.getAttribute("data-svc"); if(svc){readForm(); state.form.service=svc; render(); return;}
+  var duty=t.getAttribute("data-duty"); if(duty){var c=data.chauffeurs.find(function(x){return x.id===duty;}); if(c){c.onDuty=!c.onDuty; save(); render();} return;}
+});
+document.body.addEventListener("change",function(e){
+  if(e.target.id==="restore"){
+    var file=e.target.files&&e.target.files[0]; if(!file) return;
+    var r=new FileReader(); r.onload=function(){try{var p=JSON.parse(r.result); if(p.jobs){data=p; save(); render();}}catch(err){}}; r.readAsText(file); return;
+  }
+  var as=e.target.getAttribute("data-assign");
+  if(as){var j=data.jobs.find(function(x){return x.id===as;}); var c=ch(e.target.value); if(j&&c){j.chauffeurId=c.id;j.vehicleId=c.vehicleId; save(); render();} return;}
+  if(state.tab==="book"){readForm(); var f=state.form; var el=document.getElementById("confirm"); if(el) el.disabled=!f.client.trim();
+    var kind=veh(f.vehicleId).kind; var q=quote({service:f.service,pickup:f.pickup,drop:f.drop,when:f.date+"T"+f.time+":00",hours:f.hours,bags:f.bags,kind:kind});
+    var quoteEl=document.querySelector(".quote"); if(quoteEl) quoteEl.textContent=money(q);
+  }
+});
+document.body.addEventListener("input",function(e){
+  if(state.tab!=="book") return;
+  if(e.target.id&&e.target.id.indexOf("f-")===0){
+    readForm();
+    var f=state.form; var el=document.getElementById("confirm"); if(el) el.disabled=!f.client.trim();
+    var kind=veh(f.vehicleId).kind; var q=quote({service:f.service,pickup:f.pickup,drop:f.drop,when:f.date+"T"+f.time+":00",hours:f.hours,bags:f.bags,kind:kind});
+    var quoteEl=document.querySelector(".quote"); if(quoteEl) quoteEl.textContent=money(q);
+  }
+});
+render();
+})();
+</script>
+</body>
+</html>
