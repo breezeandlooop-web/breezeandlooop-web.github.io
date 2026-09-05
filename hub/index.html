@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Laniya's Touch — 3-Month Operations Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy: #0e2a3a;
+      --navy-2: #16384c;
+      --ink: #12202a;
+      --teal: #1a7a6d;
+      --teal-2: #249688;
+      --mint: #d8f0eb;
+      --foam: #f3faf8;
+      --gold: #c4a35a;
+      --gold-2: #e8d7a8;
+      --paper: #f7f4ee;
+      --white: #ffffff;
+      --line: #d9e4e1;
+      --muted: #5b6d75;
+      --danger: #b54a3c;
+      --ok: #1f7a4d;
+      --warn: #b7791f;
+      --shadow: 0 10px 30px rgba(14, 42, 58, 0.08);
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font-family: "DM Sans", system-ui, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      display: flex;
+      min-height: 100vh;
+    }
+    button, input, select, textarea { font-family: inherit; }
+    .app { display: flex; width: 100%; min-height: 100vh; }
+
+    /* Sidebar */
+    aside {
+      width: 272px;
+      background: linear-gradient(180deg, var(--navy) 0%, #0b2230 100%);
+      color: #e8f2f0;
+      padding: 22px 16px;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      flex-shrink: 0;
+    }
+    .brand { padding: 6px 10px 22px; border-bottom: 1px solid rgba(255,255,255,.08); margin-bottom: 16px; }
+    .brand-mark {
+      width: 42px; height: 42px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--teal-2), #0e5b52);
+      display: grid; place-items: center;
+      font-family: Fraunces, serif; font-weight: 700; color: #fff; font-size: 18px;
+      box-shadow: 0 6px 16px rgba(0,0,0,.25);
+    }
+    .brand h1 { font-family: Fraunces, serif; font-size: 18px; margin: 12px 0 2px; font-weight: 600; letter-spacing: -.02em; }
+    .brand p { margin: 0; font-size: 11.5px; color: #9bb3b8; letter-spacing: .04em; text-transform: uppercase; }
+    .meta { font-size: 12px; color: var(--muted); }
+    nav { display: flex; flex-direction: column; gap: 4px; overflow: auto; }
+    nav button {
+      appearance: none; border: 0; background: transparent; color: #c9d9dc;
+      text-align: left; padding: 10px 12px; border-radius: 10px; cursor: pointer;
+      font-size: 13.5px; display: flex; align-items: center; gap: 10px;
+    }
+    nav button:hover { background: rgba(255,255,255,.06); color: #fff; }
+    nav button.active { background: rgba(36,150,136,.22); color: #fff; box-shadow: inset 0 0 0 1px rgba(36,150,136,.35); }
+    nav .ico { width: 18px; text-align: center; opacity: .85; }
+    .aside-foot { margin-top: auto; padding: 14px 10px 4px; font-size: 11px; color: #8aa0a6; line-height: 1.45; }
+    .aside-foot strong { color: #d7e6e4; font-weight: 600; }
+
+    /* Main */
+    main { flex: 1; padding: 28px 32px 60px; max-width: 1280px; }
+    .topbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 22px; }
+    .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--teal); font-weight: 700; margin: 0 0 6px; }
+    h2.page-title { font-family: Fraunces, serif; font-size: 32px; margin: 0; letter-spacing: -.03em; color: var(--navy); }
+    .lede { color: var(--muted); margin: 8px 0 0; max-width: 62ch; line-height: 1.55; }
+    .view { display: none; }
+    .view.active { display: block; animation: fade .25s ease; }
+    @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    .grid { display: grid; gap: 16px; }
+    .g-4 { grid-template-columns: repeat(4, 1fr); }
+    .g-3 { grid-template-columns: repeat(3, 1fr); }
+    .g-2 { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 1100px) {
+      .g-4 { grid-template-columns: repeat(2, 1fr); }
+      .g-3 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 860px) {
+      body { display: block; }
+      aside { width: 100%; height: auto; position: relative; }
+      nav { flex-direction: row; flex-wrap: wrap; }
+      .g-4, .g-2 { grid-template-columns: 1fr; }
+      main { padding: 20px 16px 48px; }
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 18px 16px;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 15px; color: var(--navy); }
+    .stat { font-family: Fraunces, serif; font-size: 34px; color: var(--navy); letter-spacing: -.03em; }
+    .stat small { font-family: DM Sans, sans-serif; font-size: 13px; color: var(--muted); font-weight: 500; }
+    .progress { height: 8px; background: #e7efed; border-radius: 99px; overflow: hidden; margin-top: 10px; }
+    .progress > span { display: block; height: 100%; background: linear-gradient(90deg, var(--teal), #3bb8a8); border-radius: 99px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    th { text-align: left; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+    td { padding: 10px; border-bottom: 1px solid #eef3f2; vertical-align: top; }
+    tr:hover td { background: var(--foam); }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      border-radius: 999px; padding: 3px 9px; font-size: 11.5px; font-weight: 600;
+      background: var(--mint); color: var(--teal);
+    }
+    .pill.gold { background: #f4ead0; color: #7a5b16; }
+    .pill.navy { background: #e4eef3; color: var(--navy); }
+    .pill.warn { background: #f8e7c9; color: #8a5a10; }
+    .pill.danger { background: #f8dcd8; color: var(--danger); }
+    .pill.muted { background: #eef1f2; color: var(--muted); }
+
+    .btn {
+      border: 0; border-radius: 10px; padding: 9px 14px; cursor: pointer;
+      background: var(--navy); color: #fff; font-weight: 600; font-size: 13px;
+    }
+    .btn:hover { background: var(--navy-2); }
+    .btn.ghost { background: transparent; color: var(--navy); box-shadow: inset 0 0 0 1px var(--line); }
+    .btn.teal { background: var(--teal); }
+    .btn.small { padding: 6px 10px; font-size: 12px; }
+    .btn.danger { background: var(--danger); }
+
+    .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select, textarea {
+      border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; font-size: 13.5px;
+      background: #fff; color: var(--ink); width: 100%;
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    label.field { display: block; font-size: 12px; font-weight: 600; color: var(--navy); margin: 0 0 6px; }
+    .form-row { display: grid; gap: 12px; margin-bottom: 12px; }
+    .form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+    .form-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+    @media (max-width: 700px) { .form-row.cols-2, .form-row.cols-3 { grid-template-columns: 1fr; } }
+
+    .modal-back {
+      position: fixed; inset: 0; background: rgba(14,42,58,.45);
+      display: none; align-items: center; justify-content: center; padding: 20px; z-index: 40;
+    }
+    .modal-back.open { display: flex; }
+    .modal { background: #fff; width: min(640px, 100%); border-radius: 18px; padding: 22px; max-height: 90vh; overflow: auto; }
+    .modal h3 { font-family: Fraunces, serif; font-size: 22px; margin: 0 0 14px; }
+
+    .check-item {
+      display: flex; gap: 10px; align-items: flex-start; padding: 10px 0;
+      border-bottom: 1px solid #eef3f2;
+    }
+    .check-item input { margin-top: 3px; accent-color: var(--teal); width: 16px; height: 16px; }
+    .check-item label { font-size: 14px; line-height: 1.4; }
+    .check-item .meta { font-size: 12px; color: var(--muted); }
+
+    .tier {
+      border-top: 4px solid var(--teal);
+    }
+    .tier.t2 { border-top-color: var(--gold); }
+    .tier.t3 { border-top-color: #6b7c86; }
+    ul.clean { margin: 8px 0 0; padding-left: 18px; color: var(--muted); line-height: 1.55; }
+    .vp { margin-top: 10px; font-size: 13px; background: var(--foam); padding: 10px 12px; border-radius: 10px; color: var(--navy-2); }
+
+    .seq { display: flex; gap: 6px; flex-wrap: wrap; }
+    .seq span {
+      font-size: 11px; padding: 4px 7px; border-radius: 6px; background: #eef1f2; color: #6a7a80; font-weight: 600;
+    }
+    .seq span.done { background: var(--mint); color: var(--teal); }
+    .seq span.now { background: var(--navy); color: #fff; }
+
+    .note { font-size: 13px; color: var(--muted); line-height: 1.55; }
+    .split { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .hidden { display: none !important; }
+    .empty { text-align: center; padding: 28px 10px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <div class="brand">
+        <div class="brand-mark">LT</div>
+        <h1>Laniya's Touch</h1>
+        <p>Operations Hub · 90 days</p>
+      </div>
+      <nav>
+        <button class="active" data-view="overview"><span class="ico">▣</span> Overview</button>
+        <button data-view="pillars"><span class="ico">◇</span> Four Pillars</button>
+        <button data-view="markets"><span class="ico">◎</span> Target Markets</button>
+        <button data-view="clients"><span class="ico">⌂</span> Clients & contracts</button>
+        <button data-view="visits"><span class="ico">✓</span> Visits & QC</button>
+        <button data-view="staff"><span class="ico">☺</span> Staff</button>
+        <button data-view="pipeline"><span class="ico">☰</span> Prospect Pipeline</button>
+        <button data-view="partners"><span class="ico">⚭</span> Partnerships</button>
+        <button data-view="timeline"><span class="ico">⏱</span> 90-Day Timeline</button>
+        <button data-view="sops"><span class="ico">☑</span> SOP Checklists</button>
+        <button data-view="pricing"><span class="ico">$</span> Pricing & Profit</button>
+        <button data-view="overhead"><span class="ico">▣</span> Overhead & break-even</button>
+        <button data-view="digital"><span class="ico">◉</span> Digital Visibility</button>
+      </nav>
+      <div class="aside-foot">
+        Prepared for <strong>Laniya's Touch Quality Cleaning Services</strong><br />
+        Operational Roadmap &amp; Service Growth Proposal
+      </div>
+    </aside>
+
+    <main>
+      <!-- OVERVIEW -->
+      <section id="overview" class="view active">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">3-Month Operations & Growth Strategy</p>
+            <h2 class="page-title">Command center</h2>
+            <p class="lede">Optimize operations, lock pricing, build recurring revenue, and run an aggressive acquisition campaign — all from one working workspace.</p>
+          </div>
+          <div class="toolbar">
+            <button class="btn ghost small" onclick="exportData()">Export JSON</button>
+            <button class="btn ghost small" onclick="document.getElementById('importFile').click()">Import</button>
+            <input id="importFile" type="file" accept="application/json" class="hidden" />
+          </div>
+        </div>
+        <div class="grid g-4" id="overviewStats"></div>
+        <div class="grid g-2" style="margin-top:16px">
+          <div class="card">
+            <div class="split"><h3>Executive summary</h3><span class="pill">Working doc</span></div>
+            <p class="note">This 90-day roadmap is designed to optimize internal operations, establish clear pricing models, build predictable recurring revenue, and execute an aggressive client acquisition strategy. Standardized processes + target-market positioning create immediate operational clarity and long-term growth.</p>
+            <ul class="clean">
+              <li>Stabilize cash flow with high-volume recurring contracts (Tier 1).</li>
+              <li>Capture specialty margin with clinics, kitchens, and showrooms (Tier 2).</li>
+              <li>Fill spare capacity with project work (Tier 3).</li>
+              <li>Fill a 100-business prospect database and run a 5-step outreach sequence.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>This week's focus</h3>
+            <div id="weekFocus"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <div class="split"><h3>Pipeline snapshot</h3><button class="btn small teal" onclick="showView('pipeline')">Open pipeline</button></div>
+          <div style="overflow:auto"><table><thead><tr><th>Business</th><th>Tier / Sector</th><th>Stage</th><th>Owner next action</th></tr></thead><tbody id="overviewPipe"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- PILLARS -->
+      <section id="pillars" class="view">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">Section 1 · Engagement scope</p>
+            <h2 class="page-title">Four critical pillars</h2>
+            <p class="lede">Track the deliverables we committed to over the next three months. Tick items as they ship.</p>
+          </div>
+        </div>
+        <div class="grid g-2" id="pillarCards"></div>
+      </section>
+
+      <!-- MARKETS -->
+      <section id="markets" class="view">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">Section 2 · Revenue strategy</p>
+            <h2 class="page-title">Target market matrix</h2>
+            <p class="lede">Markets are split into three tiers so labor can be scheduled against predictable recurring work first, then specialty and project jobs.</p>
+          </div>
+        </div>
+        <div class="grid g-3" id="marketCards"></div>
+      </section>
+
+      <!-- PIPELINE -->
+      <section id="pipeline" class="view">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">Section 3 · Direct B2B prospecting</p>
+            <h2 class="page-title">100-business pipeline</h2>
+            <p class="lede">Build the high-probability commercial list, then run Email → Phone → On-site visit → Custom proposal → Follow-up.</p>
+          </div>
+          <div class="toolbar">
+            <select id="pipeFilter" onchange="renderPipeline()">
+              <option value="all">All stages</option>
+              <option value="Research">Research</option>
+              <option value="Email">Email</option>
+              <option value="Phone">Phone</option>
+              <option value="Visit">On-site visit</option>
+              <option value="Proposal">Proposal</option>
+              <option value="Follow-up">Follow-up</option>
+              <option value="Won">Won</option>
+              <option value="Lost">Lost / parked</option>
+            </select>
+            <button class="btn teal" onclick="openProspect()">+ Add prospect</button>
+          </div>
+        </div>
+        <div class="grid g-4" id="pipeStats"></div>
+        <div class="card" style="margin-top:16px; overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Business</th>
+                <th>Tier / Sector</th>
+                <th>Contact</th>
+                <th>Sequence</th>
+                <th>Next action</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="pipeBody"></tbody>
+          </table>
+          <div id="pipeEmpty" class="empty hidden">No prospects yet. Add the first of the 100-business database.</div>
+        </div>
+      </section>
+
+      <!-- CLIENTS -->
+      <section id="clients" class="view">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">Live book of work</p>
+            <h2 class="page-title">Clients & contracts</h2>
+            <p class="lede">Active sites we already clean. Price is per service at the stated frequency. Monthly revenue is calculated from that.</p>
+          </div>
+          <button class="btn teal" onclick="openClient()">+ Add client</button>
+        </div>
+        <div class="grid g-4" id="clientStats"></div>
+        <div class="card" style="margin-top:16px; overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Client / site</th>
+                <th>Sector</th>
+                <th>Frequency</th>
+                <th>Price / service</th>
+                <th>Est. hours</th>
+                <th>Monthly $</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="clientBody"></tbody>
+          </table>
+          <div id="clientEmpty" class="empty hidden">No clients yet.</div>
+        </div>
+      </section>
+
+      <!-- VISITS -->
+      <section id="visits" class="view">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">Work performed</p>
+            <h2 class="page-title">Visits & quality control</h2>
+            <p class="lede">Log each clean. Hours on site × assigned staff rates = labor cost. QC is Pass / Retrain / Redo / Not inspected.</p>
+          </div>
+          <button class="btn teal" onclick="openVisit()">+ Log visit</button>
+        </div>
+        <div class="grid g-4" id="visitStats"></div>
+        <div class="card" style="margin-top:16px; overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Client</th>
+                <th>Hours on site</th>
+                <th>Crew</th>
+                <th>Labor $</th>
+                <th>Supplies</th>
+                <th>QC</th>
+                <th>Issue</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="visitBody"></tbody>
+          </table>
+          <div id="visitEmpty" class="empty hidden">No visits logged yet.</div>
+        </div>
+      </section>
+
+      <!-- STAFF -->
+      <section id="staff" class="view">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">People</p>
+            <h2 class="page-title">Staff roster</h2>
+            <p class="lede">Loaded hourly rate (wage + burden) is what visit labor cost uses. Keep this current or margins will lie.</p>
+          </div>
+          <button class="btn teal" onclick="openStaff()">+ Add staff</button>
+        </div>
+        <div class="card" style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Loaded rate / hr</th>
+                <th>Phone</th>
+                <th>Status</th>
+                <th>Notes</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="staffBody"></tbody>
+          </table>
+          <div id="staffEmpty" class="empty hidden">No staff yet. Add a crew lead first.</div>
+        </div>
+      </section>
+
+      <!-- PARTNERS -->
+      <section id="partners" class="view">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">Section 3 · Channel 2</p>
+            <h2 class="page-title">Strategic partnerships</h2>
+            <p class="lede">Referral network: real estate agents, interior designers, general contractors, A/C technicians, and handyman providers.</p>
+          </div>
+          <button class="btn teal" onclick="openPartner()">+ Add partner</button>
+        </div>
+        <div class="card" style="overflow:auto">
+          <table>
+            <thead><tr><th>Partner</th><th>Type</th><th>Status</th><th>Notes</th><th></th></tr></thead>
+            <tbody id="partnerBody"></tbody>
+          </table>
+          <div id="partnerEmpty" class="empty hidden">No partners logged yet.</div>
+        </div>
+      </section>
+
+      <!-- TIMELINE -->
+      <section id="timeline" class="view">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">Section 4 · Implementation</p>
+            <h2 class="page-title">90-day timeline & milestones</h2>
+            <p class="lede">Month 1 designs the machine. Month 2 puts it in market. Month 3 measures conversion and locks recurring contracts.</p>
+          </div>
+        </div>
+        <div class="grid g-3" id="timelineCards"></div>
+      </section>
+
+      <!-- SOPS -->
+      <section id="sops" class="view">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">Pillar 2 · Operational management</p>
+            <h2 class="page-title">SOP & quality checklists</h2>
+            <p class="lede">Working drafts toward the comprehensive SOP manual, workflow checklists, org chart, and QA system.</p>
+          </div>
+        </div>
+        <div class="grid g-2" id="sopLists"></div>
+      </section>
+
+      <!-- PRICING -->
+      <section id="pricing" class="view">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">Pillar 1 · Financial & pricing</p>
+            <h2 class="page-title">Client profitability matrix</h2>
+            <p class="lede">Estimate labor hours, bill rate, and contribution so pricing recommendations are grounded in real jobs — not guesses.</p>
+          </div>
+          <button class="btn teal" onclick="openJob()">+ Add job estimate</button>
+        </div>
+        <div class="card" style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Client / job</th><th>Type</th><th>Hours</th><th>Labor $</th><th>Price</th><th>Margin</th><th>Recurring?</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="jobBody"></tbody>
+          </table>
+          <div id="jobEmpty" class="empty hidden">No estimates yet. Add a current or target client to see contribution.</div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <h3>Pricing notes from the proposal</h3>
+          <ul class="clean">
+            <li>Prioritize weekly commercial and property-management contracts — they stabilize crew schedules.</li>
+            <li>Villa / vacation turnovers should include photo-verified inspection as a priced standard, not a free extra.</li>
+            <li>Kitchen extraction, floor care, and medical-grade cleans carry specialty premiums.</li>
+            <li>Project work (post-construction, move-in/out, events) is for cash injection and spare capacity — price for margin, not occupancy.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- OVERHEAD -->
+      <section id="overhead" class="view">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">Fixed costs</p>
+            <h2 class="page-title">Overhead & break-even</h2>
+            <p class="lede">Monthly fixed costs only. Per-job supplies stay on the visit. Break-even compares recurring contribution to this overhead.</p>
+          </div>
+        </div>
+        <div class="grid g-2">
+          <div class="card">
+            <h3>Monthly fixed costs (BBD)</h3>
+            <div class="form-row cols-2">
+              <div><label class="field">Rent</label><input type="number" min="0" step="0.01" id="ohRent" onchange="saveOverhead()" /></div>
+              <div><label class="field">Insurance</label><input type="number" min="0" step="0.01" id="ohInsurance" onchange="saveOverhead()" /></div>
+            </div>
+            <div class="form-row cols-2">
+              <div><label class="field">Vehicle</label><input type="number" min="0" step="0.01" id="ohVehicle" onchange="saveOverhead()" /></div>
+              <div><label class="field">Supplies (stock / bulk)</label><input type="number" min="0" step="0.01" id="ohSupplies" onchange="saveOverhead()" /></div>
+            </div>
+            <div class="form-row cols-2">
+              <div><label class="field">Admin</label><input type="number" min="0" step="0.01" id="ohAdmin" onchange="saveOverhead()" /></div>
+              <div><label class="field">Other</label><input type="number" min="0" step="0.01" id="ohOther" onchange="saveOverhead()" /></div>
+            </div>
+          </div>
+          <div class="card" id="breakevenCard"></div>
+        </div>
+      </section>
+
+      <!-- DIGITAL -->
+      <section id="digital" class="view">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">Pillar 4 · Digital visibility</p>
+            <h2 class="page-title">Search, directories & LinkedIn</h2>
+            <p class="lede">Capture intent-based local searches for commercial, villa, and specialty cleaning, and put Laniya in front of office, facilities, and property managers.</p>
+          </div>
+        </div>
+        <div class="grid g-2" id="digitalLists"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Prospect modal -->
+  <div class="modal-back" id="prospectModal">
+    <div class="modal">
+      <h3 id="prospectTitle">Add prospect</h3>
+      <input type="hidden" id="pId" />
+      <div class="form-row cols-2">
+        <div><label class="field">Business name</label><input id="pName" type="text" /></div>
+        <div><label class="field">Sector</label>
+          <select id="pSector">
+            <option>Commercial office</option>
+            <option>Property management</option>
+            <option>Villa / vacation rental</option>
+            <option>Boutique hospitality</option>
+            <option>Restaurant / café</option>
+            <option>Medical / clinic</option>
+            <option>Retail / showroom</option>
+            <option>Project / other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row cols-3">
+        <div><label class="field">Tier</label>
+          <select id="pTier"><option>1</option><option>2</option><option>3</option></select>
+        </div>
+        <div><label class="field">Stage</label>
+          <select id="pStage">
+            <option>Research</option><option>Email</option><option>Phone</option>
+            <option>Visit</option><option>Proposal</option><option>Follow-up</option>
+            <option>Won</option><option>Lost</option>
+          </select>
+        </div>
+        <div><label class="field">Decision-maker role</label><input id="pRole" type="text" placeholder="Office / Facilities / Property Manager" /></div>
+      </div>
+      <div class="form-row cols-2">
+        <div><label class="field">Contact name</label><input id="pContact" type="text" /></div>
+        <div><label class="field">Phone / email</label><input id="pReach" type="text" /></div>
+      </div>
+      <div class="form-row">
+        <div><label class="field">Next action</label><input id="pNext" type="text" placeholder="Send intro email by Friday" /></div>
+      </div>
+      <div class="form-row">
+        <div><label class="field">Notes</label><textarea id="pNotes"></textarea></div>
+      </div>
+      <div class="toolbar" style="justify-content:flex-end">
+        <button class="btn ghost" onclick="closeModal('prospectModal')">Cancel</button>
+        <button class="btn teal" onclick="saveProspect()">Save prospect</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Partner modal -->
+  <div class="modal-back" id="partnerModal">
+    <div class="modal">
+      <h3>Add partner</h3>
+      <input type="hidden" id="rId" />
+      <div class="form-row cols-2">
+        <div><label class="field">Name / company</label><input id="rName" type="text" /></div>
+        <div><label class="field">Type</label>
+          <select id="rType">
+            <option>Real estate agent</option>
+            <option>Interior designer</option>
+            <option>General contractor</option>
+            <option>A/C technician</option>
+            <option>Handyman</option>
+            <option>Concierge / villa manager</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row cols-2">
+        <div><label class="field">Status</label>
+          <select id="rStatus"><option>To approach</option><option>Intro sent</option><option>Meeting booked</option><option>Active referral</option></select>
+        </div>
+        <div><label class="field">Reach</label><input id="rReach" type="text" /></div>
+      </div>
+      <div class="form-row"><div><label class="field">Notes</label><textarea id="rNotes"></textarea></div></div>
+      <div class="toolbar" style="justify-content:flex-end">
+        <button class="btn ghost" onclick="closeModal('partnerModal')">Cancel</button>
+        <button class="btn teal" onclick="savePartner()">Save partner</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client modal -->
+  <div class="modal-back" id="clientModal">
+    <div class="modal">
+      <h3 id="clientTitle">Add client</h3>
+      <input type="hidden" id="cId" />
+      <div class="form-row cols-2">
+        <div><label class="field">Client name</label><input id="cName" type="text" /></div>
+        <div><label class="field">Property / site</label><input id="cProperty" type="text" placeholder="3rd Floor, Harbour Place" /></div>
+      </div>
+      <div class="form-row cols-3">
+        <div><label class="field">Sector</label>
+          <select id="cSector">
+            <option>Commercial office</option>
+            <option>Property management</option>
+            <option>Villa / vacation rental</option>
+            <option>Boutique hospitality</option>
+            <option>Restaurant / café</option>
+            <option>Medical / clinic</option>
+            <option>Retail / showroom</option>
+            <option>Project / other</option>
+          </select>
+        </div>
+        <div><label class="field">Frequency</label>
+          <select id="cFreq">
+            <option>Weekly</option>
+            <option>Bi-weekly</option>
+            <option>Monthly</option>
+            <option>Quarterly</option>
+            <option>Yearly</option>
+            <option>One-off</option>
+          </select>
+        </div>
+        <div><label class="field">Status</label>
+          <select id="cStatus"><option>Active</option><option>Paused</option><option>Ended</option></select>
+        </div>
+      </div>
+      <div class="form-row cols-3">
+        <div><label class="field">Contract start</label><input id="cStart" type="date" /></div>
+        <div><label class="field">Price / service (BBD)</label><input id="cPrice" type="number" min="0" step="0.01" /></div>
+        <div><label class="field">Est. hours / service</label><input id="cHours" type="number" min="0" step="0.5" /></div>
+      </div>
+      <div class="form-row cols-3">
+        <div><label class="field">Contact</label><input id="cContact" type="text" /></div>
+        <div><label class="field">Phone</label><input id="cPhone" type="text" /></div>
+        <div><label class="field">Email</label><input id="cEmail" type="text" /></div>
+      </div>
+      <div class="form-row"><div><label class="field">Notes</label><textarea id="cNotes"></textarea></div></div>
+      <div class="toolbar" style="justify-content:flex-end">
+        <button class="btn ghost" onclick="closeModal('clientModal')">Cancel</button>
+        <button class="btn teal" onclick="saveClient()">Save client</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visit modal -->
+  <div class="modal-back" id="visitModal">
+    <div class="modal">
+      <h3 id="visitTitle">Log visit</h3>
+      <input type="hidden" id="vId" />
+      <div class="form-row cols-2">
+        <div><label class="field">Client</label><select id="vClient"></select></div>
+        <div><label class="field">Date</label><input id="vDate" type="date" /></div>
+      </div>
+      <div class="form-row cols-2">
+        <div><label class="field">Hours on site</label><input id="vHours" type="number" min="0" step="0.25" /></div>
+        <div><label class="field">Supplies cost (this visit)</label><input id="vSupplies" type="number" min="0" step="0.01" value="0" /></div>
+      </div>
+      <div class="form-row">
+        <div><label class="field">Crew on this visit</label><div id="vCrew" class="note"></div></div>
+      </div>
+      <div class="form-row cols-2">
+        <div><label class="field">QC score</label>
+          <select id="vQc">
+            <option>Pass</option>
+            <option>Retrain</option>
+            <option>Redo</option>
+            <option>Not inspected</option>
+          </select>
+        </div>
+        <div><label class="field">Issue / complaint</label><input id="vIssue" type="text" /></div>
+      </div>
+      <div class="form-row"><div><label class="field">QC notes</label><textarea id="vQcNotes"></textarea></div></div>
+      <div class="toolbar" style="justify-content:flex-end">
+        <button class="btn ghost" onclick="closeModal('visitModal')">Cancel</button>
+        <button class="btn teal" onclick="saveVisit()">Save visit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Staff modal -->
+  <div class="modal-back" id="staffModal">
+    <div class="modal">
+      <h3 id="staffTitle">Add staff</h3>
+      <input type="hidden" id="sId" />
+      <div class="form-row cols-2">
+        <div><label class="field">Name</label><input id="sName" type="text" /></div>
+        <div><label class="field">Role</label>
+          <select id="sRole">
+            <option>Crew lead</option>
+            <option>Cleaner</option>
+            <option>Supervisor</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row cols-3">
+        <div><label class="field">Loaded rate / hr (BBD)</label><input id="sRate" type="number" min="0" step="0.01" /></div>
+        <div><label class="field">Phone</label><input id="sPhone" type="text" /></div>
+        <div><label class="field">Status</label>
+          <select id="sStatus"><option>Active</option><option>On leave</option><option>Left</option></select>
+        </div>
+      </div>
+      <div class="form-row"><div><label class="field">Notes</label><textarea id="sNotes"></textarea></div></div>
+      <div class="toolbar" style="justify-content:flex-end">
+        <button class="btn ghost" onclick="closeModal('staffModal')">Cancel</button>
+        <button class="btn teal" onclick="saveStaffMember()">Save staff</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Job modal -->
+  <div class="modal-back" id="jobModal">
+    <div class="modal">
+      <h3>Job estimate</h3>
+      <input type="hidden" id="jId" />
+      <div class="form-row cols-2">
+        <div><label class="field">Client / job name</label><input id="jName" type="text" /></div>
+        <div><label class="field">Type</label>
+          <select id="jType">
+            <option>Weekly commercial</option>
+            <option>Property portfolio</option>
+            <option>Villa turnover</option>
+            <option>Hospitality routine</option>
+            <option>Kitchen deep clean</option>
+            <option>Clinic / medical</option>
+            <option>Post-construction</option>
+            <option>Move-in / move-out</option>
+            <option>Other project</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row cols-3">
+        <div><label class="field">Crew hours</label><input id="jHours" type="number" step="0.5" min="0" /></div>
+        <div><label class="field">Loaded labor rate / hr</label><input id="jRate" type="number" step="0.01" min="0" /></div>
+        <div><label class="field">Quoted price</label><input id="jPrice" type="number" step="0.01" min="0" /></div>
+      </div>
+      <div class="form-row cols-2">
+        <div><label class="field">Supplies / other cost</label><input id="jCost" type="number" step="0.01" min="0" value="0" /></div>
+        <div><label class="field">Recurring?</label>
+          <select id="jRec"><option>Yes — weekly</option><option>Yes — monthly</option><option>Periodic</option><option>One-off</option></select>
+        </div>
+      </div>
+      <div class="toolbar" style="justify-content:flex-end">
+        <button class="btn ghost" onclick="closeModal('jobModal')">Cancel</button>
+        <button class="btn teal" onclick="saveJob()">Save estimate</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+const KEY = "laniya-ops-hub-v2";
+const FREQ_MONTH = { Weekly: 4.33, "Bi-weekly": 2.17, Monthly: 1, Quarterly: 1/3, Yearly: 1/12, "One-off": 0 };
+
+const DEFAULT = {
+  prospects: [
+    { id: "p1", name: "Harbour Law Chambers", sector: "Commercial office", tier: "1", stage: "Email", role: "Office Manager", contact: "", reach: "", next: "Send 5-touch intro email", notes: "Tier 1 weekly office clean target." },
+    { id: "p2", name: "Coastal Property Group", sector: "Property management", tier: "1", stage: "Research", role: "Property Manager", contact: "", reach: "", next: "Map portfolio size", notes: "Aim for 10+ units per agreement." },
+    { id: "p3", name: "Palm Villa Concierge", sector: "Villa / vacation rental", tier: "1", stage: "Phone", role: "Villa Manager", contact: "", reach: "", next: "Book walkthrough of turnover SOP", notes: "Photo-verified inspection is the differentiator." }
+  ],
+  partners: [
+    { id: "r1", name: "", type: "Real estate agent", status: "To approach", reach: "", notes: "Seed list: agents handling furnished rentals and sales turnovers." }
+  ],
+  jobs: [],
+  checks: {},
+  clients: [
+    {
+      id: "c1",
+      name: "Harbour Law Chambers",
+      property: "3rd Floor, Harbour Place",
+      sector: "Commercial office",
+      frequency: "Weekly",
+      status: "Active",
+      contractStart: "2026-09-01",
+      contact: "Andrea Best",
+      phone: "",
+      email: "",
+      price: 480,
+      estHours: 6,
+      notes: ""
+    }
+  ],
+  visits: [
+    {
+      id: "v1",
+      clientId: "c1",
+      date: "2026-09-05",
+      hoursActual: 6.5,
+      suppliesCost: 12,
+      crewIds: ["s1", "s2"],
+      qcScore: "Pass",
+      qcNotes: "",
+      issue: ""
+    }
+  ],
+  staff: [
+    { id: "s1", name: "Crew lead (set name)", role: "Crew lead", payRate: 0, phone: "", status: "Active", notes: "Edit and enter loaded hourly rate." },
+    { id: "s2", name: "Cleaner (set name)", role: "Cleaner", payRate: 0, phone: "", status: "Active", notes: "" }
+  ],
+  overhead: { rent: 0, insurance: 0, vehicle: 0, supplies: 0, admin: 0, other: 0 }
+};
+
+const PILLARS = [
+  {
+    id: "fin",
+    title: "1. Financial & Pricing",
+    focus: "Profitability analysis, labor structure, and pricing models.",
+    items: [
+      "Build client-by-client profitability matrix",
+      "Capture loaded labor rate (wage + burden + travel)",
+      "Draft refined pricing recommendations by tier",
+      "Identify underpriced recurring contracts",
+      "Cost-structure optimization notes written"
+    ]
+  },
+  {
+    id: "ops",
+    title: "2. Operational Management",
+    focus: "Internal workflows, SOPs, and quality control.",
+    items: [
+      "Draft comprehensive SOP manual outline",
+      "Villa turnover + photo-verification checklist",
+      "Commercial weekly service checklist",
+      "Kitchen / extraction deep-clean checklist",
+      "Clinic hygiene & discretion protocol",
+      "Quality-assurance inspection form",
+      "Simple organizational chart (who owns what)"
+    ]
+  },
+  {
+    id: "growth",
+    title: "3. Growth & Pipeline",
+    focus: "Target positioning, lead tracking, and direct sales.",
+    items: [
+      "Write Ideal Client Profile (ICP) one-pager",
+      "Stand up 100-business prospecting database",
+      "Define 5-step outreach sequence templates",
+      "Set lead-tracking cadence (weekly pipeline review)",
+      "Automated follow-up reminders in use"
+    ]
+  },
+  {
+    id: "dig",
+    title: "4. Digital Visibility",
+    focus: "Online presence, content, and local channels.",
+    items: [
+      "Google Business Profile fully optimized",
+      "Service pages / website assets for commercial, villa, specialty",
+      "Content calendar deployed (Month 2)",
+      "LinkedIn outreach to Office / Facilities / Property Managers",
+      "Key local directory placements live"
+    ]
+  }
+];
+
+const MARKETS = [
+  {
+    tier: "Tier 1",
+    cls: "t1",
+    name: "High-priority recurring contracts",
+    tag: "Core revenue engine",
+    intro: "High-volume recurring work that establishes cash flow and stabilizes team scheduling.",
+    segs: [
+      { t: "Commercial offices", d: "Law firms, accounting practices, real estate agencies, financial firms, creative agencies, coworking spaces.", v: "Predictable weekly schedule and reliable cash flow." },
+      { t: "Property management companies", d: "B2B relationships with managers handling multiple residential and commercial units.", v: "One point of contact to secure 10+ properties per agreement." },
+      { t: "Villas & vacation rentals", d: "Luxury vacation rentals, concierge firms, villa managers.", v: "Guest turnovers, deep cleans, linen management, photo-verified inspections." },
+      { t: "Boutique hospitality", d: "Small hotels, guesthouses, apart-hotels.", v: "Public-area upkeep, back-of-house hygiene, routine room maintenance." }
+    ]
+  },
+  {
+    tier: "Tier 2",
+    cls: "t2",
+    name: "High-value specialty & periodic cleans",
+    tag: "Premium standards",
+    intro: "Specialized recurring and periodic deep-cleaning for clients with rigorous standards.",
+    segs: [
+      { t: "Restaurants & cafés", d: "Monthly or quarterly kitchen deep cleans, extraction areas, dining-room floors, upholstery.", v: "Specialty equipment + after-hours capability." },
+      { t: "Medical & professional clinics", d: "Dental, medical, veterinary, wellness spas.", v: "Strict hygiene and absolute discretion." },
+      { t: "Retail & showrooms", d: "Car dealerships, furniture stores, luxury boutiques, fitness centers.", v: "High-visibility cleanliness that protects the brand floor." }
+    ]
+  },
+  {
+    tier: "Tier 3",
+    cls: "t3",
+    name: "Cash-injection & project work",
+    tag: "Fill spare capacity",
+    intro: "On-demand specialized services to capture immediate margin and use excess crew time.",
+    segs: [
+      { t: "Carpet & upholstery deep cleaning", d: "Residential or commercial project jobs.", v: "Price for margin, not occupancy." },
+      { t: "Post-construction / renovation", d: "Builders and property owners after works.", v: "Pair with contractor referral partners." },
+      { t: "Move-in / move-out tenancy", d: "Landlords, agents, tenants.", v: "Natural feed from real-estate partners." },
+      { t: "Pre-season, post-event, floors & glass", d: "Property prep, event strike, stripping/polishing, glass.", v: "Calendar these into quiet midweek slots." }
+    ]
+  }
+];
+
+const MONTHS = [
+  {
+    id: "m1",
+    title: "Month 1",
+    focus: "Operational audit & system design",
+    items: [
+      "Profitability assessment of current work",
+      "Draft SOP manual + workflow checklists",
+      "Create the 100-business prospecting database",
+      "Write ICP and value propositions by tier",
+      "Set loaded labor rate and draft price sheet"
+    ]
+  },
+  {
+    id: "m2",
+    title: "Month 2",
+    focus: "Outreach execution & digital launch",
+    items: [
+      "Run direct outreach campaigns (5-step sequence)",
+      "Optimize Google Business Profile + directories",
+      "Deploy content calendar",
+      "Hold initial partnership meetings",
+      "Start LinkedIn touches with decision-makers"
+    ]
+  },
+  {
+    id: "m3",
+    title: "Month 3",
+    focus: "Review, conversion & lock-in",
+    items: [
+      "Review acquisition conversion rates",
+      "Finalize staff quality-control systems",
+      "Make pricing adjustments from live jobs",
+      "Install recurring-contract management",
+      "Decide which tiers to double-down on next quarter"
+    ]
+  }
+];
+
+const SOP_GROUPS = [
+  {
+    id: "sop-gen",
+    title: "Company operating rhythm",
+    items: [
+      "Weekly pipeline review (30 min)",
+      "Daily crew assignment posted the night before",
+      "Supplies inventory check each Sunday",
+      "Incident / complaint logged same day",
+      "Client photo or sign-off stored after specialty jobs"
+    ]
+  },
+  {
+    id: "sop-villa",
+    title: "Villa / vacation turnover",
+    items: [
+      "Entry photos before work begins",
+      "Linen change and bed presentation standard",
+      "Kitchen, baths, floors, glass to spec",
+      "Consumables reset list completed",
+      "Photo-verified inspection sent to manager",
+      "Issue log (maintenance / missing items) sent separately"
+    ]
+  },
+  {
+    id: "sop-office",
+    title: "Commercial weekly service",
+    items: [
+      "Trash / recycling",
+      "Desks, shared surfaces, reception",
+      "Kitchens and break rooms",
+      "Restrooms to restroom SOP",
+      "Floors vacuumed / mopped per floor type",
+      "Exception notes left for office manager"
+    ]
+  },
+  {
+    id: "sop-qa",
+    title: "Quality assurance",
+    items: [
+      "Random inspection on 1 job per crew per week",
+      "Score against checklist (pass / retrain / redo)",
+      "Client pulse check after first 3 visits of a new contract",
+      "Retraining logged when a miss repeats"
+    ]
+  }
+];
+
+const DIGITAL = [
+  {
+    id: "gbp",
+    title: "Google Business Profile & SEO",
+    items: [
+      "Categories: commercial cleaning + house cleaning + carpet cleaning as relevant",
+      "Services listed for offices, villas, kitchens, clinics, post-construction",
+      "Weekly photo uploads (before/after, team, branded van if any)",
+      "Ask every happy commercial client for a Google review",
+      "Website / landing copy matches search intent: commercial, villa, specialty"
+    ]
+  },
+  {
+    id: "li",
+    title: "LinkedIn B2B outreach",
+    items: [
+      "List 30 Office Managers, Facilities Managers, Property Managers",
+      "Connection note is specific to their property type — no generic pitch",
+      "Follow-up with one-pager of Tier 1 value props",
+      "Post one proof-of-work update every two weeks"
+    ]
+  },
+  {
+    id: "dir",
+    title: "Directories & partnerships online",
+    items: [
+      "Priority local directories identified and claimed",
+      "Consistent NAP (name, address, phone) everywhere",
+      "Partner one-pager PDF ready to send after a meeting"
+    ]
+  },
+  {
+    id: "content",
+    title: "Content calendar (Month 2 deploy)",
+    items: [
+      "Week 1: villa turnover / photo-verified inspection story",
+      "Week 2: office manager checklist (what good weekly service looks like)",
+      "Week 3: kitchen extraction / restaurant deep clean",
+      "Week 4: property manager — 10+ units, one invoice"
+    ]
+  }
+];
+
+const STAGES = ["Research","Email","Phone","Visit","Proposal","Follow-up","Won","Lost"];
+const SEQ = ["Email","Phone","Visit","Proposal","Follow-up"];
+
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY) || localStorage.getItem("laniya-ops-hub-v1");
+    if (!raw) return structuredClone(DEFAULT);
+    const parsed = JSON.parse(raw);
+    const base = structuredClone(DEFAULT);
+    return {
+      ...base,
+      ...parsed,
+      clients: parsed.clients || base.clients,
+      visits: parsed.visits || base.visits,
+      staff: parsed.staff || base.staff,
+      overhead: { ...base.overhead, ...(parsed.overhead || {}) },
+      prospects: parsed.prospects || base.prospects,
+      partners: parsed.partners || base.partners,
+      jobs: parsed.jobs || [],
+      checks: parsed.checks || {}
+    };
+  } catch { return structuredClone(DEFAULT); }
+}
+function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+let state = load();
+
+function uid(prefix) { return prefix + Math.random().toString(36).slice(2, 8); }
+function showView(id) {
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("active", b.dataset.view === id));
+  document.getElementById(id).classList.add("active");
+}
+document.querySelectorAll("nav button").forEach(b => b.addEventListener("click", () => showView(b.dataset.view)));
+
+function checked(group, i) { return !!state.checks[group + ":" + i]; }
+function toggleCheck(group, i) {
+  const k = group + ":" + i;
+  state.checks[k] = !state.checks[k];
+  save(); renderAll();
+}
+function pct(group, items) {
+  if (!items.length) return 0;
+  const n = items.filter((_, i) => checked(group, i)).length;
+  return Math.round((n / items.length) * 100);
+}
+
+function monthlyPrice(c) { return (Number(c.price)||0) * (FREQ_MONTH[c.frequency] || 0); }
+function clientById(id) { return (state.clients || []).find(c => c.id === id); }
+function staffById(id) { return (state.staff || []).find(s => s.id === id); }
+function visitLabor(v) {
+  const rates = (v.crewIds || []).map(id => Number((staffById(id) || {}).payRate) || 0);
+  const sumRates = rates.reduce((a,b) => a+b, 0);
+  return (Number(v.hoursActual)||0) * sumRates;
+}
+function overheadTotal() {
+  const o = state.overhead || {};
+  return ["rent","insurance","vehicle","supplies","admin","other"].reduce((a,k) => a + (Number(o[k])||0), 0);
+}
+
+function renderOverview() {
+  const won = state.prospects.filter(p => p.stage === "Won").length;
+  const activeP = state.prospects.filter(p => !["Won","Lost"].includes(p.stage)).length;
+  const activeC = (state.clients || []).filter(c => c.status === "Active");
+  const mRev = activeC.reduce((a,c) => a + monthlyPrice(c), 0);
+  document.getElementById("overviewStats").innerHTML = [
+    { l: "Active clients", v: activeC.length, s: money(mRev) + " / month booked" },
+    { l: "Prospects in play", v: activeP, s: state.prospects.length + " in database" },
+    { l: "Visits logged", v: (state.visits||[]).length, s: "actual cleans + QC" },
+    { l: "Contracts won (pipeline)", v: won, s: "from this 90-day push" }
+  ].map(c => `<div class="card"><div class="note">${c.l}</div><div class="stat">${c.v}</div><div class="note">${c.s}</div></div>`).join("");
+
+  const focusBits = [];
+  MONTHS.forEach(m => {
+    const open = m.items.map((t,i) => ({t,i})).filter(x => !checked(m.id, x.i));
+    if (open[0]) focusBits.push(`<div class="check-item"><div><strong>${m.title}:</strong> ${open[0].t}<div class="meta">${m.focus}</div></div></div>`);
+  });
+  document.getElementById("weekFocus").innerHTML = focusBits.slice(0,3).join("") || "<p class='note'>All timeline items complete.</p>";
+
+  const rows = state.prospects.slice(0, 6).map(p => `<tr>
+    <td><strong>${esc(p.name)}</strong></td>
+    <td>T${p.tier} · ${esc(p.sector)}</td>
+    <td><span class="pill">${esc(p.stage)}</span></td>
+    <td>${esc(p.next || "—")}</td>
+  </tr>`).join("");
+  document.getElementById("overviewPipe").innerHTML = rows || `<tr><td colspan="4" class="note">No prospects yet.</td></tr>`;
+}
+
+function renderPillars() {
+  document.getElementById("pillarCards").innerHTML = PILLARS.map(p => {
+    const pr = pct(p.id, p.items);
+    return `<div class="card">
+      <div class="split"><h3>${p.title}</h3><span class="pill">${pr}%</span></div>
+      <p class="note">${p.focus}</p>
+      <div class="progress"><span style="width:${pr}%"></span></div>
+      ${p.items.map((t,i) => itemRow(p.id, i, t)).join("")}
+    </div>`;
+  }).join("");
+}
+
+function itemRow(group, i, text) {
+  return `<div class="check-item">
+    <input type="checkbox" ${checked(group,i)?"checked":""} onchange="toggleCheck('${group}',${i})" />
+    <label>${esc(text)}</label>
+  </div>`;
+}
+
+function renderMarkets() {
+  document.getElementById("marketCards").innerHTML = MARKETS.map(m => `
+    <div class="card tier ${m.cls}">
+      <span class="pill ${m.cls==="t2"?"gold": m.cls==="t3"?"muted":""}">${m.tier} · ${m.tag}</span>
+      <h3 style="margin-top:10px">${m.name}</h3>
+      <p class="note">${m.intro}</p>
+      ${m.segs.map(s => `<div style="margin-top:14px">
+        <strong>${s.t}</strong>
+        <div class="note">${s.d}</div>
+        <div class="vp"><strong>Value prop:</strong> ${s.v}</div>
+      </div>`).join("")}
+    </div>`).join("");
+}
+
+function renderPipeline() {
+  const filter = document.getElementById("pipeFilter").value;
+  const list = state.prospects.filter(p => filter === "all" || p.stage === filter);
+  const counts = {};
+  STAGES.forEach(s => counts[s] = state.prospects.filter(p => p.stage === s).length);
+  document.getElementById("pipeStats").innerHTML = [
+    { l: "Database size", v: state.prospects.length, s: "target 100" },
+    { l: "In sequence", v: state.prospects.filter(p => SEQ.includes(p.stage)).length, s: "email → follow-up" },
+    { l: "Won", v: counts.Won || 0, s: "recurring preferred" },
+    { l: "Needs next action", v: state.prospects.filter(p => p.next && !["Won","Lost"].includes(p.stage)).length, s: "named follow-up" }
+  ].map(c => `<div class="card"><div class="note">${c.l}</div><div class="stat">${c.v}</div><div class="note">${c.s}</div></div>`).join("");
+
+  document.getElementById("pipeEmpty").classList.toggle("hidden", list.length > 0);
+  document.getElementById("pipeBody").innerHTML = list.map(p => {
+    const seq = SEQ.map(s => {
+      const idx = SEQ.indexOf(s);
+      const cur = SEQ.indexOf(p.stage);
+      const cls = p.stage === "Won" || cur > idx ? "done" : p.stage === s ? "now" : "";
+      return `<span class="${cls}">${s}</span>`;
+    }).join("");
+    return `<tr>
+      <td><strong>${esc(p.name)}</strong><div class="meta">${esc(p.role || "")}</div></td>
+      <td>T${esc(p.tier)} · ${esc(p.sector)}</td>
+      <td>${esc(p.contact || "—")}<div class="meta">${esc(p.reach || "")}</div></td>
+      <td><div class="seq">${seq}</div></td>
+      <td>${esc(p.next || "—")}</td>
+      <td style="white-space:nowrap">
+        <button class="btn ghost small" onclick="openProspect('${p.id}')">Edit</button>
+        <button class="btn ghost small" onclick="deleteProspect('${p.id}')">✕</button>
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+function openProspect(id) {
+  const p = state.prospects.find(x => x.id === id) || { id: "", name:"", sector:"Commercial office", tier:"1", stage:"Research", role:"", contact:"", reach:"", next:"", notes:"" };
+  pId.value = p.id; pName.value = p.name; pSector.value = p.sector; pTier.value = p.tier;
+  pStage.value = p.stage; pRole.value = p.role || ""; pContact.value = p.contact || "";
+  pReach.value = p.reach || ""; pNext.value = p.next || ""; pNotes.value = p.notes || "";
+  document.getElementById("prospectTitle").textContent = p.id ? "Edit prospect" : "Add prospect";
+  document.getElementById("prospectModal").classList.add("open");
+}
+function saveProspect() {
+  const rec = {
+    id: pId.value || uid("p"),
+    name: pName.value.trim() || "Untitled",
+    sector: pSector.value, tier: pTier.value, stage: pStage.value,
+    role: pRole.value.trim(), contact: pContact.value.trim(),
+    reach: pReach.value.trim(), next: pNext.value.trim(), notes: pNotes.value.trim()
+  };
+  const i = state.prospects.findIndex(x => x.id === rec.id);
+  if (i >= 0) state.prospects[i] = rec; else state.prospects.unshift(rec);
+  save(); closeModal("prospectModal"); renderAll();
+}
+function deleteProspect(id) {
+  if (!confirm("Remove this prospect?")) return;
+  state.prospects = state.prospects.filter(p => p.id !== id);
+  save(); renderAll();
+}
+
+function renderPartners() {
+  const rows = state.partners.filter(p => p.name);
+  document.getElementById("partnerEmpty").classList.toggle("hidden", rows.length > 0);
+  document.getElementById("partnerBody").innerHTML = rows.map(p => `<tr>
+    <td><strong>${esc(p.name)}</strong><div class="meta">${esc(p.reach || "")}</div></td>
+    <td>${esc(p.type)}</td>
+    <td><span class="pill">${esc(p.status)}</span></td>
+    <td>${esc(p.notes || "")}</td>
+    <td><button class="btn ghost small" onclick="openPartner('${p.id}')">Edit</button>
+        <button class="btn ghost small" onclick="deletePartner('${p.id}')">✕</button></td>
+  </tr>`).join("");
+}
+function openPartner(id) {
+  const p = state.partners.find(x => x.id === id) || { id:"", name:"", type:"Real estate agent", status:"To approach", reach:"", notes:"" };
+  rId.value = p.id; rName.value = p.name; rType.value = p.type; rStatus.value = p.status;
+  rReach.value = p.reach || ""; rNotes.value = p.notes || "";
+  document.getElementById("partnerModal").classList.add("open");
+}
+function savePartner() {
+  const rec = { id: rId.value || uid("r"), name: rName.value.trim(), type: rType.value, status: rStatus.value, reach: rReach.value.trim(), notes: rNotes.value.trim() };
+  const i = state.partners.findIndex(x => x.id === rec.id);
+  if (i >= 0) state.partners[i] = rec; else state.partners.unshift(rec);
+  save(); closeModal("partnerModal"); renderAll();
+}
+function deletePartner(id) {
+  state.partners = state.partners.filter(p => p.id !== id);
+  save(); renderAll();
+}
+
+function renderTimeline() {
+  document.getElementById("timelineCards").innerHTML = MONTHS.map(m => {
+    const pr = pct(m.id, m.items);
+    return `<div class="card">
+      <span class="pill navy">${m.title}</span>
+      <h3 style="margin-top:10px">${m.focus}</h3>
+      <div class="progress"><span style="width:${pr}%"></span></div>
+      <div class="note" style="margin:8px 0 4px">${pr}% of milestones</div>
+      ${m.items.map((t,i) => itemRow(m.id, i, t)).join("")}
+    </div>`;
+  }).join("");
+}
+
+function renderSops() {
+  document.getElementById("sopLists").innerHTML = SOP_GROUPS.map(g => `
+    <div class="card">
+      <div class="split"><h3>${g.title}</h3><span class="pill">${pct(g.id, g.items)}%</span></div>
+      ${g.items.map((t,i) => itemRow(g.id, i, t)).join("")}
+    </div>`).join("");
+}
+
+function renderDigital() {
+  document.getElementById("digitalLists").innerHTML = DIGITAL.map(g => `
+    <div class="card">
+      <div class="split"><h3>${g.title}</h3><span class="pill">${pct(g.id, g.items)}%</span></div>
+      ${g.items.map((t,i) => itemRow(g.id, i, t)).join("")}
+    </div>`).join("");
+}
+
+function renderJobs() {
+  document.getElementById("jobEmpty").classList.toggle("hidden", state.jobs.length > 0);
+  document.getElementById("jobBody").innerHTML = state.jobs.map(j => {
+    const labor = (Number(j.hours)||0) * (Number(j.rate)||0);
+    const cost = labor + (Number(j.cost)||0);
+    const price = Number(j.price)||0;
+    const margin = price ? Math.round(((price - cost) / price) * 100) : 0;
+    const pill = margin >= 40 ? "pill" : margin >= 25 ? "pill warn" : "pill danger";
+    return `<tr>
+      <td><strong>${esc(j.name)}</strong></td>
+      <td>${esc(j.type)}</td>
+      <td>${j.hours || 0}</td>
+      <td>${money(labor)}</td>
+      <td>${money(price)}</td>
+      <td><span class="${pill}">${margin}%</span></td>
+      <td>${esc(j.rec)}</td>
+      <td><button class="btn ghost small" onclick="openJob('${j.id}')">Edit</button>
+          <button class="btn ghost small" onclick="deleteJob('${j.id}')">✕</button></td>
+    </tr>`;
+  }).join("");
+}
+function money(n) { return (Number(n)||0).toLocaleString(undefined, { style:"currency", currency:"BBD" }); }
+function openJob(id) {
+  const j = state.jobs.find(x => x.id === id) || { id:"", name:"", type:"Weekly commercial", hours:"", rate:"", price:"", cost:"0", rec:"Yes — weekly" };
+  jId.value = j.id; jName.value = j.name; jType.value = j.type; jHours.value = j.hours;
+  jRate.value = j.rate; jPrice.value = j.price; jCost.value = j.cost; jRec.value = j.rec;
+  document.getElementById("jobModal").classList.add("open");
+}
+function saveJob() {
+  const rec = { id: jId.value || uid("j"), name: jName.value.trim() || "Untitled job", type: jType.value,
+    hours: jHours.value, rate: jRate.value, price: jPrice.value, cost: jCost.value, rec: jRec.value };
+  const i = state.jobs.findIndex(x => x.id === rec.id);
+  if (i >= 0) state.jobs[i] = rec; else state.jobs.unshift(rec);
+  save(); closeModal("jobModal"); renderAll();
+}
+function deleteJob(id) { state.jobs = state.jobs.filter(j => j.id !== id); save(); renderAll(); }
+
+function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+document.querySelectorAll(".modal-back").forEach(el => el.addEventListener("click", e => { if (e.target === el) el.classList.remove("open"); }));
+
+function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "laniya-ops-hub.json";
+  a.click();
+}
+document.getElementById("importFile").addEventListener("change", e => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try { state = { ...structuredClone(DEFAULT), ...JSON.parse(reader.result) }; save(); renderAll(); }
+    catch { alert("Could not read that file."); }
+  };
+  reader.readAsText(file);
+});
+
+function renderClients() {
+  const list = state.clients || [];
+  const active = list.filter(c => c.status === "Active");
+  const mRev = active.reduce((a,c) => a + monthlyPrice(c), 0);
+  const mHours = active.reduce((a,c) => a + (Number(c.estHours)||0) * (FREQ_MONTH[c.frequency]||0), 0);
+  document.getElementById("clientStats").innerHTML = [
+    { l: "Active contracts", v: active.length, s: list.length + " total" },
+    { l: "Booked monthly revenue", v: money(mRev), s: "from frequency × price" },
+    { l: "Booked monthly hours", v: mHours.toFixed(1), s: "estimated crew hours" },
+    { l: "Avg price / service", v: money(active.length ? active.reduce((a,c)=>a+(Number(c.price)||0),0)/active.length : 0), s: "active book" }
+  ].map(c => `<div class="card"><div class="note">${c.l}</div><div class="stat">${c.v}</div><div class="note">${c.s}</div></div>`).join("");
+  document.getElementById("clientEmpty").classList.toggle("hidden", list.length > 0);
+  document.getElementById("clientBody").innerHTML = list.map(c => `<tr>
+    <td><strong>${esc(c.name)}</strong><div class="meta">${esc(c.property || "")}${c.contact ? " · " + esc(c.contact) : ""}</div></td>
+    <td>${esc(c.sector)}</td>
+    <td>${esc(c.frequency)}</td>
+    <td>${money(c.price)}</td>
+    <td>${c.estHours || 0}</td>
+    <td>${c.status === "Active" ? money(monthlyPrice(c)) : "—"}</td>
+    <td><span class="pill ${c.status==="Active"?"":c.status==="Paused"?"warn":"muted"}">${esc(c.status)}</span></td>
+    <td style="white-space:nowrap">
+      <button class="btn ghost small" onclick="openClient('${c.id}')">Edit</button>
+      <button class="btn ghost small" onclick="deleteClient('${c.id}')">✕</button>
+    </td>
+  </tr>`).join("");
+}
+function openClient(id) {
+  const c = (state.clients || []).find(x => x.id === id) || {
+    id:"", name:"", property:"", sector:"Commercial office", frequency:"Weekly",
+    status:"Active", contractStart:"", contact:"", phone:"", email:"", price:"", estHours:"", notes:""
+  };
+  cId.value = c.id; cName.value = c.name; cProperty.value = c.property || "";
+  cSector.value = c.sector; cFreq.value = c.frequency; cStatus.value = c.status;
+  cStart.value = c.contractStart || ""; cPrice.value = c.price; cHours.value = c.estHours;
+  cContact.value = c.contact || ""; cPhone.value = c.phone || ""; cEmail.value = c.email || "";
+  cNotes.value = c.notes || "";
+  document.getElementById("clientTitle").textContent = c.id ? "Edit client" : "Add client";
+  document.getElementById("clientModal").classList.add("open");
+}
+function saveClient() {
+  const rec = {
+    id: cId.value || uid("c"),
+    name: cName.value.trim() || "Untitled client",
+    property: cProperty.value.trim(),
+    sector: cSector.value,
+    frequency: cFreq.value,
+    status: cStatus.value,
+    contractStart: cStart.value,
+    contact: cContact.value.trim(),
+    phone: cPhone.value.trim(),
+    email: cEmail.value.trim(),
+    price: Number(cPrice.value)||0,
+    estHours: Number(cHours.value)||0,
+    notes: cNotes.value.trim()
+  };
+  const i = state.clients.findIndex(x => x.id === rec.id);
+  if (i >= 0) state.clients[i] = rec; else state.clients.unshift(rec);
+  save(); closeModal("clientModal"); renderAll();
+}
+function deleteClient(id) {
+  if (!confirm("Remove this client? Visits stay in the log.")) return;
+  state.clients = state.clients.filter(c => c.id !== id);
+  save(); renderAll();
+}
+
+function renderVisits() {
+  const list = [...(state.visits || [])].sort((a,b) => (b.date||"").localeCompare(a.date||""));
+  const labor = list.reduce((a,v) => a + visitLabor(v), 0);
+  const supplies = list.reduce((a,v) => a + (Number(v.suppliesCost)||0), 0);
+  const flags = list.filter(v => v.qcScore === "Redo" || v.qcScore === "Retrain" || v.issue).length;
+  document.getElementById("visitStats").innerHTML = [
+    { l: "Visits", v: list.length, s: "all time in this file" },
+    { l: "Labor on logged visits", v: money(labor), s: "hours × crew rates" },
+    { l: "Visit supplies", v: money(supplies), s: "not monthly overhead" },
+    { l: "QC / issue flags", v: flags, s: "retrain, redo, or complaint" }
+  ].map(c => `<div class="card"><div class="note">${c.l}</div><div class="stat">${c.v}</div><div class="note">${c.s}</div></div>`).join("");
+  document.getElementById("visitEmpty").classList.toggle("hidden", list.length > 0);
+  document.getElementById("visitBody").innerHTML = list.map(v => {
+    const cl = clientById(v.clientId);
+    const crew = (v.crewIds || []).map(id => (staffById(id)||{}).name || id).filter(Boolean).join(", ") || "—";
+    const qcClass = v.qcScore === "Pass" ? "" : v.qcScore === "Not inspected" ? "muted" : "danger";
+    return `<tr>
+      <td>${esc(v.date || "")}</td>
+      <td><strong>${esc(cl ? cl.name : "Unknown")}</strong></td>
+      <td>${v.hoursActual || 0}</td>
+      <td>${esc(crew)}</td>
+      <td>${money(visitLabor(v))}</td>
+      <td>${money(v.suppliesCost)}</td>
+      <td><span class="pill ${qcClass}">${esc(v.qcScore)}</span></td>
+      <td>${esc(v.issue || "")}</td>
+      <td style="white-space:nowrap">
+        <button class="btn ghost small" onclick="openVisit('${v.id}')">Edit</button>
+        <button class="btn ghost small" onclick="deleteVisit('${v.id}')">✕</button>
+      </td>
+    </tr>`;
+  }).join("");
+}
+function fillCrewChecks(selected) {
+  const sel = new Set(selected || []);
+  const active = (state.staff || []).filter(s => s.status !== "Left");
+  document.getElementById("vCrew").innerHTML = active.length
+    ? active.map(s => `<label class="check-item" style="border:0;padding:4px 0">
+        <input type="checkbox" value="${s.id}" ${sel.has(s.id)?"checked":""} />
+        <span>${esc(s.name)} · ${esc(s.role)} · ${money(s.payRate)}/hr</span>
+      </label>`).join("")
+    : "Add staff first.";
+}
+function openVisit(id) {
+  const v = (state.visits || []).find(x => x.id === id) || {
+    id:"", clientId: (state.clients[0]||{}).id || "", date: new Date().toISOString().slice(0,10),
+    hoursActual:"", suppliesCost:0, crewIds:[], qcScore:"Not inspected", qcNotes:"", issue:""
+  };
+  vId.value = v.id;
+  vClient.innerHTML = (state.clients||[]).map(c => `<option value="${c.id}" ${c.id===v.clientId?"selected":""}>${esc(c.name)}</option>`).join("");
+  vDate.value = v.date || "";
+  vHours.value = v.hoursActual;
+  vSupplies.value = v.suppliesCost || 0;
+  vQc.value = v.qcScore || "Not inspected";
+  vIssue.value = v.issue || "";
+  vQcNotes.value = v.qcNotes || "";
+  fillCrewChecks(v.crewIds);
+  document.getElementById("visitTitle").textContent = v.id ? "Edit visit" : "Log visit";
+  document.getElementById("visitModal").classList.add("open");
+}
+function saveVisit() {
+  const crewIds = [...document.querySelectorAll("#vCrew input[type=checkbox]:checked")].map(i => i.value);
+  const rec = {
+    id: vId.value || uid("v"),
+    clientId: vClient.value,
+    date: vDate.value,
+    hoursActual: Number(vHours.value)||0,
+    suppliesCost: Number(vSupplies.value)||0,
+    crewIds,
+    qcScore: vQc.value,
+    qcNotes: vQcNotes.value.trim(),
+    issue: vIssue.value.trim()
+  };
+  const i = state.visits.findIndex(x => x.id === rec.id);
+  if (i >= 0) state.visits[i] = rec; else state.visits.unshift(rec);
+  save(); closeModal("visitModal"); renderAll();
+}
+function deleteVisit(id) {
+  state.visits = state.visits.filter(v => v.id !== id);
+  save(); renderAll();
+}
+
+function renderStaff() {
+  const list = state.staff || [];
+  document.getElementById("staffEmpty").classList.toggle("hidden", list.length > 0);
+  document.getElementById("staffBody").innerHTML = list.map(s => `<tr>
+    <td><strong>${esc(s.name)}</strong></td>
+    <td>${esc(s.role)}</td>
+    <td>${money(s.payRate)}</td>
+    <td>${esc(s.phone || "—")}</td>
+    <td><span class="pill ${s.status==="Active"?"":s.status==="On leave"?"warn":"muted"}">${esc(s.status)}</span></td>
+    <td>${esc(s.notes || "")}</td>
+    <td style="white-space:nowrap">
+      <button class="btn ghost small" onclick="openStaff('${s.id}')">Edit</button>
+      <button class="btn ghost small" onclick="deleteStaff('${s.id}')">✕</button>
+    </td>
+  </tr>`).join("");
+}
+function openStaff(id) {
+  const s = (state.staff || []).find(x => x.id === id) || {
+    id:"", name:"", role:"Cleaner", payRate:"", phone:"", status:"Active", notes:""
+  };
+  sId.value = s.id; sName.value = s.name; sRole.value = s.role;
+  sRate.value = s.payRate; sPhone.value = s.phone || ""; sStatus.value = s.status; sNotes.value = s.notes || "";
+  document.getElementById("staffTitle").textContent = s.id ? "Edit staff" : "Add staff";
+  document.getElementById("staffModal").classList.add("open");
+}
+function saveStaffMember() {
+  const rec = {
+    id: sId.value || uid("s"),
+    name: sName.value.trim() || "Unnamed",
+    role: sRole.value,
+    payRate: Number(sRate.value)||0,
+    phone: sPhone.value.trim(),
+    status: sStatus.value,
+    notes: sNotes.value.trim()
+  };
+  const i = state.staff.findIndex(x => x.id === rec.id);
+  if (i >= 0) state.staff[i] = rec; else state.staff.unshift(rec);
+  save(); closeModal("staffModal"); renderAll();
+}
+function deleteStaff(id) {
+  if (!confirm("Remove this staff member from the roster?")) return;
+  state.staff = state.staff.filter(s => s.id !== id);
+  save(); renderAll();
+}
+
+function renderOverhead() {
+  const o = state.overhead || {};
+  ohRent.value = o.rent || 0;
+  ohInsurance.value = o.insurance || 0;
+  ohVehicle.value = o.vehicle || 0;
+  ohSupplies.value = o.supplies || 0;
+  ohAdmin.value = o.admin || 0;
+  ohOther.value = o.other || 0;
+  const oh = overheadTotal();
+  const active = (state.clients || []).filter(c => c.status === "Active");
+  const avgRate = (() => {
+    const activeS = (state.staff || []).filter(s => s.status === "Active" && Number(s.payRate) > 0);
+    if (!activeS.length) return 0;
+    return activeS.reduce((a,s) => a + Number(s.payRate), 0) / activeS.length;
+  })();
+  const mRev = active.reduce((a,c) => a + monthlyPrice(c), 0);
+  const mLaborEst = active.reduce((a,c) => a + (Number(c.estHours)||0) * (FREQ_MONTH[c.frequency]||0) * avgRate, 0);
+  const contrib = mRev - mLaborEst;
+  const net = contrib - oh;
+  const cover = oh > 0 ? Math.round((contrib / oh) * 100) : (contrib > 0 ? 100 : 0);
+  document.getElementById("breakevenCard").innerHTML = `
+    <h3>Break-even snapshot</h3>
+    <p class="note">Uses active contracts × frequency, estimated hours, and the average loaded staff rate (${money(avgRate)}/hr). Visit supplies are excluded here.</p>
+    <div class="split" style="margin-top:12px"><span>Booked monthly revenue</span><strong>${money(mRev)}</strong></div>
+    <div class="split"><span>Est. monthly labor</span><strong>${money(mLaborEst)}</strong></div>
+    <div class="split"><span>Contribution</span><strong>${money(contrib)}</strong></div>
+    <div class="split"><span>Monthly overhead</span><strong>${money(oh)}</strong></div>
+    <div class="split" style="margin-top:10px"><span>Net after overhead</span><strong>${money(net)}</strong></div>
+    <div class="progress"><span style="width:${Math.min(cover,100)}%"></span></div>
+    <p class="note">${oh === 0 ? "Enter overhead on the left to see coverage." : "Contribution covers " + cover + "% of overhead."}</p>
+  `;
+}
+function saveOverhead() {
+  state.overhead = {
+    rent: Number(ohRent.value)||0,
+    insurance: Number(ohInsurance.value)||0,
+    vehicle: Number(ohVehicle.value)||0,
+    supplies: Number(ohSupplies.value)||0,
+    admin: Number(ohAdmin.value)||0,
+    other: Number(ohOther.value)||0
+  };
+  save();
+  renderOverhead();
+}
+
+function renderAll() {
+  renderOverview(); renderPillars(); renderMarkets(); renderPipeline();
+  renderPartners(); renderTimeline(); renderSops(); renderDigital(); renderJobs();
+  renderClients(); renderVisits(); renderStaff(); renderOverhead();
+}
+renderAll();
+</script>
+</body>
+</html>
