@@ -229,9 +229,10 @@
             <p class="lede">Optimize operations, lock pricing, build recurring revenue, and run an aggressive acquisition campaign — all from one working workspace.</p>
           </div>
           <div class="toolbar">
-            <button class="btn ghost small" onclick="exportData()">Export JSON</button>
+            <button class="btn ghost small" onclick="exportData()">Save backup</button>
+            <button class="btn ghost small" onclick="copyBackup()">Copy backup</button>
             <button class="btn ghost small" onclick="document.getElementById('importFile').click()">Import</button>
-            <input id="importFile" type="file" accept="application/json" class="hidden" />
+            <input id="importFile" type="file" accept=".txt,.json,text/plain,application/json" class="hidden" />
           </div>
         </div>
         <div class="grid g-4" id="overviewStats"></div>
@@ -775,55 +776,52 @@
   </div>
 
 <script>
-const KEY = "laniya-ops-hub-v2";
+const KEY = "laniya-ops-hub-full";
 const FREQ_MONTH = { Weekly: 4.33, "Bi-weekly": 2.17, Monthly: 1, Quarterly: 1/3, Yearly: 1/12, "One-off": 0 };
+const START = "2026-09-01";
 
 const DEFAULT = {
   prospects: [
-    { id: "p1", name: "Harbour Law Chambers", sector: "Commercial office", tier: "1", stage: "Email", role: "Office Manager", contact: "", reach: "", next: "Send 5-touch intro email", notes: "Tier 1 weekly office clean target." },
-    { id: "p2", name: "Coastal Property Group", sector: "Property management", tier: "1", stage: "Research", role: "Property Manager", contact: "", reach: "", next: "Map portfolio size", notes: "Aim for 10+ units per agreement." },
-    { id: "p3", name: "Palm Villa Concierge", sector: "Villa / vacation rental", tier: "1", stage: "Phone", role: "Villa Manager", contact: "", reach: "", next: "Book walkthrough of turnover SOP", notes: "Photo-verified inspection is the differentiator." }
+    { id: "p1", name: "Harbour Law Chambers", sector: "Commercial office", tier: "1", stage: "Email", role: "Office Manager", contact: "Andrea Best", reach: "", next: "Send 5-touch intro email", notes: "Tier 1 weekly office clean target." },
+    { id: "p2", name: "Limegrove Business Centre", sector: "Commercial office", tier: "1", stage: "Phone", role: "Facilities Manager", contact: "", reach: "", next: "Call facilities manager", notes: "Holetown offices. Aim for a weekly floor + restroom programme." },
+    { id: "p3", name: "Coral Court Medical", sector: "Medical / clinic", tier: "2", stage: "Visit", role: "Practice Manager", contact: "", reach: "", next: "On-site walkthrough Thursday", notes: "After-hours clinic clean. Hygiene + discretion protocol." },
+    { id: "p4", name: "Sunset Ridge Villas", sector: "Villa / vacation rental", tier: "1", stage: "Proposal", role: "Villa Manager", contact: "", reach: "", next: "Send turnover package", notes: "Photo-verified inspection is the differentiator." },
+    { id: "p5", name: "Worthing Boardwalk Café", sector: "Kitchen / restaurant", tier: "2", stage: "Research", role: "Owner", contact: "", reach: "", next: "Confirm after-hours window", notes: "Kitchen extraction + dining floor. Monthly deep clean." },
+    { id: "p6", name: "Coastal Property Group", sector: "Property management", tier: "1", stage: "Research", role: "Property Manager", contact: "", reach: "", next: "Map portfolio size", notes: "Aim for 10+ units per agreement." },
+    { id: "p7", name: "Palm Villa Concierge", sector: "Villa / vacation rental", tier: "1", stage: "Phone", role: "Villa Manager", contact: "", reach: "", next: "Book walkthrough of turnover SOP", notes: "Guest changeovers, linen, photo pack." },
+    { id: "p8", name: "Hastings Dental", sector: "Medical / clinic", tier: "2", stage: "Email", role: "Practice Manager", contact: "", reach: "", next: "Send clinic hygiene one-pager", notes: "Same protocol as Coral Court." },
+    { id: "p9", name: "Accra Beach Hotel", sector: "Boutique hospitality", tier: "1", stage: "Research", role: "Housekeeping Manager", contact: "", reach: "", next: "Confirm public-area scope", notes: "Corridors, lobby, back of house." },
+    { id: "p10", name: "Holetown Motor Showroom", sector: "Retail & showrooms", tier: "2", stage: "Email", role: "Showroom Manager", contact: "", reach: "", next: "Pitch evening floor programme", notes: "Glass, floors, customer bathrooms." },
+    { id: "p11", name: "Maxwell & Sons Construction", sector: "Post-construction", tier: "3", stage: "Research", role: "Site manager", contact: "", reach: "", next: "Ask for punch-list referral", notes: "Project work to fill spare midweek capacity." },
+    { id: "p12", name: "Worthing Plaza Offices", sector: "Commercial office", tier: "1", stage: "Follow-up", role: "Office Manager", contact: "", reach: "", next: "Send weekly service proposal", notes: "Two floors. Recurring weekly." }
   ],
   partners: [
-    { id: "r1", name: "", type: "Real estate agent", status: "To approach", reach: "", notes: "Seed list: agents handling furnished rentals and sales turnovers." }
+    { id: "r1", name: "Sargeant & Co. Realty", type: "Real estate agent", status: "Meeting booked", reach: "Worthing", notes: "Move-in / move-out and villa turnovers." },
+    { id: "r2", name: "Tradewind Interiors", type: "Interior designer", status: "To approach", reach: "Holetown", notes: "Show-home and handover cleans." },
+    { id: "r3", name: "Gibbs HVAC", type: "A/C technician", status: "Intro sent", reach: "South coast", notes: "Cross-refer after install dust-out." }
   ],
-  jobs: [],
+  jobs: [
+    { id: "j1", name: "Harbour Law — weekly office", type: "Weekly commercial", hours: 8, rate: 50, price: 720, cost: 18, rec: "Yes — weekly" },
+    { id: "j2", name: "Sunset Ridge — villa turnover", type: "Villa turnover", hours: 6, rate: 50, price: 480, cost: 22, rec: "Periodic" },
+    { id: "j3", name: "Coral Court — clinic deep clean", type: "Clinic / hygiene", hours: 5, rate: 50, price: 435, cost: 16, rec: "Yes — monthly" }
+  ],
   checks: {},
   clients: [
-    {
-      id: "c1",
-      name: "Harbour Law Chambers",
-      property: "3rd Floor, Harbour Place",
-      sector: "Commercial office",
-      frequency: "Weekly",
-      status: "Active",
-      contractStart: "2026-09-01",
-      contact: "Andrea Best",
-      phone: "",
-      email: "",
-      price: 480,
-      estHours: 6,
-      notes: ""
-    }
+    { id: "c1", name: "Carlisle House Offices", property: "Carlisle House, Bridgetown", sector: "Commercial office", frequency: "Weekly", status: "Active", contractStart: "2026-06-02", contact: "Patrice Alleyne", phone: "246-429-1100", email: "", price: 720, estHours: 8, notes: "Two floors + kitchen + restrooms." },
+    { id: "c2", name: "Rockley Golf Villas", property: "Rockley, Christ Church", sector: "Villa / vacation rental", frequency: "Weekly", status: "Active", contractStart: "2026-07-11", contact: "Marsha Clarke", phone: "", email: "", price: 480, estHours: 6, notes: "Four-villa package. Photo pack after each turnover." },
+    { id: "c3", name: "St. Lawrence Gap Clinic", property: "St. Lawrence Gap", sector: "Medical / clinic", frequency: "Bi-weekly", status: "Active", contractStart: "2026-08-04", contact: "Dr. Haynes office", phone: "", email: "", price: 435, estHours: 5, notes: "After-hours only. Hygiene protocol." }
   ],
   visits: [
-    {
-      id: "v1",
-      clientId: "c1",
-      date: "2026-09-05",
-      hoursActual: 6.5,
-      suppliesCost: 12,
-      crewIds: ["s1", "s2"],
-      qcScore: "Pass",
-      qcNotes: "",
-      issue: ""
-    }
+    { id: "v1", clientId: "c1", date: "2026-09-02", hoursActual: 8.5, suppliesCost: 14, crewIds: ["s1","s2"], qcScore: "Pass", qcNotes: "Kitchen glass smear on 2nd floor.", issue: "" },
+    { id: "v2", clientId: "c2", date: "2026-09-03", hoursActual: 6, suppliesCost: 22, crewIds: ["s1","s3"], qcScore: "Pass", qcNotes: "Photo pack sent to villa manager.", issue: "" },
+    { id: "v3", clientId: "c3", date: "2026-08-28", hoursActual: 5.5, suppliesCost: 11, crewIds: ["s2","s3"], qcScore: "Redo", qcNotes: "Restroom restock missed.", issue: "Redo assigned to next shift." }
   ],
   staff: [
-    { id: "s1", name: "Crew lead (set name)", role: "Crew lead", payRate: 0, phone: "", status: "Active", notes: "Edit and enter loaded hourly rate." },
-    { id: "s2", name: "Cleaner (set name)", role: "Cleaner", payRate: 0, phone: "", status: "Active", notes: "" }
+    { id: "s1", name: "Keisha Clarke", role: "Crew lead", payRate: 28, phone: "246-233-0144", status: "Active", notes: "Leads offices and villa spec." },
+    { id: "s2", name: "Marlon Weekes", role: "Cleaner", payRate: 22, phone: "246-230-7721", status: "Active", notes: "Watch restroom and glass misses." },
+    { id: "s3", name: "Shanice Holder", role: "Cleaner", payRate: 22, phone: "246-271-4480", status: "Active", notes: "Pair with Keisha on clinics." }
   ],
-  overhead: { rent: 0, insurance: 0, vehicle: 0, supplies: 0, admin: 0, other: 0 }
+  overhead: { rent: 400, insurance: 350, vehicle: 600, supplies: 180, admin: 120, other: 80 }
 };
 
 const PILLARS = [
@@ -957,6 +955,23 @@ const MONTHS = [
       "Decide which tiers to double-down on next quarter"
     ]
   }
+];
+
+
+const WEEKS = [
+  { n:1, focus:"Email 10 remaining businesses", detail:"Stand up the 100-business list and fire the first 5-touch emails." },
+  { n:2, focus:"Price every active contract", detail:"Loaded labour rate × hours vs quoted price. Flag anything under 40% contribution." },
+  { n:3, focus:"Lock villa + office SOPs", detail:"Photo-verified turnover pack and commercial weekly checklist in use." },
+  { n:4, focus:"Finish the prospect database", detail:"100 named businesses with role, sector, and next action." },
+  { n:5, focus:"Run the phone block", detail:"Call every Email-stage prospect. Book walkthroughs." },
+  { n:6, focus:"Google Business Profile live", detail:"Categories, services, photos, review ask after every happy job." },
+  { n:7, focus:"Partnership meetings", detail:"Agents, designers, HVAC, contractors — one-pager in hand." },
+  { n:8, focus:"On-site visits this week", detail:"Walk clinics, kitchens, and villas still sitting in Visit stage." },
+  { n:9, focus:"Send proposals", detail:"Turnover packages and weekly office proposals for every Visit-complete lead." },
+  { n:10, focus:"Follow-up cadence", detail:"No silent proposals. 48-hour follow-up rule." },
+  { n:11, focus:"QC sample 2–3 jobs", detail:"Inspect without living on site. Retrain on repeats." },
+  { n:12, focus:"Pricing adjustments from live jobs", detail:"Raise or cut scope on anything still leaking." },
+  { n:13, focus:"Lock recurring contracts", detail:"Convert won work into signed weekly / monthly agreements." }
 ];
 
 const SOP_GROUPS = [
@@ -1109,24 +1124,30 @@ function overheadTotal() {
   return ["rent","insurance","vehicle","supplies","admin","other"].reduce((a,k) => a + (Number(o[k])||0), 0);
 }
 
+function weekIndex() {
+  const t = new Date();
+  const s = new Date(START + "T12:00:00");
+  const n = Math.floor((t - s) / 86400000 / 7) + 1;
+  return Math.min(13, Math.max(1, n));
+}
 function renderOverview() {
   const won = state.prospects.filter(p => p.stage === "Won").length;
   const activeP = state.prospects.filter(p => !["Won","Lost"].includes(p.stage)).length;
   const activeC = (state.clients || []).filter(c => c.status === "Active");
   const mRev = activeC.reduce((a,c) => a + monthlyPrice(c), 0);
+  const w = weekIndex();
+  const emailLeft = state.prospects.filter(p => p.stage === "Research" || p.stage === "Email").length;
   document.getElementById("overviewStats").innerHTML = [
-    { l: "Active clients", v: activeC.length, s: money(mRev) + " / month booked" },
-    { l: "Prospects in play", v: activeP, s: state.prospects.length + " in database" },
-    { l: "Visits logged", v: (state.visits||[]).length, s: "actual cleans + QC" },
-    { l: "Contracts won (pipeline)", v: won, s: "from this 90-day push" }
+    { l: "Active clients", v: activeC.length, s: "on the books" },
+    { l: "Monthly booked", v: money(mRev), s: "frequency × price" },
+    { l: "Prospect pipeline", v: activeP, s: state.prospects.length + " in database" },
+    { l: "90-day plan", v: "13 weeks", s: "week " + w + " in play" }
   ].map(c => `<div class="card"><div class="note">${c.l}</div><div class="stat">${c.v}</div><div class="note">${c.s}</div></div>`).join("");
 
-  const focusBits = [];
-  MONTHS.forEach(m => {
-    const open = m.items.map((t,i) => ({t,i})).filter(x => !checked(m.id, x.i));
-    if (open[0]) focusBits.push(`<div class="check-item"><div><strong>${m.title}:</strong> ${open[0].t}<div class="meta">${m.focus}</div></div></div>`);
-  });
-  document.getElementById("weekFocus").innerHTML = focusBits.slice(0,3).join("") || "<p class='note'>All timeline items complete.</p>";
+  const wk = WEEKS[w-1];
+  document.getElementById("weekFocus").innerHTML = `<div class="check-item"><div><strong>Week ${w} of 13</strong><div class="meta">${wk.focus}</div></div></div>
+    <p class="note" style="margin:8px 0 0">${wk.detail}</p>
+    <p class="note">${emailLeft} businesses still need the first email.</p>`;
 
   const rows = state.prospects.slice(0, 6).map(p => `<tr>
     <td><strong>${esc(p.name)}</strong></td>
@@ -1260,7 +1281,8 @@ function deletePartner(id) {
 }
 
 function renderTimeline() {
-  document.getElementById("timelineCards").innerHTML = MONTHS.map(m => {
+  const w = weekIndex();
+  const months = MONTHS.map(m => {
     const pr = pct(m.id, m.items);
     return `<div class="card">
       <span class="pill navy">${m.title}</span>
@@ -1270,6 +1292,12 @@ function renderTimeline() {
       ${m.items.map((t,i) => itemRow(m.id, i, t)).join("")}
     </div>`;
   }).join("");
+  const weeks = WEEKS.map(wk => `<div class="check-item" style="padding:10px 0;border-bottom:1px solid var(--line)">
+      <div><strong>Week ${wk.n} of 13${wk.n===w?" · this week":""}</strong>
+      <div class="meta">${wk.focus}</div>
+      <div class="note">${wk.detail}</div></div>
+    </div>`).join("");
+  document.getElementById("timelineCards").innerHTML = months + `<div class="card" style="grid-column:1/-1"><h3>13-week operating calendar</h3>${weeks}</div>`;
 }
 
 function renderSops() {
@@ -1330,12 +1358,24 @@ document.querySelectorAll(".modal-back").forEach(el => el.addEventListener("clic
 
 function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-function exportData() {
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+async function exportData() {
+  const text = JSON.stringify(state, null, 2);
+  const file = new File([text], "Laniyas-Touch-hub-backup.txt", { type: "text/plain" });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: "Laniya's Touch backup" });
+      return;
+    }
+  } catch (err) { if (err && err.name === "AbortError") return; }
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "laniya-ops-hub.json";
-  a.click();
+  a.href = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
+  a.download = "Laniyas-Touch-hub-backup.txt";
+  a.rel = "noopener";
+  document.body.appendChild(a); a.click(); a.remove();
+}
+async function copyBackup() {
+  try { await navigator.clipboard.writeText(JSON.stringify(state, null, 2)); alert("Backup copied. Paste into Notes and save that note."); }
+  catch (e) { alert("Could not copy. Use Save backup instead."); }
 }
 document.getElementById("importFile").addEventListener("change", e => {
   const file = e.target.files[0]; if (!file) return;
