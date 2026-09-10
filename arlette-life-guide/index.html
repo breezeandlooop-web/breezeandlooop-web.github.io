@@ -509,7 +509,7 @@ noscript {
   <header class="app-head">
     <div class="mark">Vedic · Lahiri · Day chart</div>
     <h1 id="displayTitle">Arlette Life Guide</h1>
-    <p class="sub">A contemplative companion for your chart · Georgetown-born · no houses</p>
+    <p class="sub">A contemplative companion for your chart · Georgetown-born · working Meena houses (provisional)</p>
   </header>
 
   <p class="disclaimer" id="disclaimer">
@@ -571,7 +571,7 @@ noscript {
       <p>Your mind is dual, quick, and hungry for exchange. Storytelling, sales, hostessing, explaining the craft to a stranger — these come naturally. You can hold two ideas at once and make them charming. The soft spot: boredom when life goes flat, and the habit of showing unfinished work for a hit of dopamine or praise before the piece has settled. Your voice is a gift; train it to finish before it performs.</p>
     </div>
     <div class="card portrait-card">
-      <h3>Feeling &amp; seeker — Moon in Dhanu (Sagittarius) <span class="approx">~13°30′ · approximate</span></h3>
+      <h3>Feeling &amp; seeker — Moon in Dhanu (Sagittarius) <span class="approx">~23°19′ · Purva Ashadha</span></h3>
       <p>You need meaning, horizon, and truth. A caged Moon in Sagittarius grows restless — travel, learning, or a bigger why restores you. Faith is not optional décor; it is how your heart breathes. When the week feels small, ask what larger story you are serving.</p>
     </div>
     <div class="card portrait-card">
@@ -673,12 +673,12 @@ noscript {
     <div class="card">
       <div class="eyebrow">Working chart · provisional</div>
       <h2>Natal map &amp; houses</h2>
-      <p class="approx">Lahiri sidereal · Georgetown · working Lagna Meena ~12:40 local (UTC−3) · not a hospital lock · whole-sign houses</p>
+      <p class="approx">Lahiri sidereal · Georgetown · ~12:40 local UTC−3 · Meena working Lagna · whole-sign · not hospital-locked · degrees recalculated 2026-09-10</p>
       <div class="lagna-note">
-        <strong>Ascendant (working):</strong> Meena (Pisces) · Uttara Bhadrapada · soft/absorbent inside.
-        Lived exterior often tight and aloof (Ketu in 1st + Saturn guard) — nice, not chatty-friendly.
-        Lagnesha Jupiter with Venus in the 3rd: self grows through craft and making.
-        Moon in 10th Purva Ashadha: career carries emotional weather. Test against life; revise if birth time firms up.
+        <strong>Working facts (provisional):</strong> Birth 1 Jul 1977 · Georgetown · local ~12:40 (UTC−3 in 1977).
+        Lagna Meena ~13° · Uttara Bhadrapada pada 3 (only if time ~12:05–12:50; earlier Meena = Purva Bhadrapada; after ~12:55 = Revati).
+        Moon Dhanu ~23°19′ Purva Ashadha · 10th (whole sign). Ketu in 1st · Mars in 2nd · Venus+Jupiter in 3rd · Sun+Mercury in 4th · Saturn in 5th · Rahu in 7th.
+        Sun–Mercury orb ~2° (both Ardra). Not a hospital lock — revise if exact time appears.
       </div>
       <h3 style="margin-top:18px;color:var(--gold-soft);font-size:0.95rem;">Grahas</h3>
       <div class="graha-map" id="grahaMap"></div>
@@ -694,6 +694,19 @@ noscript {
       <p class="approx">Saturn Pocket first · Venus Pocket second · train the till so Mars doesn’t run it</p>
       <ul class="money-rules" id="moneyRules"></ul>
       <p class="approx" style="margin-top:12px;"><strong style="color:var(--gold-pale);">Motto:</strong> Mars may want it. Saturn must count it. Venus may enjoy only what’s left.</p>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <div class="eyebrow">From Purva Ashadha Moon · approx</div>
+      <h2>Vimshottari spine</h2>
+      <p class="approx">Balance at birth ~5.0y Venus remaining. Dates ± weeks with Moon minute.</p>
+      <ul class="money-rules">
+        <li><strong>Venus</strong> — 1977 → mid-1982</li>
+        <li><strong>Sun</strong> — → mid-1988</li>
+        <li><strong>Moon</strong> — → mid-1998 (children 1993 &amp; 1996 fall here)</li>
+        <li><strong>Mars</strong> — → mid-2005</li>
+        <li><strong>Rahu</strong> — → mid-2023</li>
+        <li><strong>Jupiter</strong> — mid-2023 → ~2039 (current)</li>
+      </ul>
     </div>
   </section>
 
@@ -723,9 +736,9 @@ noscript {
         <label for="setName">Display name</label>
         <input type="text" id="setName" value="Arlette">
         <label>Birth note</label>
-        <p style="font-size:0.88rem;color:var(--text-dim);">1 July 1977 · Georgetown, Guyana · Vedic Lahiri sidereal day chart</p>
+        <p style="font-size:0.88rem;color:var(--text-dim);">1 July 1977 · Georgetown, Guyana · Vedic Lahiri · working chart ~12:40 local</p>
         <label>Time window</label>
-        <p style="font-size:0.88rem;color:var(--text-dim);">Working time ~12:40 local Georgetown · Guyana UTC−3 in 1977 · Meena Lagna (provisional) · Moon Purva Ashadha · whole-sign houses on · revise if hospital time appears</p>
+        <p style="font-size:0.88rem;color:var(--text-dim);">Working ~12:40 local · Guyana UTC−3 (1977) · Meena ~13° Uttara Bhadrapada (prov.) · Moon ~23°19′ Purva Ashadha · whole-sign houses · degrees ±few′ · revise if hospital time appears</p>
         <div class="btn-row" style="margin-top:16px;">
           <button type="button" class="btn" id="saveSettingsBtn">Save name</button>
           <button type="button" class="btn btn-ghost" id="exportBtn">Export JSON</button>
@@ -738,7 +751,7 @@ noscript {
     </div>
   </section>
 
-  <footer class="app-foot">Arlette Life Guide · v1.2 · local only</footer>
+  <footer class="app-foot">Arlette Life Guide · v1.2.1 · local only</footer>
 </div>
 
 <script>
@@ -771,27 +784,28 @@ var VARA = [
 
 /* Locked natal longitudes (Lahiri day chart — verified). Degrees as labels. */
 var NATAL_LON = {
-  Sun: 75.5,
+  /* Lahiri approx @ working 12:40 local Georgetown 1 Jul 1977 (UTC-3); ±few′ */
+  Sun: 76.13,
   Moon: 263.32,
-  Mercury: 76.7,
-  Venus: 30.5167,
-  Mars: 24.6667,
-  Jupiter: 56.2167,
-  Saturn: 111.5333,
-  Rahu: 176.75,
-  Ketu: 356.75
+  Mercury: 78.13,
+  Venus: 31.21,
+  Mars: 25.14,
+  Jupiter: 56.37,
+  Saturn: 111.62,
+  Rahu: 176.72,
+  Ketu: 356.72
 };
 
 var NATAL = {
-  Sun: { sign: 'Mithuna', deg: '15°30′', gift: 'Dual mind, visible voice, storytelling light', lesson: 'Finish before you perform; boredom is a teacher' },
-  Moon: { sign: 'Dhanu', deg: '~23°19′ · Purva Ashadha', gift: 'Conviction through beauty & refresh; invincible heart when watered', lesson: 'From lack, don’t chase unstable “more” as love or status' },
-  Mercury: { sign: 'Mithuna', deg: '16°42′', gift: 'Sales, hostess skill, agile explanation', lesson: 'Oversharing unfinished work for dopamine' },
-  Venus: { sign: 'Vrishabha', deg: '0°31′ (own)', gift: 'Beauty with weight; craft that lasts', lesson: 'Worth is not only when beauty is praised' },
-  Mars: { sign: 'Mesha', deg: '24°40′ · Bharani · H2', gift: 'Capacity to bear & earn by courage', lesson: 'Heat in money — grab/spend/credit before the ledger' },
-  Jupiter: { sign: 'Vrishabha', deg: '26°13′', gift: 'Expand through tangible dharma & value', lesson: 'Wisdom must become matter, not talk' },
-  Saturn: { sign: 'Karka', deg: '21°32′', gift: 'Deep loyalty once belonging feels safe', lesson: 'People-pleasing & approval as armor' },
-  Rahu: { sign: 'Kanya', deg: '26°45′ (mean)', gift: 'Craft-detail hunger; usefulness', lesson: 'Perfectionism that stalls service' },
-  Ketu: { sign: 'Meena', deg: '26°45′ (mean) · H1', gift: 'Phases of self; soft devotion under the armor', lesson: 'Aloof shell can hide the absorbent heart — both are true' }
+  Sun: { sign: 'Mithuna', deg: '16°07′ · Ardra p3', gift: 'Dual mind, visible voice, storytelling light', lesson: 'Finish before you perform; boredom is a teacher' },
+  Moon: { sign: 'Dhanu', deg: '~23°19′ · Purva Ashadha p3', gift: 'Conviction through beauty & refresh; invincible heart when watered', lesson: 'From lack, don’t chase unstable “more” as love or status' },
+  Mercury: { sign: 'Mithuna', deg: '18°07′ · Ardra p4', gift: 'Sales, hostess skill, agile explanation', lesson: 'Oversharing unfinished work for dopamine' },
+  Venus: { sign: 'Vrishabha', deg: '1°12′ (own) · Krittika p2', gift: 'Beauty with weight; craft that lasts', lesson: 'Worth is not only when beauty is praised' },
+  Mars: { sign: 'Mesha', deg: '25°08′ · Bharani p4 · H2', gift: 'Capacity to bear & earn by courage', lesson: 'Heat in money — grab/spend/credit before the ledger' },
+  Jupiter: { sign: 'Vrishabha', deg: '26°21′ · Mrigashira p1', gift: 'Expand through tangible dharma & value', lesson: 'Wisdom must become matter, not talk' },
+  Saturn: { sign: 'Karka', deg: '21°37′ · Ashlesha p2', gift: 'Deep loyalty once belonging feels safe', lesson: 'People-pleasing & approval as armor' },
+  Rahu: { sign: 'Kanya', deg: '~26°43′ (mean) · Chitra p2 · H7', gift: 'Craft-detail hunger; usefulness', lesson: 'Perfectionism that stalls service' },
+  Ketu: { sign: 'Meena', deg: '~26°43′ (mean) · Revati p4 · H1', gift: 'Phases of self; soft devotion under the armor', lesson: 'Aloof shell can hide the absorbent heart — both are true' }
 };
 
 var GRAHA_GLYPH = {
@@ -1223,7 +1237,7 @@ function buildSeasonCard(date) {
   if (!win) {
     return '<div class="season-card" id="seasonCard"><div class="eyebrow">Gochara season</div>' +
       '<h2>No major Guru–Shani exact season</h2>' +
-      '<p>Outside curated Jupiter-in-Cancer windows (Jun 2–Oct 31 2026; return ~Jan 25–Jun 15 2027). Natal Saturn remains Karka 21°32′ — a standing theme of belonging without self-erasure.</p></div>';
+      '<p>Outside curated Jupiter-in-Cancer windows (Jun 2–Oct 31 2026; return ~Jan 25–Jun 15 2027). Natal Saturn remains Karka 21°37′ — a standing theme of belonging without self-erasure.</p></div>';
   }
   tr = getTransitLongitudes(date);
   jupLon = tr.Jupiter.lon;
@@ -1232,7 +1246,7 @@ function buildSeasonCard(date) {
   html = '<div class="season-card" id="seasonCard">' +
     '<div class="eyebrow">Season · ' + win.label + '</div>' +
     '<h2>Season: Guru on your Shani</h2>' +
-    '<p>Transit Jupiter exalted in Cancer is conjunct / lighting natal Saturn at Karka 21°32′. Contemplative practice: belonging without self-erasure; expand through structure, not flash.</p>' +
+    '<p>Transit Jupiter exalted in Cancer is conjunct / lighting natal Saturn at Karka 21°37′. Contemplative practice: belonging without self-erasure; expand through structure, not flash.</p>' +
     '<p class="orb">Computed orb (transit ♃ to natal ♄): <strong>' + orbStr + '°</strong>' +
     (orb <= 3 ? ' · within 3° highlight' : '') +
     (orb <= 1 ? ' · nearly exact' : '') +
