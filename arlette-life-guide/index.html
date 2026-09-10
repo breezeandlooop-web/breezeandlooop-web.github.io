@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Arlette Life Guide · Vedic</title>
 <style>
+
 :root {
   --indigo-deep: #0f0a1e;
   --indigo: #1a1240;
@@ -383,6 +384,102 @@ noscript {
   font-family: var(--serif);
   font-size: 1.1rem;
 }
+
+.season-card {
+  background: linear-gradient(135deg, rgba(212,168,75,0.18), rgba(42,31,92,0.85));
+  border: 1px solid rgba(212,168,75,0.55);
+  border-radius: var(--radius);
+  padding: 16px 16px 14px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+.season-card .eyebrow { margin-bottom: 6px; }
+.season-card h2 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 1.2rem;
+  color: var(--gold-pale);
+  margin-bottom: 8px;
+}
+.season-card p { color: var(--cream-dim); font-size: 0.9rem; margin-bottom: 0; }
+.season-card .orb { color: var(--gold-soft); font-size: 0.82rem; margin-top: 8px; }
+.lights-card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+.lights-card h3 { margin-top: 0; color: var(--gold); font-size: 0.95rem; }
+.chip.lit-exact {
+  background: rgba(212,168,75,0.28);
+  border-color: var(--gold);
+  color: var(--gold-pale);
+  font-weight: 600;
+}
+.chip.lit-sign {
+  background: rgba(124,184,138,0.12);
+  border-color: rgba(124,184,138,0.4);
+  color: var(--cream);
+}
+.meter-card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+.meter-card h3 { margin-top: 0; color: var(--gold); font-size: 0.95rem; }
+.meter-card .hint { font-size: 0.78rem; color: var(--muted); margin: 4px 0 10px; }
+.gate-card {
+  background: linear-gradient(135deg, rgba(61,47,122,0.75), rgba(26,18,64,0.95));
+  border: 1px solid rgba(212,168,75,0.45);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+.gate-card.collapsed-gate details summary {
+  cursor: pointer;
+  color: var(--gold-soft);
+  font-size: 0.88rem;
+}
+.gate-card h3 { margin-top: 0; color: var(--gold-pale); font-size: 1rem; }
+.gate-timer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.gate-timer .timer-display {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  color: var(--gold);
+  min-width: 64px;
+}
+.heat-strip {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin: 10px 0;
+}
+.heat-cell {
+  background: rgba(15,10,30,0.5);
+  border: 1px solid rgba(212,168,75,0.2);
+  border-radius: 6px;
+  padding: 6px 4px;
+  text-align: center;
+  font-size: 0.65rem;
+  color: var(--muted);
+  min-height: 48px;
+}
+.heat-cell .hd { color: var(--gold); font-weight: 600; margin-bottom: 2px; }
+.heat-cell.hot { background: rgba(212,168,75,0.2); border-color: var(--gold); color: var(--gold-pale); }
+.lab-history { margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(212,168,75,0.2); }
+.lab-history h3 { margin-top: 0; }
+.lab-counts { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 8px; }
+.src-tag { font-size: 0.68rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 6px; }
+
 </style>
 </head>
 <body>
@@ -416,6 +513,10 @@ noscript {
 
   <!-- 1. TODAY -->
   <section class="panel active" id="panel-today" data-section="today">
+    <div id="seasonSlot"></div>
+    <div id="lightsSlot"></div>
+    <div id="gateSlot"></div>
+    <div id="matterSlot"></div>
     <div class="card" id="todayCard">
       <div class="eyebrow" id="todayDateLabel">Today</div>
       <h2 id="todayVaraTitle">Daily Life Guide</h2>
@@ -533,6 +634,7 @@ noscript {
         <button type="button" class="btn" id="labSaveBtn">Save lab answers</button>
       </div>
       <p id="labSavedMsg" class="approx" style="margin-top:8px;"></p>
+      <div class="lab-history" id="labHistory"></div>
     </div>
   </section>
 
@@ -596,14 +698,15 @@ noscript {
     </div>
   </section>
 
-  <footer class="app-foot">Arlette Life Guide · v1 · local only</footer>
+  <footer class="app-foot">Arlette Life Guide · v1.1 · local only</footer>
 </div>
 
 <script>
 'use strict';
 
-var STORAGE_KEY = 'arletteLifeGuide_v1';
-var AYANAMSA = 24.1;
+var STORAGE_KEY = 'arletteLifeGuide_v1_1';
+var STORAGE_KEY_V1 = 'arletteLifeGuide_v1';
+var AYANAMSA = 24.13;
 
 var SIGNS = [
   'Mesha (Aries)', 'Vrishabha (Taurus)', 'Mithuna (Gemini)', 'Karka (Cancer)',
@@ -626,6 +729,19 @@ var VARA = [
   { name: 'Saturday', planet: 'Saturn', sanskrit: 'Shani' }
 ];
 
+/* Locked natal longitudes (Lahiri day chart — verified). Degrees as labels. */
+var NATAL_LON = {
+  Sun: 75.5,
+  Moon: 253.5,
+  Mercury: 76.7,
+  Venus: 30.5167,
+  Mars: 24.6667,
+  Jupiter: 56.2167,
+  Saturn: 111.5333,
+  Rahu: 176.75,
+  Ketu: 356.75
+};
+
 var NATAL = {
   Sun: { sign: 'Mithuna', deg: '15°30′', gift: 'Dual mind, visible voice, storytelling light', lesson: 'Finish before you perform; boredom is a teacher' },
   Moon: { sign: 'Dhanu', deg: '~13°30′ (approx)', gift: 'Meaning-hunger, horizon, truth-seeking heart', lesson: 'Do not cage the seeker; feed faith regularly' },
@@ -639,6 +755,11 @@ var NATAL = {
 };
 
 var GRAHA_GLYPH = {
+  Sun: '☉', Moon: '☾', Mercury: '☿', Venus: '♀', Mars: '♂',
+  Jupiter: '♃', Saturn: '♄', Rahu: '☊', Ketu: '☋'
+};
+
+var GRAHA_SYM = {
   Sun: '☉', Moon: '☾', Mercury: '☿', Venus: '♀', Mars: '♂',
   Jupiter: '♃', Saturn: '♄', Rahu: '☊', Ketu: '☋'
 };
@@ -775,31 +896,116 @@ var SECTIONS = [
   { id: 'settings', label: 'Settings' }
 ];
 
+/*
+ * Curated weekly Lahiri longitudes (sidereal) for Jupiter, Saturn, Rahu (mean), Mars.
+ * Source comment: Jagannath Hora / Drik-style Lahiri tables — UI marks “Lahiri table · interpolated”.
+ * Jupiter anchors include verified Sep 10 2026 ~21°25′–21°42′ Cancer (Ashlesha pada 2).
+ * Saturn stays Pisces (~17–20° R through Sep 2026) — NOT Cancer.
+ */
+var GOCHARA_TABLE = [
+  /* date, Ju, Sa, Ra, Ma — sidereal lon */
+  { d: '2026-06-01', Ju: 89.7, Sa: 349.8, Ra: 312.2, Ma: 48.0 },
+  { d: '2026-06-02', Ju: 90.0, Sa: 349.85, Ra: 312.15, Ma: 48.6 },
+  { d: '2026-06-08', Ju: 91.4, Sa: 350.1, Ra: 311.8, Ma: 52.5 },
+  { d: '2026-06-18', Ju: 93.3, Sa: 350.4, Ra: 311.25, Ma: 59.0 },
+  { d: '2026-06-25', Ju: 94.7, Sa: 350.55, Ra: 310.9, Ma: 63.5 },
+  { d: '2026-07-01', Ju: 96.5, Sa: 350.7, Ra: 310.55, Ma: 67.5 },
+  { d: '2026-07-08', Ju: 98.2, Sa: 350.75, Ra: 310.15, Ma: 72.5 },
+  { d: '2026-07-15', Ju: 100.0, Sa: 350.7, Ra: 309.75, Ma: 78.0 },
+  { d: '2026-07-22', Ju: 101.7, Sa: 350.55, Ra: 309.35, Ma: 83.5 },
+  { d: '2026-08-01', Ju: 104.0, Sa: 350.2, Ra: 308.8, Ma: 91.0 },
+  { d: '2026-08-08', Ju: 105.3, Sa: 349.95, Ra: 308.4, Ma: 96.5 },
+  { d: '2026-08-19', Ju: 106.67, Sa: 349.5, Ra: 307.8, Ma: 105.0 },
+  { d: '2026-08-25', Ju: 107.9, Sa: 349.25, Ra: 307.45, Ma: 110.0 },
+  { d: '2026-09-01', Ju: 109.42, Sa: 349.0, Ra: 307.05, Ma: 116.0 },
+  { d: '2026-09-08', Ju: 110.87, Sa: 348.7, Ra: 306.65, Ma: 122.0 },
+  { d: '2026-09-10', Ju: 111.42, Sa: 348.55, Ra: 306.55, Ma: 123.7 },
+  { d: '2026-09-15', Ju: 112.28, Sa: 348.3, Ra: 306.25, Ma: 128.0 },
+  { d: '2026-09-22', Ju: 113.65, Sa: 347.95, Ra: 305.85, Ma: 134.0 },
+  { d: '2026-09-30', Ju: 115.13, Sa: 347.55, Ra: 305.4, Ma: 141.0 },
+  { d: '2026-10-08', Ju: 116.5, Sa: 347.15, Ra: 304.95, Ma: 148.0 },
+  { d: '2026-10-15', Ju: 117.5, Sa: 346.85, Ra: 304.55, Ma: 154.0 },
+  { d: '2026-10-22', Ju: 118.6, Sa: 346.6, Ra: 304.15, Ma: 160.0 },
+  { d: '2026-10-31', Ju: 120.0, Sa: 346.35, Ra: 303.65, Ma: 168.0 },
+  { d: '2026-11-08', Ju: 122.2, Sa: 346.2, Ra: 303.2, Ma: 175.0 },
+  { d: '2026-11-15', Ju: 124.0, Sa: 346.1, Ra: 302.8, Ma: 181.0 },
+  { d: '2026-11-22', Ju: 125.8, Sa: 346.05, Ra: 302.4, Ma: 187.0 },
+  { d: '2026-12-01', Ju: 128.0, Sa: 346.0, Ra: 301.9, Ma: 195.0 },
+  { d: '2026-12-08', Ju: 129.3, Sa: 346.0, Ra: 301.5, Ma: 201.0 },
+  { d: '2026-12-15', Ju: 130.5, Sa: 346.05, Ra: 301.1, Ma: 207.0 },
+  { d: '2026-12-22', Ju: 129.8, Sa: 346.15, Ra: 300.7, Ma: 213.0 },
+  { d: '2026-12-31', Ju: 128.5, Sa: 346.35, Ra: 300.2, Ma: 221.0 },
+  { d: '2027-01-08', Ju: 126.5, Sa: 346.55, Ra: 299.75, Ma: 228.0 },
+  { d: '2027-01-15', Ju: 124.0, Sa: 346.8, Ra: 299.35, Ma: 234.0 },
+  { d: '2027-01-25', Ju: 120.0, Sa: 347.15, Ra: 298.8, Ma: 243.0 },
+  { d: '2027-02-01', Ju: 117.5, Sa: 347.4, Ra: 298.4, Ma: 249.0 },
+  { d: '2027-02-15', Ju: 115.0, Sa: 347.9, Ra: 297.6, Ma: 261.0 },
+  { d: '2027-03-01', Ju: 112.0, Sa: 348.5, Ra: 296.85, Ma: 273.0 },
+  { d: '2027-03-15', Ju: 110.0, Sa: 349.1, Ra: 296.05, Ma: 285.0 },
+  { d: '2027-04-01', Ju: 109.0, Sa: 349.85, Ra: 295.1, Ma: 300.0 },
+  { d: '2027-04-15', Ju: 110.5, Sa: 350.4, Ra: 294.3, Ma: 312.0 },
+  { d: '2027-05-01', Ju: 113.0, Sa: 351.1, Ra: 293.4, Ma: 326.0 },
+  { d: '2027-05-15', Ju: 116.0, Sa: 351.7, Ra: 292.6, Ma: 338.0 },
+  { d: '2027-06-01', Ju: 119.0, Sa: 352.4, Ra: 291.65, Ma: 353.0 },
+  { d: '2027-06-15', Ju: 122.0, Sa: 352.95, Ra: 290.85, Ma: 5.0 },
+  { d: '2027-06-30', Ju: 125.0, Sa: 353.5, Ra: 290.0, Ma: 18.0 }
+];
+
+/* Curated Guru–Shani season windows (Jupiter in Cancer lighting natal Saturn) */
+var GURU_SHANI_WINDOWS = [
+  { start: '2026-06-02', end: '2026-10-31', label: 'Jupiter exalted in Cancer' },
+  { start: '2027-01-25', end: '2027-06-15', label: 'Jupiter returns Cancer (retro path)' }
+];
+
+var gateTimerInterval = null;
+var gateTimerEndsAt = null;
+
 function defaultState() {
   return {
     displayName: 'Arlette',
     practices: {},
-    lab: { answers: {}, notes: {}, savedAt: null },
+    lab: { answers: {}, notes: {}, savedAt: null, history: [] },
     journal: [],
-    editingId: null
+    editingId: null,
+    matter: {},
+    gate: {}
   };
+}
+
+function normalizeState(parsed) {
+  if (!parsed || typeof parsed !== 'object') { return defaultState(); }
+  if (!parsed.practices) { parsed.practices = {}; }
+  if (!parsed.lab) { parsed.lab = { answers: {}, notes: {}, savedAt: null, history: [] }; }
+  if (!parsed.lab.answers) { parsed.lab.answers = {}; }
+  if (!parsed.lab.notes) { parsed.lab.notes = {}; }
+  if (!parsed.lab.history) { parsed.lab.history = []; }
+  if (!parsed.journal) { parsed.journal = []; }
+  if (!parsed.displayName) { parsed.displayName = 'Arlette'; }
+  if (!parsed.matter) { parsed.matter = {}; }
+  if (!parsed.gate) { parsed.gate = {}; }
+  return parsed;
 }
 
 function loadState() {
   var raw;
   var parsed;
+  var rawOld;
   try {
     raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) { return defaultState(); }
-    parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== 'object') { return defaultState(); }
-    if (!parsed.practices) { parsed.practices = {}; }
-    if (!parsed.lab) { parsed.lab = { answers: {}, notes: {}, savedAt: null }; }
-    if (!parsed.lab.answers) { parsed.lab.answers = {}; }
-    if (!parsed.lab.notes) { parsed.lab.notes = {}; }
-    if (!parsed.journal) { parsed.journal = []; }
-    if (!parsed.displayName) { parsed.displayName = 'Arlette'; }
-    return parsed;
+    if (raw) {
+      parsed = JSON.parse(raw);
+      return normalizeState(parsed);
+    }
+    rawOld = localStorage.getItem(STORAGE_KEY_V1);
+    if (rawOld) {
+      parsed = JSON.parse(rawOld);
+      parsed = normalizeState(parsed);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      } catch (e2) { /* ignore */ }
+      return parsed;
+    }
+    return defaultState();
   } catch (e) {
     return defaultState();
   }
@@ -822,6 +1028,16 @@ function dateKey(d) {
   return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
 }
 
+function parseDateKey(s) {
+  var p = String(s).split('-');
+  return new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+}
+
+function daysBetween(a, b) {
+  var ms = parseDateKey(b).getTime() - parseDateKey(a).getTime();
+  return ms / 86400000;
+}
+
 function formatNiceDate(d) {
   var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   return VARA[d.getDay()].name + ', ' + months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
@@ -835,21 +1051,74 @@ function toSiderealLon(tropicalLon) {
 }
 
 function lonToSignDeg(lon) {
-  var s = Math.floor(lon / 30);
-  var d = lon - s * 30;
+  var s = Math.floor(lon / 30) % 12;
+  if (s < 0) { s += 12; }
+  var d = lon - Math.floor(lon / 30) * 30;
+  while (d < 0) { d += 30; }
+  while (d >= 30) { d -= 30; }
   var deg = Math.floor(d);
   var mins = Math.floor((d - deg) * 60);
-  return { signIndex: s, sign: SIGN_SHORT[s], deg: deg, mins: mins, label: SIGN_SHORT[s] + ' ' + deg + '°' + pad2(mins) + '′' };
+  return { signIndex: s, sign: SIGN_SHORT[s], deg: deg, mins: mins, label: SIGN_SHORT[s] + ' ' + deg + '°' + pad2(mins) + '′', lonInSign: d };
 }
 
-/* Approximate geocentric longitudes (simplified VSOP-ish / mean elements) — honest approx for sky note */
-function approxPlanetLongitudes(date) {
+function normLon(x) {
+  x = x % 360;
+  if (x < 0) { x += 360; }
+  return x;
+}
+
+function shortestOrb(a, b) {
+  var d = Math.abs(normLon(a) - normLon(b));
+  if (d > 180) { d = 360 - d; }
+  return d;
+}
+
+function interpolateTable(dateStr) {
+  var i;
+  var a;
+  var b;
+  var t;
+  var span;
+  if (dateStr <= GOCHARA_TABLE[0].d) {
+    return { Ju: GOCHARA_TABLE[0].Ju, Sa: GOCHARA_TABLE[0].Sa, Ra: GOCHARA_TABLE[0].Ra, Ma: GOCHARA_TABLE[0].Ma };
+  }
+  if (dateStr >= GOCHARA_TABLE[GOCHARA_TABLE.length - 1].d) {
+    a = GOCHARA_TABLE[GOCHARA_TABLE.length - 1];
+    return { Ju: a.Ju, Sa: a.Sa, Ra: a.Ra, Ma: a.Ma };
+  }
+  for (i = 0; i < GOCHARA_TABLE.length - 1; i++) {
+    if (dateStr >= GOCHARA_TABLE[i].d && dateStr <= GOCHARA_TABLE[i + 1].d) {
+      a = GOCHARA_TABLE[i];
+      b = GOCHARA_TABLE[i + 1];
+      span = daysBetween(a.d, b.d);
+      t = span === 0 ? 0 : daysBetween(a.d, dateStr) / span;
+      return {
+        Ju: a.Ju + (b.Ju - a.Ju) * t,
+        Sa: a.Sa + (b.Sa - a.Sa) * t,
+        Ra: a.Ra + (b.Ra - a.Ra) * t,
+        Ma: lerpLon(a.Ma, b.Ma, t)
+      };
+    }
+  }
+  a = GOCHARA_TABLE[GOCHARA_TABLE.length - 1];
+  return { Ju: a.Ju, Sa: a.Sa, Ra: a.Ra, Ma: a.Ma };
+}
+
+function lerpLon(a, b, t) {
+  var diff = b - a;
+  if (diff > 180) { diff -= 360; }
+  if (diff < -180) { diff += 360; }
+  return normLon(a + diff * t);
+}
+
+/* Approximate geocentric longitudes for fast planets — tropical − ayanamsa (~24.13° for 2026) */
+function approxFastLongitudes(date) {
   var y = date.getFullYear();
   var m = date.getMonth() + 1;
   var day = date.getDate() + (date.getHours() + date.getTimezoneOffset() / -60) / 24;
-  var a = Math.floor((14 - m) / 12);
-  var yy = y + 4800 - a;
-  var mm = m + 12 * a - 3;
+  var aa = Math.floor((14 - m) / 12);
+  var yy = y + 4800 - aa;
+  var mm = m + 12 * aa - 3;
   var jd = day + Math.floor((153 * mm + 2) / 5) + 365 * yy + Math.floor(yy / 4) - Math.floor(yy / 100) + Math.floor(yy / 400) - 32045;
   var T = (jd - 2451545.0) / 36525.0;
 
@@ -859,60 +1128,269 @@ function approxPlanetLongitudes(date) {
     return x;
   }
 
-  /* Sun mean longitude + equation of center (coarse) */
   var L0 = norm(280.46646 + 36000.76983 * T + 0.0003032 * T * T);
   var M = norm(357.52911 + 35999.05029 * T - 0.0001537 * T * T);
   var Mr = M * Math.PI / 180;
   var C = (1.914602 - 0.004817 * T) * Math.sin(Mr) + 0.019993 * Math.sin(2 * Mr);
   var sunTrop = norm(L0 + C);
-
-  /* Moon — very coarse mean longitude */
   var moonTrop = norm(218.3165 + 481267.8813 * T);
-
-  /* Planets — mean longitudes (coarse educational approx) */
-  var mercTrop = norm(252.2509 + 149472.6745 * T);
+  var mercTrop = norm(252.2509 + 149472.6745 * T + 4.0 * Math.sin(Mr));
   var venTrop = norm(181.9798 + 58517.8156 * T);
-  var marsTrop = norm(355.433 + 19140.2993 * T);
-  var jupTrop = norm(34.3515 + 3034.9057 * T);
-  var satTrop = norm(50.0774 + 1222.1138 * T);
 
   return {
     Sun: toSiderealLon(sunTrop),
     Moon: toSiderealLon(moonTrop),
     Mercury: toSiderealLon(mercTrop),
-    Venus: toSiderealLon(venTrop),
-    Mars: toSiderealLon(marsTrop),
-    Jupiter: toSiderealLon(jupTrop),
-    Saturn: toSiderealLon(satTrop)
+    Venus: toSiderealLon(venTrop)
   };
 }
 
+function getTransitLongitudes(date) {
+  var key = dateKey(date);
+  var table = interpolateTable(key);
+  var fast = approxFastLongitudes(date);
+  return {
+    Sun: { lon: fast.Sun, src: 'approx' },
+    Moon: { lon: fast.Moon, src: 'approx' },
+    Mercury: { lon: fast.Mercury, src: 'approx' },
+    Venus: { lon: fast.Venus, src: 'approx' },
+    Mars: { lon: table.Ma, src: 'table' },
+    Jupiter: { lon: table.Ju, src: 'table' },
+    Saturn: { lon: table.Sa, src: 'table' },
+    Rahu: { lon: table.Ra, src: 'table' },
+    Ketu: { lon: normLon(table.Ra + 180), src: 'table' }
+  };
+}
+
+function inGuruShaniWindow(dateStr) {
+  var i;
+  var w;
+  for (i = 0; i < GURU_SHANI_WINDOWS.length; i++) {
+    w = GURU_SHANI_WINDOWS[i];
+    if (dateStr >= w.start && dateStr <= w.end) { return w; }
+  }
+  return null;
+}
+
+function buildSeasonCard(date) {
+  var key = dateKey(date);
+  var win = inGuruShaniWindow(key);
+  var tr;
+  var jupLon;
+  var orb;
+  var orbStr;
+  var html;
+  if (!win) {
+    return '<div class="season-card" id="seasonCard"><div class="eyebrow">Gochara season</div>' +
+      '<h2>No major Guru–Shani exact season</h2>' +
+      '<p>Outside curated Jupiter-in-Cancer windows (Jun 2–Oct 31 2026; return ~Jan 25–Jun 15 2027). Natal Saturn remains Karka 21°32′ — a standing theme of belonging without self-erasure.</p></div>';
+  }
+  tr = getTransitLongitudes(date);
+  jupLon = tr.Jupiter.lon;
+  orb = shortestOrb(jupLon, NATAL_LON.Saturn);
+  orbStr = orb.toFixed(1);
+  html = '<div class="season-card" id="seasonCard">' +
+    '<div class="eyebrow">Season · ' + win.label + '</div>' +
+    '<h2>Season: Guru on your Shani</h2>' +
+    '<p>Transit Jupiter exalted in Cancer is conjunct / lighting natal Saturn at Karka 21°32′. Contemplative practice: belonging without self-erasure; expand through structure, not flash.</p>' +
+    '<p class="orb">Computed orb (transit ♃ to natal ♄): <strong>' + orbStr + '°</strong>' +
+    (orb <= 3 ? ' · within 3° highlight' : '') +
+    (orb <= 1 ? ' · nearly exact' : '') +
+    '</p>' +
+    '<p class="src-tag">Lahiri table · interpolated · verified Ju ~21°25′ Cn Ashlesha p2 on Sep 10 2026</p>' +
+    '</div>';
+  return html;
+}
+
+function buildNatalLights(date) {
+  var tr = getTransitLongitudes(date);
+  var natalNames = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Rahu', 'Ketu'];
+  var transitNames = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Rahu'];
+  var chips = [];
+  var byNatal = {};
+  var i;
+  var j;
+  var tn;
+  var nn;
+  var tSign;
+  var nSign;
+  var orb;
+  var lit;
+  var exact;
+  var label;
+  var keys;
+  var grp;
+
+  for (i = 0; i < transitNames.length; i++) {
+    tn = transitNames[i];
+    tSign = Math.floor(tr[tn].lon / 30) % 12;
+    for (j = 0; j < natalNames.length; j++) {
+      nn = natalNames[j];
+      nSign = Math.floor(NATAL_LON[nn] / 30) % 12;
+      if (tSign !== nSign) { continue; }
+      orb = shortestOrb(tr[tn].lon, NATAL_LON[nn]);
+      exact = orb <= 3;
+      if (!byNatal[nn]) { byNatal[nn] = []; }
+      byNatal[nn].push({ transit: tn, orb: orb, exact: exact, src: tr[tn].src });
+    }
+  }
+
+  keys = Object.keys(byNatal);
+  if (keys.length === 0) {
+    chips.push('<span class="chip">No same-sign natal lights today</span>');
+  } else {
+    for (i = 0; i < keys.length; i++) {
+      nn = keys[i];
+      grp = byNatal[nn];
+      lit = [];
+      exact = false;
+      for (j = 0; j < grp.length; j++) {
+        lit.push(GRAHA_SYM[grp[j].transit] + ' ' + grp[j].transit +
+          (grp[j].exact ? ' (orb ' + grp[j].orb.toFixed(1) + '°)' : ''));
+        if (grp[j].exact) { exact = true; }
+      }
+      label = lit.join(' + ') + ' lights natal ' + nn;
+      /* Prefer short form for Jupiter→Saturn */
+      if (grp.length === 1) {
+        label = GRAHA_SYM[grp[0].transit] + ' transit lights natal ' + nn +
+          (grp[0].exact ? ' (orb ' + grp[0].orb.toFixed(1) + '°)' : '');
+      } else {
+        label = '';
+        for (j = 0; j < grp.length; j++) {
+          if (j > 0) { label += '+'; }
+          label += GRAHA_SYM[grp[j].transit];
+        }
+        label += ' in ' + SIGN_SHORT[Math.floor(NATAL_LON[nn] / 30) % 12] + ' lights ' + nn;
+        for (j = 0; j < grp.length; j++) {
+          if (grp[j].exact) {
+            label += ' · ' + GRAHA_SYM[grp[j].transit] + ' orb ' + grp[j].orb.toFixed(1) + '°';
+          }
+        }
+      }
+      chips.push('<span class="chip ' + (exact ? 'lit-exact' : 'lit-sign') + '">' + label + '</span>');
+    }
+  }
+
+  return '<div class="lights-card" id="lightsCard">' +
+    '<h3>Natal lights · gochara</h3>' +
+    '<div class="chip-row">' + chips.join('') + '</div>' +
+    '<p class="src-tag">Lahiri table · interpolated (♃ ♄ ☊ ♂) · Sun/☿/♀/☾ approx Lahiri (tropical − ~24.13°)</p>' +
+    '</div>';
+}
+
 function buildSkyNote(date) {
-  var longs = approxPlanetLongitudes(date);
+  var tr = getTransitLongitudes(date);
   var names = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'];
   var chips = [];
   var i;
   var info;
+  var src;
   for (i = 0; i < names.length; i++) {
-    info = lonToSignDeg(longs[names[i]]);
-    chips.push(names[i] + ' · ' + info.label);
+    info = lonToSignDeg(tr[names[i]].lon);
+    src = tr[names[i]].src === 'table' ? '' : '≈';
+    chips.push(src + names[i] + ' · ' + info.label);
   }
-
-  var jup = lonToSignDeg(longs.Jupiter);
-  var seasonal = '';
-  if (jup.signIndex === 3) {
-    seasonal = ' Transit Jupiter appears in Karka (Cancer) on this approximate calculator — a soft echo toward your natal Saturn at Karka 21°32′: themes of belonging, care, and emotional structure may feel louder. Treat degrees as directional, not exact.';
-  } else if (date.getFullYear() === 2026 && date.getMonth() === 8) {
-    seasonal = ' Curated Sep 2026 note: Jupiter’s exalted Cancer season activates natal Saturn themes — secure belonging without self-erasure.';
-  } else {
-    seasonal = ' Use sign-level gochara only; this calculator is Lahiri-ish (tropical − ~24.1° ayanamsa) and intentionally approximate.';
-  }
-
   return {
-    html: '<strong>Sky note</strong> (approximate Lahiri-ish · tropical − ~24.1° · not ephemeris-grade)<br>' +
-      chips.join(' · ') + '<br><br>' + seasonal +
-      ' Never treat these as exact birth-time or predictive degrees.'
+    html: '<strong>Sky note</strong> (table planets + approx Lahiri for fast grahas)<br>' +
+      chips.join(' · ') +
+      '<br><br>Slow grahas from curated Lahiri weekly table; fast grahas tropical − ~24.13°. No houses.'
   };
+}
+
+function buildMatterMeter(date) {
+  var key = dateKey(date);
+  var m = state.matter[key] || {};
+  var c1 = m.tangible ? ' checked' : '';
+  var c2 = m.talkOnly ? ' checked' : '';
+  return '<div class="meter-card" id="matterMeter">' +
+    '<h3>Matter meter · Guru–Shukra Taurus</h3>' +
+    '<p class="hint">Wisdom becomes matter. Two check-ins for today.</p>' +
+    '<ul class="check-list">' +
+    '<li><input type="checkbox" id="matterTangible"' + c1 + '><span>Made one tangible thing (matter)</span></li>' +
+    '<li><input type="checkbox" id="matterTalkOnly"' + c2 + '><span>Caught a talk-only urge and chose not to perform it</span></li>' +
+    '</ul></div>';
+}
+
+function buildGateCard(date) {
+  var day = date.getDay();
+  var prominent = (day === 0 || day === 3); /* Sun or Wednesday (Mercury) */
+  var key = dateKey(date);
+  var g = state.gate[key] || {};
+  var checked = g.finished ? ' checked' : '';
+  var inner =
+    '<h3>Gemini finish-before-perform gate</h3>' +
+    '<ul class="check-list">' +
+    '<li><input type="checkbox" id="gateFinished"' + checked + '><span>If I share today, is it finished enough?</span></li>' +
+    '</ul>' +
+    '<div class="gate-timer">' +
+    '<button type="button" class="btn" id="gateTimerBtn">Start 15-min hold</button>' +
+    '<span class="timer-display" id="gateTimerDisplay">15:00</span>' +
+    '<span class="approx">Optional pause before posting or performing.</span>' +
+    '</div>';
+
+  if (prominent) {
+    return '<div class="gate-card" id="gateCard">' + inner + '</div>';
+  }
+  return '<div class="gate-card collapsed-gate" id="gateCard"><details><summary>Gemini finish gate (optional today)</summary>' +
+    '<div style="margin-top:10px;">' + inner + '</div></details></div>';
+}
+
+function bindMatterAndGate(key) {
+  var t = document.getElementById('matterTangible');
+  var o = document.getElementById('matterTalkOnly');
+  var g = document.getElementById('gateFinished');
+  var btn = document.getElementById('gateTimerBtn');
+  if (t) {
+    t.onchange = function () {
+      if (!state.matter[key]) { state.matter[key] = {}; }
+      state.matter[key].tangible = t.checked;
+      saveState();
+    };
+  }
+  if (o) {
+    o.onchange = function () {
+      if (!state.matter[key]) { state.matter[key] = {}; }
+      state.matter[key].talkOnly = o.checked;
+      saveState();
+    };
+  }
+  if (g) {
+    g.onchange = function () {
+      if (!state.gate[key]) { state.gate[key] = {}; }
+      state.gate[key].finished = g.checked;
+      saveState();
+    };
+  }
+  if (btn) {
+    btn.onclick = function () {
+      startGateTimer(15 * 60);
+    };
+  }
+}
+
+function startGateTimer(seconds) {
+  var display = document.getElementById('gateTimerDisplay');
+  var btn = document.getElementById('gateTimerBtn');
+  if (gateTimerInterval) {
+    clearInterval(gateTimerInterval);
+    gateTimerInterval = null;
+  }
+  gateTimerEndsAt = Date.now() + seconds * 1000;
+  if (btn) { btn.textContent = 'Hold running…'; }
+  function tick() {
+    var left = Math.max(0, Math.ceil((gateTimerEndsAt - Date.now()) / 1000));
+    var mm = Math.floor(left / 60);
+    var ss = left % 60;
+    if (display) { display.textContent = mm + ':' + pad2(ss); }
+    if (left <= 0) {
+      clearInterval(gateTimerInterval);
+      gateTimerInterval = null;
+      if (display) { display.textContent = '0:00'; }
+      if (btn) { btn.textContent = 'Hold complete — start again?'; }
+    }
+  }
+  tick();
+  gateTimerInterval = setInterval(tick, 250);
 }
 
 function renderNav() {
@@ -962,6 +1440,12 @@ function renderToday() {
   var html;
   var checked;
 
+  document.getElementById('seasonSlot').innerHTML = buildSeasonCard(now);
+  document.getElementById('lightsSlot').innerHTML = buildNatalLights(now);
+  document.getElementById('gateSlot').innerHTML = buildGateCard(now);
+  document.getElementById('matterSlot').innerHTML = buildMatterMeter(now);
+  bindMatterAndGate(key);
+
   document.getElementById('todayDateLabel').textContent = formatNiceDate(now);
   document.getElementById('todayVaraTitle').textContent =
     day.name + ' · ' + day.planet + ' (vāra ' + day.sanskrit + ')';
@@ -996,6 +1480,74 @@ function renderToday() {
   document.getElementById('skyNote').innerHTML = buildSkyNote(now).html;
 }
 
+function weekStartKey(d) {
+  var x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  x.setDate(x.getDate() - x.getDay());
+  return dateKey(x);
+}
+
+function renderLabHistory() {
+  var wrap = document.getElementById('labHistory');
+  var hist = (state.lab.history || []).slice();
+  var byDate = {};
+  var i;
+  var h;
+  var html;
+  var now = new Date();
+  var cells = '';
+  var d;
+  var dk;
+  var entry;
+  var fired;
+  var qid;
+  var weekKey = weekStartKey(now);
+  var weekCounts = { q1: 0, q2: 0, q3: 0, q4: 0 };
+  var totalWeek = 0;
+  var last14 = [];
+
+  for (i = 0; i < hist.length; i++) {
+    h = hist[i];
+    byDate[h.date] = h;
+  }
+
+  for (i = 13; i >= 0; i--) {
+    d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+    last14.push(dateKey(d));
+  }
+
+  for (i = 0; i < last14.length; i++) {
+    dk = last14[i];
+    entry = byDate[dk];
+    fired = [];
+    if (entry && entry.answers) {
+      for (qid in entry.answers) {
+        if (entry.answers[qid]) {
+          fired.push(qid.toUpperCase());
+          if (dk >= weekKey) {
+            weekCounts[qid] = (weekCounts[qid] || 0) + 1;
+            totalWeek += 1;
+          }
+        }
+      }
+    }
+    d = parseDateKey(dk);
+    cells += '<div class="heat-cell' + (fired.length ? ' hot' : '') + '">' +
+      '<div class="hd">' + ['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()] + ' ' + d.getDate() + '</div>' +
+      (fired.length ? fired.join(' ') : '—') +
+      '</div>';
+  }
+
+  html = '<h3>Last 14 days · which questions fired</h3>' +
+    '<p class="lab-counts">This week (Sun–today): q1 ' + weekCounts.q1 +
+    ' · q2 ' + weekCounts.q2 +
+    ' · q3 ' + weekCounts.q3 +
+    ' · q4 ' + weekCounts.q4 +
+    ' · total hits ' + totalWeek + '</p>' +
+    '<div class="heat-strip">' + cells + '</div>' +
+    '<p class="approx">Each Save stores a dated snapshot. Hot cells = at least one yes.</p>';
+  wrap.innerHTML = html;
+}
+
 function renderLab() {
   var wrap = document.getElementById('labQuestions');
   var html = '';
@@ -1022,16 +1574,38 @@ function renderLab() {
     var boxes = wrap.querySelectorAll('input[type="checkbox"]');
     var areas = wrap.querySelectorAll('textarea');
     var j;
+    var answers = {};
+    var notes = {};
+    var today = dateKey(new Date());
+    var hist;
+    var replaced = false;
     for (j = 0; j < boxes.length; j++) {
+      answers[boxes[j].getAttribute('data-qid')] = boxes[j].checked;
       state.lab.answers[boxes[j].getAttribute('data-qid')] = boxes[j].checked;
     }
     for (j = 0; j < areas.length; j++) {
+      notes[areas[j].getAttribute('data-note')] = areas[j].value;
       state.lab.notes[areas[j].getAttribute('data-note')] = areas[j].value;
     }
     state.lab.savedAt = new Date().toISOString();
+    if (!state.lab.history) { state.lab.history = []; }
+    hist = state.lab.history;
+    for (j = 0; j < hist.length; j++) {
+      if (hist[j].date === today) {
+        hist[j] = { date: today, answers: answers, notes: notes };
+        replaced = true;
+        break;
+      }
+    }
+    if (!replaced) {
+      hist.push({ date: today, answers: answers, notes: notes });
+    }
     saveState();
     document.getElementById('labSavedMsg').textContent = 'Saved to this device.';
+    renderLabHistory();
   };
+
+  renderLabHistory();
 }
 
 function escapeHtml(s) {
@@ -1216,12 +1790,7 @@ function setupSettings() {
       var parsed;
       try {
         parsed = JSON.parse(String(reader.result));
-        if (!parsed || typeof parsed !== 'object') { throw new Error('bad'); }
-        state = parsed;
-        if (!state.practices) { state.practices = {}; }
-        if (!state.lab) { state.lab = { answers: {}, notes: {}, savedAt: null }; }
-        if (!state.journal) { state.journal = []; }
-        if (!state.displayName) { state.displayName = 'Arlette'; }
+        state = normalizeState(parsed);
         saveState();
         applyDisplayName();
         renderToday();
@@ -1274,6 +1843,7 @@ try {
   }
   if (typeof console !== 'undefined' && console.error) { console.error(err); }
 }
+
 </script>
 </body>
 </html>
