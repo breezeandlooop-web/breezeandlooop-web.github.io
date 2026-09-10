@@ -100,133 +100,133 @@ function viewBoard(f){
   const map={flight,ready,money:moneyDue,closed};
   const list=map[f]||flight;
   const owe=moneyDue.reduce((s,x)=>s+dueOf(x),0);
-  $("#app").innerHTML=`<div class="top"><div><span class="word">Breeze Slip</span><span class="sub">${esc(state.studio)}</span></div>
-    <button class="chip" onclick="go('#/studio')">Studio</button></div>
+  $("#app").innerHTML=`<div class=\"top\"><div><span class=\"word\">Breeze Slip</span><span class=\"sub\">${esc(state.studio)}</span></div>
+    <button class=\"chip\" onclick=\"go('#/studio')\">Studio</button></div>
     <h1>On the hook</h1>
-    <p class="lede">WhatsApp stays the shop. This is the slip you used to keep in your head.</p>
-    <div class="stats"><div class="stat"><b>${flight.length}</b><span>In flight</span></div>
-    <div class="stat"><b>${ready.length}</b><span>Ready</span></div>
-    <div class="stat"><b>${money(owe)}</b><span>Still due</span></div></div>
-    <div class="filters">
-      ${chip("flight","In flight",f)}${chip("ready","Ready",f)}${chip("money","Money due",f)}${chip("closed","Closed",f)}
+    <p class=\"lede\">WhatsApp stays the shop. This is the slip you used to keep in your head.</p>
+    <div class=\"stats\"><div class=\"stat\"><b>${flight.length}</b><span>In flight</span></div>
+    <div class=\"stat\"><b>${ready.length}</b><span>Ready</span></div>
+    <div class=\"stat\"><b>${money(owe)}</b><span>Still due</span></div></div>
+    <div class=\"filters\">
+      ${chip(\"flight\",\"In flight\",f)}${chip(\"ready\",\"Ready\",f)}${chip(\"money\",\"Money due\",f)}${chip(\"closed\",\"Closed\",f)}
     </div>
-    <div class="list">${list.map(card).join("")||"<p class='lede'>Quiet board.</p>"}</div>
-    <button class="fab" onclick="go('#/new')">New slip</button>`;
+    <div class=\"list\">${list.map(card).join(\"\")||\"<p class='lede'>Quiet board.</p>\"}</div>
+    <button class=\"fab\" onclick=\"go('#/new')\">New slip</button>`;
 }
-function chip(id,l,on){return `<button class="chip ${on===id?"on":""}" onclick="go('#/${id}')">${l}</button>`}
+function chip(id,l,on){return `<button class=\"chip ${on===id?\"on\":\"\"}\" onclick=\"go('#/${id}')\">${l}</button>`}
 function card(x){
   const d=dueOf(x);
-  const pill=d===0?`<span class="pill paid">Paid</span>`:`<span class="pill due">Due ${money(d)}</span>`;
-  return `<button class="card" onclick="go('#/order/${x.id}')">
-    <div class="k"><span>${esc(x.customer)}</span><span class="${late(x)?"late":""}">${late(x)?"Late \u00b7 ":""}${pretty(x.due)}</span></div>
+  const pill=d===0?`<span class=\"pill paid\">Paid</span>`:`<span class=\"pill due\">Due ${money(d)}</span>`;
+  return `<button class=\"card\" onclick=\"go('#/order/${x.id}')\">
+    <div class=\"k\"><span>${esc(x.customer)}</span><span class=\"${late(x)?\"late\":\"\"}\">${late(x)?\"Late \u00b7 \":\"\"}${pretty(x.due)}</span></div>
     <h3>${esc(x.piece)}</h3>
-    <div class="pills"><span class="pill">${esc(x.stage)}</span>${pill}<span class="money">${money(x.paid)} / ${money(x.price)}</span></div>
+    <div class=\"pills\"><span class=\"pill\">${esc(x.stage)}</span>${pill}<span class=\"money\">${money(x.paid)} / ${money(x.price)}</span></div>
   </button>`;
 }
 function viewNew(){
-  $("#app").innerHTML=`<button class="back" onclick="go('#/flight')">\u2190 Board</button>
-    <h1>New slip</h1><p class="lede">Name, piece, price. Then back to the hook.</p>
-    <form id="nf">
-      <label><span>Customer</span><input name="customer" required placeholder="Who is this for?"></label>
-      <label><span>Piece</span><input name="piece" required placeholder="Sea-glass tote"></label>
-      <div class="row">
-        <label><span>Price BBD</span><input name="price" type="number" min="0" required placeholder="180"></label>
-        <label><span>Paid today</span><input name="paid" type="number" min="0" placeholder="0"></label>
+  $("#app").innerHTML=`<button class=\"back\" onclick=\"go('#/flight')\">\u2190 Board</button>
+    <h1>New slip</h1><p class=\"lede\">Name, piece, price. Then back to the hook.</p>
+    <form id=\"nf\">
+      <label><span>Customer</span><input name=\"customer\" required placeholder=\"Who is this for?\"></label>
+      <label><span>Piece</span><input name=\"piece\" required placeholder=\"Sea-glass tote\"></label>
+      <div class=\"row\">
+        <label><span>Price BBD</span><input name=\"price\" type=\"number\" min=\"0\" required placeholder=\"180\"></label>
+        <label><span>Paid today</span><input name=\"paid\" type=\"number\" min=\"0\" placeholder=\"0\"></label>
       </div>
-      <div class="row">
-        <label><span>Due</span><input name="due" type="date"></label>
-        <label><span>Rail</span><select name="method">${METHODS.map(m=>`<option>${m}</option>`).join("")}</select></label>
+      <div class=\"row\">
+        <label><span>Due</span><input name=\"due\" type=\"date\"></label>
+        <label><span>Rail</span><select name=\"method\">${METHODS.map(m=>`<option>${m}</option>`).join(\"\")}</select></label>
       </div>
-      <label><span>Where / how it leaves</span><input name="where" placeholder="Collect Oistins"></label>
-      <button class="fab" type="submit">Save slip</button>
+      <label><span>Where / how it leaves</span><input name=\"where\" placeholder=\"Collect Oistins\"></label>
+      <button class=\"fab\" type=\"submit\">Save slip</button>
     </form>`;
   $("#nf").onsubmit=e=>{
     e.preventDefault();
     const f=new FormData(e.target);
-    const price=+f.get("price")||0;
-    const row=o(f.get("customer").trim(),f.get("piece").trim(),f.get("where").trim(),f.get("due"),price,+f.get("paid")||0,f.get("method"),"Brief locked");
-    state.orders.unshift(row);save(state);go("#/order/"+row.id);
+    const price=+f.get(\"price\")||0;
+    const row=o(f.get(\"customer\").trim(),f.get(\"piece\").trim(),f.get(\"where\").trim(),f.get(\"due\"),price,+f.get(\"paid\")||0,f.get(\"method\"),\"Brief locked\");
+    state.orders.unshift(row);save(state);go(\"#/order/\"+row.id);
   };
 }
 function viewOrder(id){
   const x=state.orders.find(v=>v.id===id);
-  if(!x){ $("#app").innerHTML=`<button class="back" onclick="go('#/flight')">\u2190 Board</button><h1>Slip gone</h1>`;return; }
+  if(!x){ $("#app").innerHTML=`<button class=\"back\" onclick=\"go('#/flight')\">\u2190 Board</button><h1>Slip gone</h1>`;return; }
   const d=dueOf(x);
-  $("#app").innerHTML=`<button class="back" onclick="go('#/flight')">\u2190 Board</button>
-    <div class="k"><span>${esc(x.customer)}</span><span class="${late(x)?"late":""}">${pretty(x.due)}</span></div>
+  $("#app").innerHTML=`<button class=\"back\" onclick=\"go('#/flight')\">\u2190 Board</button>
+    <div class=\"k\"><span>${esc(x.customer)}</span><span class=\"${late(x)?\"late\":\"\"}\">${pretty(x.due)}</span></div>
     <h1>${esc(x.piece)}</h1>
-    <p class="lede">${esc(x.where||"No pickup note yet.")}</p>
-    <div class="box"><div class="big">${money(x.paid)} <span class="tiny">/ ${money(x.price)}</span></div>
-    <div class="tiny">${usd(x.paid)} paid \u00b7 ${d?money(d)+" still due":"Balance clear."} \u00b7 ${usd(x.price)} full</div></div>
+    <p class=\"lede\">${esc(x.where||\"No pickup note yet.\")}</p>
+    <div class=\"box\"><div class=\"big\">${money(x.paid)} <span class=\"tiny\">/ ${money(x.price)}</span></div>
+    <div class=\"tiny\">${usd(x.paid)} paid \u00b7 ${d?money(d)+\" still due\":\"Balance clear.\"} \u00b7 ${usd(x.price)} full</div></div>
     <h2>Stage</h2>
-    <div class="filters" style="flex-wrap:wrap;margin-top:10px">${STAGES.map(s=>`<button class="chip ${x.stage===s?"on":""}" onclick="setStage('${x.id}','${s}')">${s}</button>`).join("")}</div>
-    <h2 style="margin-top:18px">Log money</h2>
-    <form id="pf" class="row">
-      <label><span>Amount BBD</span><input name="amt" type="number" min="1" required placeholder="${d||""}"></label>
-      <label><span>Rail</span><select name="method">${METHODS.map(m=>`<option ${m===x.method?"selected":""}>${m}</option>`).join("")}</select></label>
+    <div class=\"filters\" style=\"flex-wrap:wrap;margin-top:10px\">${STAGES.map(s=>`<button class=\"chip ${x.stage===s?\"on\":\"\"}\" onclick=\"setStage('${x.id}','${s}')\">${s}</button>`).join(\"\")}</div>
+    <h2 style=\"margin-top:18px\">Log money</h2>
+    <form id=\"pf\" class=\"row\">
+      <label><span>Amount BBD</span><input name=\"amt\" type=\"number\" min=\"1\" required placeholder=\"${d||\"\"}\"></label>
+      <label><span>Rail</span><select name=\"method\">${METHODS.map(m=>`<option ${m===x.method?\"selected\":\"\"}>${m}</option>`).join(\"\")}</select></label>
     </form>
-    <button class="btn p" onclick="document.getElementById('pf').requestSubmit()">Add payment</button>
-    <button class="btn" onclick="share('${x.id}')">Copy WhatsApp status</button>
-    <button class="btn" onclick="go('#/s/${x.id}')">Open customer page</button>
-    <form id="nf2">
-      <label><span>Studio notes</span><textarea name="notes">${esc(x.notes)}</textarea></label>
-      <label><span>Phone</span><input name="phone" value="${esc(x.phone)}" placeholder="+1 246"></label>
-      <button class="btn" type="submit">Save notes</button>
+    <button class=\"btn p\" onclick=\"document.getElementById('pf').requestSubmit()\">Add payment</button>
+    <button class=\"btn\" onclick=\"share('${x.id}')\">Copy WhatsApp status</button>
+    <button class=\"btn\" onclick=\"go('#/s/${x.id}')\">Open customer page</button>
+    <form id=\"nf2\">
+      <label><span>Studio notes</span><textarea name=\"notes\">${esc(x.notes)}</textarea></label>
+      <label><span>Phone</span><input name=\"phone\" value=\"${esc(x.phone)}\" placeholder=\"+1 246\"></label>
+      <button class=\"btn\" type=\"submit\">Save notes</button>
     </form>`;
   $("#pf").onsubmit=e=>{
     e.preventDefault();
     const f=new FormData(e.target);
-    x.paid+=(+f.get("amt")||0);x.method=f.get("method");save(state);render();
+    x.paid+=(+f.get(\"amt\")||0);x.method=f.get(\"method\");save(state);render();
   };
   $("#nf2").onsubmit=e=>{
     e.preventDefault();
     const f=new FormData(e.target);
-    x.notes=f.get("notes");x.phone=f.get("phone");save(state);
+    x.notes=f.get(\"notes\");x.phone=f.get(\"phone\");save(state);
   };
 }
 function setStage(id,s){const x=state.orders.find(v=>v.id===id);if(!x)return;x.stage=s;save(state);render()}
 function share(id){
   const x=state.orders.find(v=>v.id===id);if(!x)return;
-  const url=location.href.split("#")[0]+"#/s/"+x.id;
-  const t=`${state.studio}\n${x.piece}\nStage: ${x.stage}\n${x.due?"Ready aim: "+pretty(x.due)+"\n":""}Paid ${money(x.paid)} of ${money(x.price)} (${usd(x.paid)} of ${usd(x.price)}).\n${url}`;
+  const url=location.href.split(\"#\")[0]+\"#/s/\"+x.id;
+  const t=`${state.studio}\n${x.piece}\nStage: ${x.stage}\n${x.due?\"Ready aim: \"+pretty(x.due)+\"\n\":\"\"}Paid ${money(x.paid)} of ${money(x.price)} (${usd(x.paid)} of ${usd(x.price)}).\n${url}`;
   navigator.clipboard.writeText(t).catch(()=>{});
-  const phone=(x.phone||"").replace(/[^\d]/g,"");
-  location.href="https://wa.me/"+(phone?phone:"")+"?text="+encodeURIComponent(t);
+  const phone=(x.phone||\"\").replace(/[^\\d]/g,\"\");
+  location.href=\"https://wa.me/\"+(phone?phone:\"\")+\"?text=\"+encodeURIComponent(t);
 }
 function viewPub(id){
   const x=state.orders.find(v=>v.id===id);
-  if(!x){$("#app").innerHTML=`<h1>This slip has gone quiet.</h1><p class="lede">Ask the maker for a fresh link.</p>`;return;}
+  if(!x){$("#app").innerHTML=`<h1>This slip has gone quiet.</h1><p class=\"lede\">Ask the maker for a fresh link.</p>`;return;}
   const i=Math.max(0,STAGES.indexOf(x.stage));
   const d=dueOf(x);
-  $("#app").innerHTML=`<p class="sub" style="text-align:center">${esc(state.studio)}</p>
-    <h1 style="text-align:center;margin-top:12px">${esc(x.piece)}</h1>
-    <p class="lede" style="text-align:center">For ${esc(x.customer.split(" ")[0])} \u00b7 ${esc(state.place)}</p>
-    <div class="box"><div class="k"><span>Now</span><span>${x.due?"Aim "+pretty(x.due):""}</span></div>
+  $("#app").innerHTML=`<p class=\"sub\" style=\"text-align:center\">${esc(state.studio)}</p>
+    <h1 style=\"text-align:center;margin-top:12px\">${esc(x.piece)}</h1>
+    <p class=\"lede\" style=\"text-align:center\">For ${esc(x.customer.split(\" \")[0])} \u00b7 ${esc(state.place)}</p>
+    <div class=\"box\"><div class=\"k\"><span>Now</span><span>${x.due?\"Aim \"+pretty(x.due):\"\"}</span></div>
     <h2>${esc(x.stage)}</h2>
-    <div class="tiny" style="margin-top:10px">${STAGES.map((s,n)=> (n<i?"\u2713 ":n===i?"\u25cf ":"\u25cb ")+s).join("<br>")}</div></div>
-    <div class="box"><div class="k"><span>Money</span></div>
-    <div class="big">${money(x.paid)} / ${money(x.price)}</div>
-    <p class="tiny">${usd(x.paid)} paid \u00b7 ${d?money(d)+" still due":"Balance clear."}</p></div>
-    <p class="lede" style="text-align:center">Made by hand. No app to install.</p>`;
+    <div class=\"tiny\" style=\"margin-top:10px\">${STAGES.map((s,n)=> (n<i?\"\\u2713 \":n===i?\"\\u25cf \":\"\\u25cb \")+s).join(\"<br>\")}</div></div>
+    <div class=\"box\"><div class=\"k\"><span>Money</span></div>
+    <div class=\"big\">${money(x.paid)} / ${money(x.price)}</div>
+    <p class=\"tiny\">${usd(x.paid)} paid \u00b7 ${d?money(d)+\" still due\":\"Balance clear.\"}</p></div>
+    <p class=\"lede\" style=\"text-align:center\">Made by hand. No app to install.</p>`;
 }
 function viewStudio(){
-  $("#app").innerHTML=`<button class="back" onclick="go('#/flight')">\u2190 Board</button>
+  $("#app").innerHTML=`<button class=\"back\" onclick=\"go('#/flight')\">\u2190 Board</button>
     <h1>Studio</h1>
-    <form id="sf">
-      <label><span>Studio name</span><input name="studio" value="${esc(state.studio)}"></label>
-      <label><span>Place</span><input name="place" value="${esc(state.place)}"></label>
-      <button class="btn p" type="submit">Save studio</button>
+    <form id=\"sf\">
+      <label><span>Studio name</span><input name=\"studio\" value=\"${esc(state.studio)}\"></label>
+      <label><span>Place</span><input name=\"place\" value=\"${esc(state.place)}\"></label>
+      <button class=\"btn p\" type=\"submit\">Save studio</button>
     </form>
-    <button class="btn" onclick="csv()">Download this month CSV</button>
-    <button class="btn" onclick="if(confirm('Reload sample slips?')){localStorage.removeItem(KEY);state=load();go('#/flight')}">Reload samples</button>`;
-  $("#sf").onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);state.studio=f.get("studio");state.place=f.get("place");save(state);};
+    <button class=\"btn\" onclick=\"csv()\">Download this month CSV</button>
+    <button class=\"btn\" onclick=\"if(confirm('Reload sample slips?')){localStorage.removeItem(KEY);state=load();go('#/flight')}\">Reload samples</button>`;
+  $("#sf").onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);state.studio=f.get(\"studio\");state.place=f.get(\"place\");save(state);};
 }
 function csv(){
-  const head="date,customer,piece,stage,price_bbd,paid_bbd,due_bbd,price_usd,paid_usd,method,due_date,where";
-  const lines=state.orders.map(x=>[today(),x.customer,x.piece,x.stage,x.price,x.paid,dueOf(x),(x.price/2),(x.paid/2),x.method,x.due,x.where].map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(","));
-  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([[head,...lines].join("\n")]));a.download="breeze-slip.csv";a.click();
+  const head=\"date,customer,piece,stage,price_bbd,paid_bbd,due_bbd,price_usd,paid_usd,method,due_date,where\";
+  const lines=state.orders.map(x=>[today(),x.customer,x.piece,x.stage,x.price,x.paid,dueOf(x),(x.price/2),(x.paid/2),x.method,x.due,x.where].map(v=>`\"${String(v??\"\").replace(/\"/g,'\"\"')}\"`).join(\",\"));
+  const a=document.createElement(\"a\");a.href=URL.createObjectURL(new Blob([[head,...lines].join(\"\\n\")]));a.download=\"breeze-slip.csv\";a.click();
 }
-function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&","<":"<",">":">","\"":"""}[c]))}
+function esc(s){return String(s==null?\"\":s).replace(/&/g,\"&\").replace(/</g,\"<\").replace(/>/g,\">\").replace(/\"/g,\""\")}
 window.onhashchange=render;render();
 </script>
 </body>
