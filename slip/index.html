@@ -1,17 +1,233 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#F4EFE6" />
-  <title>Breeze Slip</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,480;9..144,560;9..144,640&family=Outfit:wght@320;400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#F4EFE6"/>
+<title>Breeze Slip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560&family=Outfit:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--sand:#f4efe6;--paper:#fbf7f0;--ink:#1c2b28;--soft:#4a5b57;--mute:#7a8682;--line:#d9d0c2;--teal:#1f6f6a;--deep:#155753;--wash:#dceae7;--rust:#8b3a2f;--rw:#f4e3de;--ok:#2f6b45;--ow:#dcecde}
+*{box-sizing:border-box}html,body{margin:0;background:var(--sand);color:var(--ink);font-family:Outfit,system-ui,sans-serif}
+.shell{max-width:430px;margin:0 auto;min-height:100dvh;padding:18px 16px 32px}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:560;letter-spacing:-.03em;margin:0}
+h1{font-size:30px;line-height:1.12}.lede{color:var(--soft);margin:8px 0 0;font-size:15px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.word{font-family:Fraunces,Georgia,serif;font-size:18px}.sub{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:16px 0}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:12px 10px}
+.stat b{display:block;font-family:Fraunces,Georgia,serif;font-size:18px}.stat span{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.filters{display:flex;gap:8px;overflow:auto;margin:0 0 14px}
+.chip,.pay{border:1px solid var(--line);background:transparent;border-radius:999px;padding:7px 12px;font:inherit;color:var(--soft);white-space:nowrap}
+.chip.on,.pay.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:16px;width:100%;text-align:left;font:inherit;color:inherit;box-shadow:0 18px 40px rgba(28,43,40,.07);margin:0 0 10px}
+.k{display:flex;justify-content:space-between;font-size:12px;color:var(--mute);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.late{color:var(--rust)}
+.pills{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+.pill{font-size:11px;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:4px 8px;background:var(--wash);color:var(--deep)}
+.pill.due{background:var(--rw);color:var(--rust)}.pill.paid{background:var(--ow);color:var(--ok)}
+.money{margin-left:auto;font-size:13px;color:var(--soft);text-transform:none;letter-spacing:0}
+.fab,.btn{border:0;border-radius:18px;padding:16px;font:inherit;width:100%;margin-top:12px}
+.fab{background:var(--teal);color:#f7fffd;font-weight:500}
+.btn{background:var(--paper);border:1px solid var(--line);text-align:left;color:inherit}
+.btn.p{background:var(--teal);color:#f7fffd;text-align:center;border-color:var(--teal)}
+.back{border:0;background:0;color:var(--deep);font:inherit;padding:0;margin-bottom:12px}
+label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--soft);margin:10px 0}
+label span{font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+input,textarea,select{font:inherit;color:inherit;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:13px 14px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{background:#eef5f3;border:1px solid var(--line);border-radius:18px;padding:14px;margin:16px 0}
+.big{font-family:Fraunces,Georgia,serif;font-size:26px}
+.tiny{color:var(--mute);font-size:12px}
+.list{display:flex;flex-direction:column}
+</style>
 </head>
 <body>
-  <div id="app"></div>
-  <script src="app.js"></script>
+<div class="shell" id="app"></div>
+<script>
+const KEY="breeze-slip.v1";
+const STAGES=["Brief locked","Materials in","On the hook","Blocked","Ready","Packed","Shipped","Collected"];
+const CLOSED=new Set(["Shipped","Collected"]);
+const METHODS=["Cash","Bank transfer","Local wallet","Card"];
+const $=s=>document.querySelector(s);
+const today=()=>new Date().toISOString().slice(0,10);
+const uid=()=>"s"+Math.random().toString(36).slice(2,8);
+const money=(n)=>"BBD "+(Math.round((+n||0)*100)/100);
+const usd=(n)=>"USD "+(Math.round((+n||0)*50)/100);
+function shift(d){const x=new Date();x.setDate(x.getDate()+d);return x.toISOString().slice(0,10)}
+function pretty(iso){if(!iso)return"No date";return new Date(iso+"T12:00:00").toLocaleDateString("en-BB",{day:"numeric",month:"short"})}
+function load(){
+  try{const r=JSON.parse(localStorage.getItem(KEY));if(r&&r.orders)return r}catch(e){}
+  const s={studio:"Breeze & Loop",place:"Oistins, Christ Church",orders:[
+    o("Amina Clarke","Sea-glass market tote","Ship to Toronto",shift(9),220,110,"Bank transfer","On the hook"),
+    o("Devon Alleyne","Navy bucket hat","Collect Saturday, Fish Fry",shift(3),95,40,"Cash","Materials in"),
+    o("Priya Shah","Lookbook shawl, clay stripe","London \u2014 hold for December",shift(40),310,150,"Bank transfer","Brief locked"),
+    o("Leah Holdipp","Baby blanket, foam + sand","Worthing pickup",shift(-1),180,180,"Local wallet","Ready")
+  ]};
+  save(s);return s;
+}
+function o(customer,piece,where,due,price,paid,method,stage){
+  return{id:uid(),publicId:uid().slice(1),customer,piece,where,due,price,paid,deposit:Math.round(price/2),method,stage,notes:"",phone:""};
+}
+function save(s){localStorage.setItem(KEY,JSON.stringify(s));state=s;return s}
+let state=load();
+function route(){
+  const p=location.hash.replace(/^#/, "").split("/").filter(Boolean);
+  if(p[0]==="new")return{n:"new"};
+  if(p[0]==="order")return{n:"order",id:p[1]};
+  if(p[0]==="s")return{n:"pub",id:p[1]};
+  if(p[0]==="studio")return{n:"studio"};
+  return{n:"board",f:p[0]||"flight"};
+}
+function go(h){location.hash=h}
+function dueOf(x){return Math.max(0,x.price-x.paid)}
+function late(x){return x.due&&x.due<today()&&!CLOSED.has(x.stage)}
+function render(){
+  const r=route();
+  if(r.n==="new")return viewNew();
+  if(r.n==="order")return viewOrder(r.id);
+  if(r.n==="pub")return viewPub(r.id);
+  if(r.n==="studio")return viewStudio();
+  viewBoard(r.f);
+}
+function viewBoard(f){
+  const all=state.orders.slice().sort((a,b)=>(a.due||"9").localeCompare(b.due||"9"));
+  const flight=all.filter(x=>!CLOSED.has(x.stage)&&x.stage!=="Ready");
+  const ready=all.filter(x=>x.stage==="Ready"||x.stage==="Packed");
+  const moneyDue=all.filter(x=>dueOf(x)>0);
+  const closed=all.filter(x=>CLOSED.has(x.stage));
+  const map={flight,ready,money:moneyDue,closed};
+  const list=map[f]||flight;
+  const owe=moneyDue.reduce((s,x)=>s+dueOf(x),0);
+  $("#app").innerHTML=`<div class="top"><div><span class="word">Breeze Slip</span><span class="sub">${esc(state.studio)}</span></div>
+    <button class="chip" onclick="go('#/studio')">Studio</button></div>
+    <h1>On the hook</h1>
+    <p class="lede">WhatsApp stays the shop. This is the slip you used to keep in your head.</p>
+    <div class="stats"><div class="stat"><b>${flight.length}</b><span>In flight</span></div>
+    <div class="stat"><b>${ready.length}</b><span>Ready</span></div>
+    <div class="stat"><b>${money(owe)}</b><span>Still due</span></div></div>
+    <div class="filters">
+      ${chip("flight","In flight",f)}${chip("ready","Ready",f)}${chip("money","Money due",f)}${chip("closed","Closed",f)}
+    </div>
+    <div class="list">${list.map(card).join("")||"<p class='lede'>Quiet board.</p>"}</div>
+    <button class="fab" onclick="go('#/new')">New slip</button>`;
+}
+function chip(id,l,on){return `<button class="chip ${on===id?"on":""}" onclick="go('#/${id}')">${l}</button>`}
+function card(x){
+  const d=dueOf(x);
+  const pill=d===0?`<span class="pill paid">Paid</span>`:`<span class="pill due">Due ${money(d)}</span>`;
+  return `<button class="card" onclick="go('#/order/${x.id}')">
+    <div class="k"><span>${esc(x.customer)}</span><span class="${late(x)?"late":""}">${late(x)?"Late \u00b7 ":""}${pretty(x.due)}</span></div>
+    <h3>${esc(x.piece)}</h3>
+    <div class="pills"><span class="pill">${esc(x.stage)}</span>${pill}<span class="money">${money(x.paid)} / ${money(x.price)}</span></div>
+  </button>`;
+}
+function viewNew(){
+  $("#app").innerHTML=`<button class="back" onclick="go('#/flight')">\u2190 Board</button>
+    <h1>New slip</h1><p class="lede">Name, piece, price. Then back to the hook.</p>
+    <form id="nf">
+      <label><span>Customer</span><input name="customer" required placeholder="Who is this for?"></label>
+      <label><span>Piece</span><input name="piece" required placeholder="Sea-glass tote"></label>
+      <div class="row">
+        <label><span>Price BBD</span><input name="price" type="number" min="0" required placeholder="180"></label>
+        <label><span>Paid today</span><input name="paid" type="number" min="0" placeholder="0"></label>
+      </div>
+      <div class="row">
+        <label><span>Due</span><input name="due" type="date"></label>
+        <label><span>Rail</span><select name="method">${METHODS.map(m=>`<option>${m}</option>`).join("")}</select></label>
+      </div>
+      <label><span>Where / how it leaves</span><input name="where" placeholder="Collect Oistins"></label>
+      <button class="fab" type="submit">Save slip</button>
+    </form>`;
+  $("#nf").onsubmit=e=>{
+    e.preventDefault();
+    const f=new FormData(e.target);
+    const price=+f.get("price")||0;
+    const row=o(f.get("customer").trim(),f.get("piece").trim(),f.get("where").trim(),f.get("due"),price,+f.get("paid")||0,f.get("method"),"Brief locked");
+    state.orders.unshift(row);save(state);go("#/order/"+row.id);
+  };
+}
+function viewOrder(id){
+  const x=state.orders.find(v=>v.id===id);
+  if(!x){ $("#app").innerHTML=`<button class="back" onclick="go('#/flight')">\u2190 Board</button><h1>Slip gone</h1>`;return; }
+  const d=dueOf(x);
+  $("#app").innerHTML=`<button class="back" onclick="go('#/flight')">\u2190 Board</button>
+    <div class="k"><span>${esc(x.customer)}</span><span class="${late(x)?"late":""}">${pretty(x.due)}</span></div>
+    <h1>${esc(x.piece)}</h1>
+    <p class="lede">${esc(x.where||"No pickup note yet.")}</p>
+    <div class="box"><div class="big">${money(x.paid)} <span class="tiny">/ ${money(x.price)}</span></div>
+    <div class="tiny">${usd(x.paid)} paid \u00b7 ${d?money(d)+" still due":"Balance clear."} \u00b7 ${usd(x.price)} full</div></div>
+    <h2>Stage</h2>
+    <div class="filters" style="flex-wrap:wrap;margin-top:10px">${STAGES.map(s=>`<button class="chip ${x.stage===s?"on":""}" onclick="setStage('${x.id}','${s}')">${s}</button>`).join("")}</div>
+    <h2 style="margin-top:18px">Log money</h2>
+    <form id="pf" class="row">
+      <label><span>Amount BBD</span><input name="amt" type="number" min="1" required placeholder="${d||""}"></label>
+      <label><span>Rail</span><select name="method">${METHODS.map(m=>`<option ${m===x.method?"selected":""}>${m}</option>`).join("")}</select></label>
+    </form>
+    <button class="btn p" onclick="document.getElementById('pf').requestSubmit()">Add payment</button>
+    <button class="btn" onclick="share('${x.id}')">Copy WhatsApp status</button>
+    <button class="btn" onclick="go('#/s/${x.id}')">Open customer page</button>
+    <form id="nf2">
+      <label><span>Studio notes</span><textarea name="notes">${esc(x.notes)}</textarea></label>
+      <label><span>Phone</span><input name="phone" value="${esc(x.phone)}" placeholder="+1 246"></label>
+      <button class="btn" type="submit">Save notes</button>
+    </form>`;
+  $("#pf").onsubmit=e=>{
+    e.preventDefault();
+    const f=new FormData(e.target);
+    x.paid+=(+f.get("amt")||0);x.method=f.get("method");save(state);render();
+  };
+  $("#nf2").onsubmit=e=>{
+    e.preventDefault();
+    const f=new FormData(e.target);
+    x.notes=f.get("notes");x.phone=f.get("phone");save(state);
+  };
+}
+function setStage(id,s){const x=state.orders.find(v=>v.id===id);if(!x)return;x.stage=s;save(state);render()}
+function share(id){
+  const x=state.orders.find(v=>v.id===id);if(!x)return;
+  const url=location.href.split("#")[0]+"#/s/"+x.id;
+  const t=`${state.studio}\n${x.piece}\nStage: ${x.stage}\n${x.due?"Ready aim: "+pretty(x.due)+"\n":""}Paid ${money(x.paid)} of ${money(x.price)} (${usd(x.paid)} of ${usd(x.price)}).\n${url}`;
+  navigator.clipboard.writeText(t).catch(()=>{});
+  const phone=(x.phone||"").replace(/[^\d]/g,"");
+  location.href="https://wa.me/"+(phone?phone:"")+"?text="+encodeURIComponent(t);
+}
+function viewPub(id){
+  const x=state.orders.find(v=>v.id===id);
+  if(!x){$("#app").innerHTML=`<h1>This slip has gone quiet.</h1><p class="lede">Ask the maker for a fresh link.</p>`;return;}
+  const i=Math.max(0,STAGES.indexOf(x.stage));
+  const d=dueOf(x);
+  $("#app").innerHTML=`<p class="sub" style="text-align:center">${esc(state.studio)}</p>
+    <h1 style="text-align:center;margin-top:12px">${esc(x.piece)}</h1>
+    <p class="lede" style="text-align:center">For ${esc(x.customer.split(" ")[0])} \u00b7 ${esc(state.place)}</p>
+    <div class="box"><div class="k"><span>Now</span><span>${x.due?"Aim "+pretty(x.due):""}</span></div>
+    <h2>${esc(x.stage)}</h2>
+    <div class="tiny" style="margin-top:10px">${STAGES.map((s,n)=> (n<i?"\u2713 ":n===i?"\u25cf ":"\u25cb ")+s).join("<br>")}</div></div>
+    <div class="box"><div class="k"><span>Money</span></div>
+    <div class="big">${money(x.paid)} / ${money(x.price)}</div>
+    <p class="tiny">${usd(x.paid)} paid \u00b7 ${d?money(d)+" still due":"Balance clear."}</p></div>
+    <p class="lede" style="text-align:center">Made by hand. No app to install.</p>`;
+}
+function viewStudio(){
+  $("#app").innerHTML=`<button class="back" onclick="go('#/flight')">\u2190 Board</button>
+    <h1>Studio</h1>
+    <form id="sf">
+      <label><span>Studio name</span><input name="studio" value="${esc(state.studio)}"></label>
+      <label><span>Place</span><input name="place" value="${esc(state.place)}"></label>
+      <button class="btn p" type="submit">Save studio</button>
+    </form>
+    <button class="btn" onclick="csv()">Download this month CSV</button>
+    <button class="btn" onclick="if(confirm('Reload sample slips?')){localStorage.removeItem(KEY);state=load();go('#/flight')}">Reload samples</button>`;
+  $("#sf").onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);state.studio=f.get("studio");state.place=f.get("place");save(state);};
+}
+function csv(){
+  const head="date,customer,piece,stage,price_bbd,paid_bbd,due_bbd,price_usd,paid_usd,method,due_date,where";
+  const lines=state.orders.map(x=>[today(),x.customer,x.piece,x.stage,x.price,x.paid,dueOf(x),(x.price/2),(x.paid/2),x.method,x.due,x.where].map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(","));
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([[head,...lines].join("\n")]));a.download="breeze-slip.csv";a.click();
+}
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&","<":"<",">":">","\"":"""}[c]))}
+window.onhashchange=render;render();
+</script>
 </body>
 </html>
