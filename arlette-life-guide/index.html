@@ -278,6 +278,27 @@ noscript {
 .graha-row .sign { font-size: 0.75rem; color: var(--gold); margin-bottom: 6px; }
 .graha-row .gift, .graha-row .lesson { font-size: 0.82rem; color: var(--text-dim); }
 .graha-row .lesson { margin-top: 4px; opacity: 0.9; }
+
+.house-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 12px; }
+.house-table th, .house-table td {
+  text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--card-border);
+  vertical-align: top;
+}
+.house-table th { color: var(--gold-soft); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.house-table td:first-child { color: var(--gold-pale); white-space: nowrap; width: 2.5rem; }
+.money-rules { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 8px; }
+.money-rules li {
+  font-size: 0.84rem; color: var(--text-dim); padding: 8px 10px;
+  border-left: 2px solid var(--gold); background: rgba(0,0,0,0.15); border-radius: 0 8px 8px 0;
+}
+.money-rules li strong { color: var(--gold-pale); }
+.lagna-note {
+  margin-top: 12px; padding: 12px; border-radius: 10px;
+  background: rgba(212, 175, 110, 0.08); border: 1px solid var(--card-border);
+  font-size: 0.86rem; color: var(--text-dim); line-height: 1.45;
+}
+.lagna-note strong { color: var(--gold-pale); }
+
 .lab-q {
   padding: 12px 0;
   border-bottom: 1px solid rgba(168,155,196,0.15);
@@ -650,10 +671,29 @@ noscript {
   <!-- 7. NATAL FREQUENCY MAP -->
   <section class="panel" id="panel-map" data-section="map">
     <div class="card">
-      <div class="eyebrow">Grahas · no houses</div>
-      <h2>Natal frequency map</h2>
-      <p class="approx">Day chart · Lahiri sidereal · Moon degree soft · Lagna omitted</p>
+      <div class="eyebrow">Working chart · provisional</div>
+      <h2>Natal map &amp; houses</h2>
+      <p class="approx">Lahiri sidereal · Georgetown · working Lagna Meena ~12:40 local (UTC−3) · not a hospital lock · whole-sign houses</p>
+      <div class="lagna-note">
+        <strong>Ascendant (working):</strong> Meena (Pisces) · Uttara Bhadrapada · soft/absorbent inside.
+        Lived exterior often tight and aloof (Ketu in 1st + Saturn guard) — nice, not chatty-friendly.
+        Lagnesha Jupiter with Venus in the 3rd: self grows through craft and making.
+        Moon in 10th Purva Ashadha: career carries emotional weather. Test against life; revise if birth time firms up.
+      </div>
+      <h3 style="margin-top:18px;color:var(--gold-soft);font-size:0.95rem;">Grahas</h3>
       <div class="graha-map" id="grahaMap"></div>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <div class="eyebrow">Whole sign from Meena</div>
+      <h2>House map</h2>
+      <div id="houseMap"></div>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <div class="eyebrow">Mars in 2nd · Bharani</div>
+      <h2>Money rules</h2>
+      <p class="approx">Saturn Pocket first · Venus Pocket second · train the till so Mars doesn’t run it</p>
+      <ul class="money-rules" id="moneyRules"></ul>
+      <p class="approx" style="margin-top:12px;"><strong style="color:var(--gold-pale);">Motto:</strong> Mars may want it. Saturn must count it. Venus may enjoy only what’s left.</p>
     </div>
   </section>
 
@@ -685,7 +725,7 @@ noscript {
         <label>Birth note</label>
         <p style="font-size:0.88rem;color:var(--text-dim);">1 July 1977 · Georgetown, Guyana · Vedic Lahiri sidereal day chart</p>
         <label>Time window</label>
-        <p style="font-size:0.88rem;color:var(--text-dim);">Birth time unknown · window ~11:00–15:00 local · Guyana was UTC−3 in 1977 · Moon approximate · no houses / no Lagna</p>
+        <p style="font-size:0.88rem;color:var(--text-dim);">Working time ~12:40 local Georgetown · Guyana UTC−3 in 1977 · Meena Lagna (provisional) · Moon Purva Ashadha · whole-sign houses on · revise if hospital time appears</p>
         <div class="btn-row" style="margin-top:16px;">
           <button type="button" class="btn" id="saveSettingsBtn">Save name</button>
           <button type="button" class="btn btn-ghost" id="exportBtn">Export JSON</button>
@@ -698,7 +738,7 @@ noscript {
     </div>
   </section>
 
-  <footer class="app-foot">Arlette Life Guide · v1.1 · local only</footer>
+  <footer class="app-foot">Arlette Life Guide · v1.2 · local only</footer>
 </div>
 
 <script>
@@ -732,7 +772,7 @@ var VARA = [
 /* Locked natal longitudes (Lahiri day chart — verified). Degrees as labels. */
 var NATAL_LON = {
   Sun: 75.5,
-  Moon: 253.5,
+  Moon: 263.32,
   Mercury: 76.7,
   Venus: 30.5167,
   Mars: 24.6667,
@@ -744,14 +784,14 @@ var NATAL_LON = {
 
 var NATAL = {
   Sun: { sign: 'Mithuna', deg: '15°30′', gift: 'Dual mind, visible voice, storytelling light', lesson: 'Finish before you perform; boredom is a teacher' },
-  Moon: { sign: 'Dhanu', deg: '~13°30′ (approx)', gift: 'Meaning-hunger, horizon, truth-seeking heart', lesson: 'Do not cage the seeker; feed faith regularly' },
+  Moon: { sign: 'Dhanu', deg: '~23°19′ · Purva Ashadha', gift: 'Conviction through beauty & refresh; invincible heart when watered', lesson: 'From lack, don’t chase unstable “more” as love or status' },
   Mercury: { sign: 'Mithuna', deg: '16°42′', gift: 'Sales, hostess skill, agile explanation', lesson: 'Oversharing unfinished work for dopamine' },
   Venus: { sign: 'Vrishabha', deg: '0°31′ (own)', gift: 'Beauty with weight; craft that lasts', lesson: 'Worth is not only when beauty is praised' },
-  Mars: { sign: 'Mesha', deg: '24°40′', gift: 'Clean fire to start; courage', lesson: 'Impatience with the slow middle' },
+  Mars: { sign: 'Mesha', deg: '24°40′ · Bharani · H2', gift: 'Capacity to bear & earn by courage', lesson: 'Heat in money — grab/spend/credit before the ledger' },
   Jupiter: { sign: 'Vrishabha', deg: '26°13′', gift: 'Expand through tangible dharma & value', lesson: 'Wisdom must become matter, not talk' },
   Saturn: { sign: 'Karka', deg: '21°32′', gift: 'Deep loyalty once belonging feels safe', lesson: 'People-pleasing & approval as armor' },
   Rahu: { sign: 'Kanya', deg: '26°45′ (mean)', gift: 'Craft-detail hunger; usefulness', lesson: 'Perfectionism that stalls service' },
-  Ketu: { sign: 'Meena', deg: '26°45′ (mean)', gift: 'Faith, release, soft devotion', lesson: 'Dissolving edges when clarity is needed' }
+  Ketu: { sign: 'Meena', deg: '26°45′ (mean) · H1', gift: 'Phases of self; soft devotion under the armor', lesson: 'Aloof shell can hide the absorbent heart — both are true' }
 };
 
 var GRAHA_GLYPH = {
@@ -1640,6 +1680,54 @@ function renderWeek() {
       '<span style="color:var(--warn)">Watch: ' + line.soft + '</span></div></div>';
   }
   document.getElementById('weekGrid').innerHTML = html;
+}
+
+
+var HOUSES = [
+  { h: 1, sign: 'Meena', who: 'Ketu', note: 'Absorbent self; phases; soft inside / can read aloof' },
+  { h: 2, sign: 'Mesha', who: 'Mars Bharani', note: 'Money, voice, values — heat; train the ledger' },
+  { h: 3, sign: 'Vrishabha', who: 'Venus + Jupiter', note: 'Craft-dharma · hands · making · brand' },
+  { h: 4, sign: 'Mithuna', who: 'Sun + Mercury Ardra', note: 'Home/roots mind-storm; belonging work' },
+  { h: 5, sign: 'Karka', who: 'Saturn Ashlesha', note: 'Children & creativity as duty + structure' },
+  { h: 6, sign: 'Simha', who: '—', note: 'Daily grind, service, conflict hygiene' },
+  { h: 7, sign: 'Kanya', who: 'Rahu Chitra', note: 'Partners/others — unusual, loud field; go slow' },
+  { h: 8, sign: 'Tula', who: '—', note: 'Shared resources & deep change via Venus’s sign' },
+  { h: 9, sign: 'Vrischika', who: '—', note: 'Dharma & faith that survives the cut' },
+  { h: 10, sign: 'Dhanu', who: 'Moon Purva Ashadha', note: 'Career = emotional weather + conviction' },
+  { h: 11, sign: 'Makara', who: '—', note: 'Gains & networks — slow Saturn build' },
+  { h: 12, sign: 'Kumbha', who: '—', note: 'Solitude to empty the sponge' }
+];
+
+var MONEY_RULES = [
+  ['Saturn Pocket first (70%)', 'Rent, food, debt minimums, utilities — before Venus spends.'],
+  ['Venus Pocket second (30%)', 'Yarn, looks, craft, pleasure — only from this pocket.'],
+  ['Lump sum law', 'Split the day it lands. Park debt share where you can’t one-tap it.'],
+  ['No silent take', 'If it isn’t yours on paper, it isn’t yours.'],
+  ['Credit = plan or no', 'Written payoff date/amount, or don’t take it.'],
+  ['Someone else paying', 'Name it out loud — or don’t go / pay your half.'],
+  ['24-hour cool', 'Non-essential want from lack: wait one sleep.'],
+  ['Weekly money date', '15 minutes, same day — balances, debt, pockets.'],
+  ['Earn > chase', 'Prefer 3rd-house craft/work money over patrons and charm.']
+];
+
+function renderHouses() {
+  var html = '<table class="house-table"><thead><tr><th>#</th><th>Sign</th><th>Occupants</th><th>Note</th></tr></thead><tbody>';
+  var i, row;
+  for (i = 0; i < HOUSES.length; i++) {
+    row = HOUSES[i];
+    html += '<tr><td>' + row.h + '</td><td>' + row.sign + '</td><td>' + row.who + '</td><td>' + row.note + '</td></tr>';
+  }
+  html += '</tbody></table>';
+  document.getElementById('houseMap').innerHTML = html;
+}
+
+function renderMoneyRules() {
+  var html = '';
+  var i;
+  for (i = 0; i < MONEY_RULES.length; i++) {
+    html += '<li><strong>' + MONEY_RULES[i][0] + '</strong> — ' + MONEY_RULES[i][1] + '</li>';
+  }
+  document.getElementById('moneyRules').innerHTML = html;
 }
 
 function renderMap() {
