@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arlette Life Guide · Vedic</title>
+<style>
+:root {
+  --indigo-deep: #0f0a1e;
+  --indigo: #1a1240;
+  --indigo-mid: #2a1f5c;
+  --indigo-soft: #3d2f7a;
+  --gold: #d4a84b;
+  --gold-soft: #e8c97a;
+  --gold-pale: #f5e6c8;
+  --cream: #faf6ee;
+  --cream-dim: #e8e0d0;
+  --muted: #a89bc4;
+  --text: #f0ebe3;
+  --text-dim: #c4b8a8;
+  --card: rgba(42, 31, 92, 0.55);
+  --card-border: rgba(212, 168, 75, 0.28);
+  --ok: #7cb88a;
+  --warn: #c9a06a;
+  --radius: 14px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.35);
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --serif: Georgia, "Times New Roman", serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--indigo-deep);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.55;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(61,47,122,0.5), transparent),
+    radial-gradient(ellipse 60% 40% at 90% 10%, rgba(212,168,75,0.08), transparent);
+}
+a { color: var(--gold-soft); }
+button, input, textarea, select { font: inherit; color: inherit; }
+.wrap { max-width: 720px; margin: 0 auto; padding: 0 16px 96px; }
+header.app-head {
+  padding: 28px 0 12px;
+  text-align: center;
+  border-bottom: 1px solid var(--card-border);
+  margin-bottom: 8px;
+}
+header.app-head .mark {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+header.app-head h1 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 1.65rem;
+  color: var(--gold-pale);
+  letter-spacing: 0.02em;
+}
+header.app-head .sub {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.disclaimer {
+  font-size: 0.75rem;
+  color: var(--muted);
+  background: rgba(15,10,30,0.6);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin: 14px 0 18px;
+  line-height: 1.45;
+}
+nav.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(15,10,30,0.92);
+  backdrop-filter: blur(10px);
+  padding: 10px 0 12px;
+  margin: 0 -4px 16px;
+  border-bottom: 1px solid rgba(212,168,75,0.15);
+}
+nav.tabs button {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--muted);
+  padding: 7px 11px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+nav.tabs button:hover { color: var(--gold-pale); border-color: var(--card-border); }
+nav.tabs button.active {
+  background: var(--indigo-mid);
+  color: var(--gold);
+  border-color: var(--gold);
+}
+.panel { display: block; animation: none; margin-bottom: 8px; }
+html.js .panel { display: none; animation: fadeIn 0.35s ease; }
+html.js .panel.active { display: block; }
+.open-hint {
+  background: rgba(212,168,75,0.15);
+  border: 1px solid var(--gold);
+  color: var(--cream);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin: 0 0 14px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+.open-hint strong { color: var(--gold-soft); }
+#bootError {
+  display: none;
+  background: #5c1a2a;
+  border: 1px solid #c45c6a;
+  color: #ffe8ec;
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin: 0 0 14px;
+  font-size: 0.88rem;
+}
+#bootError.show { display: block; }
+noscript {
+  display: block;
+  background: #5c1a2a;
+  color: #fff;
+  padding: 14px;
+  text-align: center;
+  font-weight: 600;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 18px 18px 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+.card h2 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 1.25rem;
+  color: var(--gold-pale);
+  margin-bottom: 8px;
+}
+.card h3 {
+  font-size: 0.95rem;
+  color: var(--gold);
+  margin: 14px 0 6px;
+  letter-spacing: 0.03em;
+}
+.card p { color: var(--text-dim); margin-bottom: 10px; font-size: 0.92rem; }
+.card p:last-child { margin-bottom: 0; }
+.card ul, .card ol { margin: 6px 0 10px 1.15rem; color: var(--text-dim); font-size: 0.92rem; }
+.card li { margin-bottom: 6px; }
+.eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.sky-note {
+  background: linear-gradient(135deg, rgba(61,47,122,0.7), rgba(26,18,64,0.9));
+  border: 1px solid rgba(212,168,75,0.4);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  font-size: 0.85rem;
+  color: var(--cream-dim);
+}
+.sky-note strong { color: var(--gold-soft); }
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
+.chip {
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(212,168,75,0.12);
+  border: 1px solid rgba(212,168,75,0.35);
+  color: var(--gold-pale);
+}
+.check-list { list-style: none; margin-left: 0 !important; }
+.check-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(168,155,196,0.12);
+}
+.check-list li:last-child { border-bottom: none; }
+.check-list input[type="checkbox"] {
+  margin-top: 3px;
+  accent-color: var(--gold);
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.prompt-box {
+  background: rgba(15,10,30,0.45);
+  border-left: 3px solid var(--gold);
+  padding: 12px 14px;
+  margin-top: 10px;
+  border-radius: 0 10px 10px 0;
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--gold-pale);
+  font-size: 0.95rem;
+}
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 560px) { .two-col { grid-template-columns: 1fr; } }
+.col-strength { border-top: 3px solid var(--ok); }
+.col-soft { border-top: 3px solid var(--warn); }
+.pillar {
+  padding: 12px 14px;
+  background: rgba(15,10,30,0.35);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  border-left: 3px solid var(--gold);
+}
+.pillar strong { color: var(--gold-soft); display: block; margin-bottom: 4px; font-size: 0.9rem; }
+.pillar span { font-size: 0.85rem; color: var(--text-dim); }
+.week-grid { display: grid; gap: 8px; }
+.week-day {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(15,10,30,0.4);
+  border-radius: 10px;
+  border: 1px solid rgba(212,168,75,0.18);
+  font-size: 0.85rem;
+}
+.week-day .wd-name { color: var(--gold); font-weight: 600; font-size: 0.8rem; }
+.week-day .wd-planet { color: var(--muted); font-size: 0.72rem; }
+.week-day .wd-today { outline: 1px solid var(--gold); background: rgba(212,168,75,0.08); }
+.graha-map { display: grid; gap: 10px; }
+.graha-row {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(15,10,30,0.4);
+  border-radius: 10px;
+  border: 1px solid rgba(212,168,75,0.2);
+  align-items: start;
+}
+.graha-glyph {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--indigo-soft);
+  border: 1px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: var(--gold-pale);
+}
+.graha-row h4 { color: var(--gold-pale); font-size: 0.9rem; margin-bottom: 2px; }
+.graha-row .sign { font-size: 0.75rem; color: var(--gold); margin-bottom: 6px; }
+.graha-row .gift, .graha-row .lesson { font-size: 0.82rem; color: var(--text-dim); }
+.graha-row .lesson { margin-top: 4px; opacity: 0.9; }
+.lab-q {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(168,155,196,0.15);
+}
+.lab-q:last-of-type { border-bottom: none; }
+.lab-q label.q-label {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.lab-q textarea {
+  width: 100%;
+  margin-top: 8px;
+  margin-left: 28px;
+  max-width: calc(100% - 28px);
+  background: rgba(15,10,30,0.5);
+  border: 1px solid rgba(212,168,75,0.25);
+  border-radius: 8px;
+  padding: 8px 10px;
+  min-height: 52px;
+  resize: vertical;
+  color: var(--cream);
+}
+.practice-today {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: rgba(212,168,75,0.1);
+  border-radius: 10px;
+  border: 1px dashed rgba(212,168,75,0.45);
+  font-size: 0.88rem;
+  color: var(--gold-pale);
+}
+.journal-form { display: grid; gap: 8px; margin-bottom: 14px; }
+.journal-form input, .journal-form textarea, .settings-form input {
+  width: 100%;
+  background: rgba(15,10,30,0.5);
+  border: 1px solid rgba(212,168,75,0.25);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--cream);
+}
+.journal-form textarea { min-height: 100px; resize: vertical; }
+.btn {
+  display: inline-block;
+  background: var(--indigo-soft);
+  border: 1px solid var(--gold);
+  color: var(--gold-pale);
+  padding: 9px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: 0.15s;
+}
+.btn:hover { background: var(--gold); color: var(--indigo-deep); }
+.btn-ghost {
+  background: transparent;
+  border-color: rgba(168,155,196,0.4);
+  color: var(--muted);
+}
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.journal-entry {
+  padding: 12px 14px;
+  background: rgba(15,10,30,0.4);
+  border-radius: 10px;
+  border: 1px solid rgba(212,168,75,0.18);
+  margin-bottom: 8px;
+}
+.journal-entry .meta { font-size: 0.72rem; color: var(--gold); margin-bottom: 4px; }
+.journal-entry .body { font-size: 0.88rem; color: var(--text-dim); white-space: pre-wrap; }
+.journal-entry .actions { margin-top: 8px; }
+.empty-state {
+  text-align: center;
+  padding: 28px 16px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-family: var(--serif);
+  font-style: italic;
+}
+.settings-form label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--gold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 12px 0 4px;
+}
+.portrait-card h3 { margin-top: 0; }
+.approx { font-size: 0.72rem; color: var(--muted); font-style: italic; }
+footer.app-foot {
+  text-align: center;
+  padding: 24px 0 8px;
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+noscript {
+  display: block;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--gold-pale);
+  font-family: var(--serif);
+  font-size: 1.1rem;
+}
+</style>
+</head>
+<body>
+<noscript><strong>JavaScript is off.</strong> Open arlette-life-guide.html in Safari or Chrome (Share → Open in Safari from Files). The portrait sections below still scroll if your browser shows HTML without scripts.</noscript>
+<div class="wrap" id="view">
+  <header class="app-head">
+    <div class="mark">Vedic · Lahiri · Day chart</div>
+    <h1 id="displayTitle">Arlette Life Guide</h1>
+    <p class="sub">A contemplative companion for your chart · Georgetown-born · no houses</p>
+  </header>
+
+  <p class="disclaimer" id="disclaimer">
+    Soft note: this is a reflective life guide drawn from Vedic planetary symbolism — not medical, legal, or financial advice, and not fate. Use what resonates; leave the rest. Birth time unknown, so Moon is approximate and houses/Lagna are omitted entirely.
+  </p>
+
+  <div class="open-hint" id="openHint">
+  <strong>iPhone:</strong> Don’t rely on the Files preview. In Files, tap Share → <strong>Open in Safari</strong> (or Copy to Safari). Then the daily guide and tabs work. On a computer: open the file in Chrome or Safari.
+</div>
+<div id="bootError" role="alert"></div>
+<nav class="tabs" id="navTabs" role="tablist" aria-label="Sections">
+  <button type="button" data-go="today" class="active">Today</button>
+  <button type="button" data-go="who">Who is Arlette</button>
+  <button type="button" data-go="purpose">Life purpose</button>
+  <button type="button" data-go="strengths">Strengths</button>
+  <button type="button" data-go="lab">Approval lab</button>
+  <button type="button" data-go="week">Week</button>
+  <button type="button" data-go="map">Natal map</button>
+  <button type="button" data-go="journal">Journal</button>
+  <button type="button" data-go="settings">Settings</button>
+</nav>
+
+  <!-- 1. TODAY -->
+  <section class="panel active" id="panel-today" data-section="today">
+    <div class="card" id="todayCard">
+      <div class="eyebrow" id="todayDateLabel">Today</div>
+      <h2 id="todayVaraTitle">Daily Life Guide</h2>
+      <p id="todayInsight"><strong style="color:var(--gold-soft)">Today’s insight:</strong> Open this file in Safari or Chrome so the guide can match today’s weekday planet to your natal chart. Scroll below for Who is Arlette, Life purpose, and the Approval lab — those sections are always readable.</p>
+      <h3>Best practices</h3>
+      <ul class="check-list" id="todayPractices">
+        <li>Open in Safari (not Files preview) for the live daily checklist.</li>
+        <li>Read “Who is Arlette” once today.</li>
+        <li>Visit Approval lab if praise-seeking or people-pleasing shows up.</li>
+      </ul>
+      <h3>Watch-fors</h3>
+      <ul id="todayWatch">
+        <li>Files preview can look blank even when the app is fine.</li>
+        <li>Chat previews also block JavaScript.</li>
+      </ul>
+      <h3>Daily prompt</h3>
+      <div class="prompt-box" id="todayPrompt">What would “enough” feel like in my body today, without earning it?</div>
+    </div>
+    <div class="sky-note" id="skyNote"><strong>Sky note:</strong> Live sky calculation needs Safari/Chrome. Your natal Saturn in Cancer is a standing theme of belonging without self-erasure.</div>
+  </section>
+
+  <!-- 2. WHO IS ARLETTE -->
+  <section class="panel" id="panel-who" data-section="who">
+    <div class="card portrait-card">
+      <div class="eyebrow">Blueprint</div>
+      <h2>Who is Arlette</h2>
+      <p>You were born 1 July 1977 in Georgetown, Guyana — a coastal child under a Gemini Sun and Mercury, with Venus and Jupiter both resting in Taurus, Mars lit in Aries, Saturn in Cancer, and the Moon roughly in Sagittarius. No rising sign here: birth time unknown. What follows is your day-chart portrait — the sky’s vocabulary for how you move, make, and belong.</p>
+    </div>
+    <div class="card portrait-card">
+      <h3>Mind &amp; voice — Sun + Mercury in Mithuna (Gemini)</h3>
+      <p>Your mind is dual, quick, and hungry for exchange. Storytelling, sales, hostessing, explaining the craft to a stranger — these come naturally. You can hold two ideas at once and make them charming. The soft spot: boredom when life goes flat, and the habit of showing unfinished work for a hit of dopamine or praise before the piece has settled. Your voice is a gift; train it to finish before it performs.</p>
+    </div>
+    <div class="card portrait-card">
+      <h3>Feeling &amp; seeker — Moon in Dhanu (Sagittarius) <span class="approx">~13°30′ · approximate</span></h3>
+      <p>You need meaning, horizon, and truth. A caged Moon in Sagittarius grows restless — travel, learning, or a bigger why restores you. Faith is not optional décor; it is how your heart breathes. When the week feels small, ask what larger story you are serving.</p>
+    </div>
+    <div class="card portrait-card">
+      <h3>Drive — Mars in Mesha (Aries)</h3>
+      <p>You start fire. Initiative is clean and brave. Impatience with slow steps is the shadow — you may leap past the boring middle that craft actually requires. Pair Mars’ spark with Venus–Jupiter’s patience in Taurus: begin boldly, then stay.</p>
+    </div>
+    <div class="card portrait-card">
+      <h3>Craft &amp; dharma — Venus own-sign Taurus + Jupiter in Taurus</h3>
+      <p>Guru and Shukra share a sign: life-purpose spine. You expand through tangible beauty — coastal craft, objects with weight, values you can touch. Wisdom that stays in the head is incomplete for you; it must become matter. Breeze &amp; Loop and maker life fit this spine: beauty with substance, not trend-thin glitter.</p>
+    </div>
+    <div class="card portrait-card">
+      <h3>Shell &amp; belonging — Saturn in Karka (Cancer)</h3>
+      <p>Here sits the crab shell: caretaking as worth, approval as safety, fear of judgment or rejection. When you ask “am I people-pleasing?” — yes, as a Saturn–Cancer pattern. When you ask “am I looking for praise?” — yes, via Gemini mind (cleverness praised), Venus (beauty valued), and Saturn (belonging earned). These are skills to train, not curses. Secure belonging without self-erasure is your long work.</p>
+    </div>
+    <div class="card portrait-card">
+      <h3>Rahu in Kanya / Ketu in Meena</h3>
+      <p>Rahu in Virgo hungers for craft-detail, usefulness, and getting things right enough to serve. Ketu in Pisces asks for faith and release — not every seam needs to be perfect. The dance: useful precision without drowning in perfectionism; devotion without dissolving your edges.</p>
+    </div>
+  </section>
+
+  <!-- 3. LIFE PURPOSE -->
+  <section class="panel" id="panel-purpose" data-section="purpose">
+    <div class="card">
+      <div class="eyebrow">North star</div>
+      <h2>Life purpose</h2>
+      <p>Your purpose is to turn beauty into something people can live with — objects, spaces, words, and welcome that carry weight — while speaking with a Gemini clarity that teaches and hosts, and while building belonging that does not require you to disappear.</p>
+      <h3>Living pillars</h3>
+      <div class="pillar"><strong>1. Beauty with substance</strong><span>Create and curate what lasts on the shelf and in the heart — craft over flash, coastal material over disposable trend.</span></div>
+      <div class="pillar"><strong>2. Voice that hosts &amp; teaches</strong><span>Use Sun–Mercury Gemini to explain, sell, storytell, and make others feel at home — then finish the work before you perform it.</span></div>
+      <div class="pillar"><strong>3. Belonging without self-erasure</strong><span>Saturn in Cancer learns secure care: love that does not demand you earn it by over-giving or disappearing.</span></div>
+      <div class="pillar"><strong>4. Slow structure over fast money</strong><span>Taurus Jupiter–Venus favor steady, value-aligned growth. Trend-aware, not trend-enslaved.</span></div>
+      <div class="pillar"><strong>5. Meaning on the horizon</strong><span>Sagittarius Moon needs a why larger than the week. Keep a living question or faith practice so the crab shell does not harden into isolation.</span></div>
+      <div class="pillar"><strong>6. Useful precision, soft release</strong><span>Rahu Virgo crafts detail for usefulness; Ketu Pisces remembers when to let go. Perfection in service of people, not anxiety.</span></div>
+    </div>
+  </section>
+
+  <!-- 4. STRENGTHS vs SOFT SPOTS -->
+  <section class="panel" id="panel-strengths" data-section="strengths">
+    <div class="card">
+      <div class="eyebrow">Chart-backed</div>
+      <h2>Strengths vs soft spots</h2>
+      <div class="two-col">
+        <div class="card col-strength" style="margin:0;box-shadow:none;">
+          <h3>Strengths</h3>
+          <ul>
+            <li>Dual, agile mind — sales, story, hostess skill (Sun–Mercury Gemini)</li>
+            <li>Tangible aesthetic sense; beauty you can hold (Venus own Taurus)</li>
+            <li>Expanding through craft &amp; value (Jupiter Taurus with Venus)</li>
+            <li>Clean initiative; courage to start (Mars Aries)</li>
+            <li>Seeking truth &amp; meaning; natural teacher-seeker (Moon Sagittarius approx.)</li>
+            <li>Capacity for deep care &amp; loyalty once safe (Saturn Cancer)</li>
+            <li>Detail hunger that can serve usefulness (Rahu Virgo)</li>
+          </ul>
+        </div>
+        <div class="card col-soft" style="margin:0;box-shadow:none;">
+          <h3>Soft spots</h3>
+          <ul>
+            <li>Showing unfinished work for validation (Gemini dopamine loop)</li>
+            <li>Restlessness when caged; horizon hunger unmet (Moon Sag)</li>
+            <li>Impatience with slow middle steps (Mars Aries)</li>
+            <li>People-pleasing &amp; approval-seeking as safety (Saturn Cancer + Venus + Gemini)</li>
+            <li>Emotional armor that blocks the belonging you want</li>
+            <li>Perfectionism that stalls usefulness (Rahu Virgo)</li>
+            <li>Faith neglected until burnout (Ketu Pisces ignored)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. APPROVAL LAB -->
+  <section class="panel" id="panel-lab" data-section="lab">
+    <div class="card">
+      <div class="eyebrow">Interactive</div>
+      <h2>Approval &amp; people-pleasing lab</h2>
+      <p><strong style="color:var(--gold-soft)">Chart diagnosis:</strong> Saturn in Cancer trains belonging through caretaking and fear of rejection. Gemini Sun–Mercury seeks praise for cleverness. Venus in own Taurus feels worth when beauty is valued. Together they form a pattern: “If I please, I am safe; if I am praised, I exist.” Naming it is the first kindness.</p>
+      <h3>Intercept questions</h3>
+      <div id="labQuestions"></div>
+      <div class="practice-today" id="labPractice"></div>
+      <div class="btn-row">
+        <button type="button" class="btn" id="labSaveBtn">Save lab answers</button>
+      </div>
+      <p id="labSavedMsg" class="approx" style="margin-top:8px;"></p>
+    </div>
+  </section>
+
+  <!-- 6. WEEK AT A GLANCE -->
+  <section class="panel" id="panel-week" data-section="week">
+    <div class="card">
+      <div class="eyebrow">Seven days</div>
+      <h2>Week at a glance</h2>
+      <div class="week-grid" id="weekGrid"></div>
+    </div>
+  </section>
+
+  <!-- 7. NATAL FREQUENCY MAP -->
+  <section class="panel" id="panel-map" data-section="map">
+    <div class="card">
+      <div class="eyebrow">Grahas · no houses</div>
+      <h2>Natal frequency map</h2>
+      <p class="approx">Day chart · Lahiri sidereal · Moon degree soft · Lagna omitted</p>
+      <div class="graha-map" id="grahaMap"></div>
+    </div>
+  </section>
+
+  <!-- 8. JOURNAL -->
+  <section class="panel" id="panel-journal" data-section="journal">
+    <div class="card">
+      <div class="eyebrow">Private notes</div>
+      <h2>Journal</h2>
+      <form class="journal-form" id="journalForm">
+        <input type="date" id="journalDate" required>
+        <textarea id="journalBody" placeholder="What is true for you today?" required></textarea>
+        <div class="btn-row">
+          <button type="submit" class="btn">Save entry</button>
+          <button type="button" class="btn btn-ghost" id="journalCancelEdit" style="display:none;">Cancel edit</button>
+        </div>
+      </form>
+      <div id="journalList"></div>
+    </div>
+  </section>
+
+  <!-- 9. SETTINGS -->
+  <section class="panel" id="panel-settings" data-section="settings">
+    <div class="card">
+      <div class="eyebrow">Preferences</div>
+      <h2>Settings</h2>
+      <div class="settings-form">
+        <label for="setName">Display name</label>
+        <input type="text" id="setName" value="Arlette">
+        <label>Birth note</label>
+        <p style="font-size:0.88rem;color:var(--text-dim);">1 July 1977 · Georgetown, Guyana · Vedic Lahiri sidereal day chart</p>
+        <label>Time window</label>
+        <p style="font-size:0.88rem;color:var(--text-dim);">Birth time unknown · window ~11:00–15:00 local · Guyana was UTC−3 in 1977 · Moon approximate · no houses / no Lagna</p>
+        <div class="btn-row" style="margin-top:16px;">
+          <button type="button" class="btn" id="saveSettingsBtn">Save name</button>
+          <button type="button" class="btn btn-ghost" id="exportBtn">Export JSON</button>
+          <button type="button" class="btn btn-ghost" id="importBtn">Import JSON</button>
+          <button type="button" class="btn btn-ghost" id="resetBtn">Reset all</button>
+        </div>
+        <input type="file" id="importFile" accept="application/json,.json" style="display:none;">
+        <p id="settingsMsg" class="approx" style="margin-top:10px;"></p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="app-foot">Arlette Life Guide · v1 · local only</footer>
+</div>
+
+<script>
+'use strict';
+
+var STORAGE_KEY = 'arletteLifeGuide_v1';
+var AYANAMSA = 24.1;
+
+var SIGNS = [
+  'Mesha (Aries)', 'Vrishabha (Taurus)', 'Mithuna (Gemini)', 'Karka (Cancer)',
+  'Simha (Leo)', 'Kanya (Virgo)', 'Tula (Libra)', 'Vrishchika (Scorpio)',
+  'Dhanu (Sagittarius)', 'Makara (Capricorn)', 'Kumbha (Aquarius)', 'Meena (Pisces)'
+];
+
+var SIGN_SHORT = [
+  'Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha', 'Kanya',
+  'Tula', 'Vrishchika', 'Dhanu', 'Makara', 'Kumbha', 'Meena'
+];
+
+var VARA = [
+  { name: 'Sunday', planet: 'Sun', sanskrit: 'Ravi' },
+  { name: 'Monday', planet: 'Moon', sanskrit: 'Soma' },
+  { name: 'Tuesday', planet: 'Mars', sanskrit: 'Mangala' },
+  { name: 'Wednesday', planet: 'Mercury', sanskrit: 'Budha' },
+  { name: 'Thursday', planet: 'Jupiter', sanskrit: 'Guru' },
+  { name: 'Friday', planet: 'Venus', sanskrit: 'Shukra' },
+  { name: 'Saturday', planet: 'Saturn', sanskrit: 'Shani' }
+];
+
+var NATAL = {
+  Sun: { sign: 'Mithuna', deg: '15°30′', gift: 'Dual mind, visible voice, storytelling light', lesson: 'Finish before you perform; boredom is a teacher' },
+  Moon: { sign: 'Dhanu', deg: '~13°30′ (approx)', gift: 'Meaning-hunger, horizon, truth-seeking heart', lesson: 'Do not cage the seeker; feed faith regularly' },
+  Mercury: { sign: 'Mithuna', deg: '16°42′', gift: 'Sales, hostess skill, agile explanation', lesson: 'Oversharing unfinished work for dopamine' },
+  Venus: { sign: 'Vrishabha', deg: '0°31′ (own)', gift: 'Beauty with weight; craft that lasts', lesson: 'Worth is not only when beauty is praised' },
+  Mars: { sign: 'Mesha', deg: '24°40′', gift: 'Clean fire to start; courage', lesson: 'Impatience with the slow middle' },
+  Jupiter: { sign: 'Vrishabha', deg: '26°13′', gift: 'Expand through tangible dharma & value', lesson: 'Wisdom must become matter, not talk' },
+  Saturn: { sign: 'Karka', deg: '21°32′', gift: 'Deep loyalty once belonging feels safe', lesson: 'People-pleasing & approval as armor' },
+  Rahu: { sign: 'Kanya', deg: '26°45′ (mean)', gift: 'Craft-detail hunger; usefulness', lesson: 'Perfectionism that stalls service' },
+  Ketu: { sign: 'Meena', deg: '26°45′ (mean)', gift: 'Faith, release, soft devotion', lesson: 'Dissolving edges when clarity is needed' }
+};
+
+var GRAHA_GLYPH = {
+  Sun: '☉', Moon: '☾', Mercury: '☿', Venus: '♀', Mars: '♂',
+  Jupiter: '♃', Saturn: '♄', Rahu: '☊', Ketu: '☋'
+};
+
+var DAILY = {
+  Sun: {
+    insight: 'Sunday carries Ravi — your natal Sun in Mithuna. Today the sky asks your dual mind to shine with clarity, not scatter. Let one story, one offer, or one finished piece get the light. Your Gemini Sun thrives when visibility meets completion.',
+    practices: [
+      'Finish one small creative or sales piece before sharing it.',
+      'Speak one true sentence about your craft without soft-pedaling.',
+      'Sit in sunlight or open air for ten quiet minutes — body as altar.'
+    ],
+    watch: [
+      'Performing for praise instead of offering finished work.',
+      'Splitting attention across too many bright ideas.'
+    ],
+    prompt: 'What one thing am I ready to complete and let be seen — without asking for applause first?'
+  },
+  Moon: {
+    insight: 'Monday carries Soma — speaking to your approximate Moon in Dhanu. Your heart needs horizon and meaning. Soften the crab shell of Saturn–Cancer by feeding the seeker: a walk, a prayer, a larger why for the week.',
+    practices: [
+      'Name today’s larger why in one sentence.',
+      'Do one act of care for yourself that is not about earning belonging.',
+      'Read or listen to something that stretches your horizon.'
+    ],
+    watch: [
+      'Feeling caged and snapping at those closest.',
+      'Numbing restlessness instead of giving it a destination.'
+    ],
+    prompt: 'Where does my heart feel small — and what horizon would restore it?'
+  },
+  Mars: {
+    insight: 'Tuesday carries Mangala — your Mars in Mesha. Fire is clean today: start, decide, cut through fog. Pair the spark with Taurus patience so you do not abandon the middle of the work.',
+    practices: [
+      'Start the hard thing in the first hour you are free.',
+      'Set a timer for focused craft — then stop cleanly.',
+      'Move your body enough to burn excess heat (walk, stretch, sea air).'
+    ],
+    watch: [
+      'Impatience with anyone slower than your spark.',
+      'Starting three fires and tending none.'
+    ],
+    prompt: 'What am I ready to begin — and what slow step will I respect after the first spark?'
+  },
+  Mercury: {
+    insight: 'Wednesday carries Budha — your Mercury sits with the Sun in Mithuna. Words, sales, hostessing, and teaching are favored. Watch the urge to float unfinished drafts for validation; let cleverness serve usefulness.',
+    practices: [
+      'Write or pitch one clear message — then leave it alone.',
+      'Listen twice as long as you explain today.',
+      'Organize one small corner of craft inventory or inbox.'
+    ],
+    watch: [
+      'Oversharing WIP for dopamine or praise.',
+      'Talking past the point of connection.'
+    ],
+    prompt: 'What do I need to say clearly — and what am I saying only to be admired?'
+  },
+  Jupiter: {
+    insight: 'Thursday carries Guru — your Jupiter in Vrishabha beside Venus. Expansion wants substance: beauty, craft, values with weight. Teach or host from what you have lived, not from borrowed shine. Wisdom becomes matter.',
+    practices: [
+      'Invest time in one tangible improvement to your craft or space.',
+      'Share one piece of hard-won wisdom without overselling it.',
+      'Choose quality over a quick win in a money or making decision.'
+    ],
+    watch: [
+      'Big talk without a material next step.',
+      'Over-promising from enthusiasm.'
+    ],
+    prompt: 'How can today’s wisdom become something I can touch or give?'
+  },
+  Venus: {
+    insight: 'Friday carries Shukra — your Venus is strong in own-sign Vrishabha. Beauty, pleasure, relationship, and craft are in dignity. Receive appreciation without making it proof of worth. Make something lovely and useful.',
+    practices: [
+      'Tend one beautiful, useful thing (object, meal, display, garment).',
+      'Receive a compliment with a simple thank-you — no deflection.',
+      'Spend a little on quality that aligns with your values, or repair what you have.'
+    ],
+    watch: [
+      'Equating beauty-praise with safety or love.',
+      'People-pleasing through aesthetics while ignoring your own taste.'
+    ],
+    prompt: 'Where can I create or enjoy beauty without needing it to earn belonging?'
+  },
+  Saturn: {
+    insight: 'Saturday carries Shani — speaking directly to your Saturn in Karka. Structure, boundaries, and honest belonging are the work. Notice where caretaking becomes self-erasure. Build a shell that protects without isolating.',
+    practices: [
+      'Say one kind no — or one clear yes that is truly yours.',
+      'Do a small duty fully (body, home, craft maintenance).',
+      'Check: am I giving to be loved, or giving from fullness?'
+    ],
+    watch: [
+      'Approval-seeking disguised as helpfulness.',
+      'Emotional armor that blocks the closeness you want.'
+    ],
+    prompt: 'Where am I earning belonging — and what would secure care look like instead?'
+  }
+};
+
+var WEEK_LINES = {
+  Sun: { best: 'Finish one visible piece.', lean: 'Clarity & voice', soft: 'Scatter / performance' },
+  Moon: { best: 'Feed meaning & rest.', lean: 'Horizon & heart', soft: 'Cage restlessness' },
+  Mars: { best: 'Start, then stay a beat.', lean: 'Clean initiative', soft: 'Impatience' },
+  Mercury: { best: 'Speak & organize clearly.', lean: 'Story / sales skill', soft: 'WIP validation' },
+  Jupiter: { best: 'Expand through substance.', lean: 'Craft wisdom', soft: 'Big talk only' },
+  Venus: { best: 'Make & receive beauty.', lean: 'Own-sign grace', soft: 'Worth = praise' },
+  Saturn: { best: 'Boundary with care.', lean: 'Loyal structure', soft: 'People-pleasing' }
+};
+
+var LAB_QS = [
+  { id: 'q1', text: 'Today, did I say yes when I meant no — to keep someone comfortable?' },
+  { id: 'q2', text: 'Did I share unfinished work mainly to get praise, relief, or dopamine?' },
+  { id: 'q3', text: 'Am I people-pleasing right now (Saturn–Cancer pattern) — caring as a bid for safety?' },
+  { id: 'q4', text: 'Am I looking for praise/approval through cleverness (Gemini) or beauty (Venus) instead of resting in enoughness?' }
+];
+
+var LAB_PRACTICES = [
+  'True belonging practice: offer help only after asking yourself “Would I still do this if no one thanked me?”',
+  'True belonging practice: let one compliment land with “thank you” and silence — no joke, no deflection.',
+  'True belonging practice: keep one preference private today; do not explain it away.',
+  'True belonging practice: finish a tiny craft step before seeking any feedback.',
+  'True belonging practice: name one need out loud to someone safe — without over-apologizing.',
+  'True belonging practice: sit with the urge to people-please for three breaths, then choose.'
+];
+
+var SECTIONS = [
+  { id: 'today', label: 'Today' },
+  { id: 'who', label: 'Who is Arlette' },
+  { id: 'purpose', label: 'Life purpose' },
+  { id: 'strengths', label: 'Strengths' },
+  { id: 'lab', label: 'Approval lab' },
+  { id: 'week', label: 'Week' },
+  { id: 'map', label: 'Natal map' },
+  { id: 'journal', label: 'Journal' },
+  { id: 'settings', label: 'Settings' }
+];
+
+function defaultState() {
+  return {
+    displayName: 'Arlette',
+    practices: {},
+    lab: { answers: {}, notes: {}, savedAt: null },
+    journal: [],
+    editingId: null
+  };
+}
+
+function loadState() {
+  var raw;
+  var parsed;
+  try {
+    raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) { return defaultState(); }
+    parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') { return defaultState(); }
+    if (!parsed.practices) { parsed.practices = {}; }
+    if (!parsed.lab) { parsed.lab = { answers: {}, notes: {}, savedAt: null }; }
+    if (!parsed.lab.answers) { parsed.lab.answers = {}; }
+    if (!parsed.lab.notes) { parsed.lab.notes = {}; }
+    if (!parsed.journal) { parsed.journal = []; }
+    if (!parsed.displayName) { parsed.displayName = 'Arlette'; }
+    return parsed;
+  } catch (e) {
+    return defaultState();
+  }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) { /* ignore quota */ }
+}
+
+var state = loadState();
+var editJournalId = null;
+
+function pad2(n) {
+  return n < 10 ? '0' + n : String(n);
+}
+
+function dateKey(d) {
+  return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+}
+
+function formatNiceDate(d) {
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return VARA[d.getDay()].name + ', ' + months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+}
+
+function toSiderealLon(tropicalLon) {
+  var lon = tropicalLon - AYANAMSA;
+  while (lon < 0) { lon += 360; }
+  while (lon >= 360) { lon -= 360; }
+  return lon;
+}
+
+function lonToSignDeg(lon) {
+  var s = Math.floor(lon / 30);
+  var d = lon - s * 30;
+  var deg = Math.floor(d);
+  var mins = Math.floor((d - deg) * 60);
+  return { signIndex: s, sign: SIGN_SHORT[s], deg: deg, mins: mins, label: SIGN_SHORT[s] + ' ' + deg + '°' + pad2(mins) + '′' };
+}
+
+/* Approximate geocentric longitudes (simplified VSOP-ish / mean elements) — honest approx for sky note */
+function approxPlanetLongitudes(date) {
+  var y = date.getFullYear();
+  var m = date.getMonth() + 1;
+  var day = date.getDate() + (date.getHours() + date.getTimezoneOffset() / -60) / 24;
+  var a = Math.floor((14 - m) / 12);
+  var yy = y + 4800 - a;
+  var mm = m + 12 * a - 3;
+  var jd = day + Math.floor((153 * mm + 2) / 5) + 365 * yy + Math.floor(yy / 4) - Math.floor(yy / 100) + Math.floor(yy / 400) - 32045;
+  var T = (jd - 2451545.0) / 36525.0;
+
+  function norm(x) {
+    x = x % 360;
+    if (x < 0) { x += 360; }
+    return x;
+  }
+
+  /* Sun mean longitude + equation of center (coarse) */
+  var L0 = norm(280.46646 + 36000.76983 * T + 0.0003032 * T * T);
+  var M = norm(357.52911 + 35999.05029 * T - 0.0001537 * T * T);
+  var Mr = M * Math.PI / 180;
+  var C = (1.914602 - 0.004817 * T) * Math.sin(Mr) + 0.019993 * Math.sin(2 * Mr);
+  var sunTrop = norm(L0 + C);
+
+  /* Moon — very coarse mean longitude */
+  var moonTrop = norm(218.3165 + 481267.8813 * T);
+
+  /* Planets — mean longitudes (coarse educational approx) */
+  var mercTrop = norm(252.2509 + 149472.6745 * T);
+  var venTrop = norm(181.9798 + 58517.8156 * T);
+  var marsTrop = norm(355.433 + 19140.2993 * T);
+  var jupTrop = norm(34.3515 + 3034.9057 * T);
+  var satTrop = norm(50.0774 + 1222.1138 * T);
+
+  return {
+    Sun: toSiderealLon(sunTrop),
+    Moon: toSiderealLon(moonTrop),
+    Mercury: toSiderealLon(mercTrop),
+    Venus: toSiderealLon(venTrop),
+    Mars: toSiderealLon(marsTrop),
+    Jupiter: toSiderealLon(jupTrop),
+    Saturn: toSiderealLon(satTrop)
+  };
+}
+
+function buildSkyNote(date) {
+  var longs = approxPlanetLongitudes(date);
+  var names = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'];
+  var chips = [];
+  var i;
+  var info;
+  for (i = 0; i < names.length; i++) {
+    info = lonToSignDeg(longs[names[i]]);
+    chips.push(names[i] + ' · ' + info.label);
+  }
+
+  var jup = lonToSignDeg(longs.Jupiter);
+  var seasonal = '';
+  if (jup.signIndex === 3) {
+    seasonal = ' Transit Jupiter appears in Karka (Cancer) on this approximate calculator — a soft echo toward your natal Saturn at Karka 21°32′: themes of belonging, care, and emotional structure may feel louder. Treat degrees as directional, not exact.';
+  } else if (date.getFullYear() === 2026 && date.getMonth() === 8) {
+    seasonal = ' Curated Sep 2026 note: Jupiter’s exalted Cancer season activates natal Saturn themes — secure belonging without self-erasure.';
+  } else {
+    seasonal = ' Use sign-level gochara only; this calculator is Lahiri-ish (tropical − ~24.1° ayanamsa) and intentionally approximate.';
+  }
+
+  return {
+    html: '<strong>Sky note</strong> (approximate Lahiri-ish · tropical − ~24.1° · not ephemeris-grade)<br>' +
+      chips.join(' · ') + '<br><br>' + seasonal +
+      ' Never treat these as exact birth-time or predictive degrees.'
+  };
+}
+
+function renderNav() {
+  var nav = document.getElementById('navTabs');
+  var html = '';
+  var i;
+  for (i = 0; i < SECTIONS.length; i++) {
+    html += '<button type="button" data-go="' + SECTIONS[i].id + '"' +
+      (i === 0 ? ' class="active"' : '') + '>' + SECTIONS[i].label + '</button>';
+  }
+  nav.innerHTML = html;
+  nav.onclick = function (ev) {
+    var t = ev.target;
+    if (t && t.getAttribute('data-go')) {
+      showSection(t.getAttribute('data-go'));
+    }
+  };
+}
+
+function showSection(id) {
+  var panels = document.querySelectorAll('.panel');
+  var buttons = document.querySelectorAll('nav.tabs button');
+  var i;
+  for (i = 0; i < panels.length; i++) {
+    if (panels[i].getAttribute('data-section') === id) {
+      panels[i].className = 'panel active';
+    } else {
+      panels[i].className = 'panel';
+    }
+  }
+  for (i = 0; i < buttons.length; i++) {
+    if (buttons[i].getAttribute('data-go') === id) {
+      buttons[i].className = 'active';
+    } else {
+      buttons[i].className = '';
+    }
+  }
+}
+
+function renderToday() {
+  var now = new Date();
+  var day = VARA[now.getDay()];
+  var pack = DAILY[day.planet];
+  var key = dateKey(now);
+  var practiceState = state.practices[key] || {};
+  var i;
+  var html;
+  var checked;
+
+  document.getElementById('todayDateLabel').textContent = formatNiceDate(now);
+  document.getElementById('todayVaraTitle').textContent =
+    day.name + ' · ' + day.planet + ' (vāra ' + day.sanskrit + ')';
+  document.getElementById('todayInsight').innerHTML =
+    '<strong style="color:var(--gold-soft)">Today’s insight:</strong> ' + pack.insight;
+
+  html = '';
+  for (i = 0; i < pack.practices.length; i++) {
+    checked = practiceState['p' + i] ? ' checked' : '';
+    html += '<li><input type="checkbox" data-pi="' + i + '"' + checked + '>' +
+      '<span>' + pack.practices[i] + '</span></li>';
+  }
+  document.getElementById('todayPractices').innerHTML = html;
+  document.getElementById('todayPractices').onchange = function (ev) {
+    var t = ev.target;
+    var pi;
+    if (t && t.getAttribute('data-pi') !== null) {
+      pi = t.getAttribute('data-pi');
+      if (!state.practices[key]) { state.practices[key] = {}; }
+      state.practices[key]['p' + pi] = t.checked;
+      saveState();
+    }
+  };
+
+  html = '';
+  for (i = 0; i < pack.watch.length; i++) {
+    html += '<li>' + pack.watch[i] + '</li>';
+  }
+  document.getElementById('todayWatch').innerHTML = html;
+  document.getElementById('todayPrompt').textContent = pack.prompt;
+
+  document.getElementById('skyNote').innerHTML = buildSkyNote(now).html;
+}
+
+function renderLab() {
+  var wrap = document.getElementById('labQuestions');
+  var html = '';
+  var i;
+  var q;
+  var checked;
+  var note;
+  var dayIdx = new Date().getDay();
+
+  for (i = 0; i < LAB_QS.length; i++) {
+    q = LAB_QS[i];
+    checked = state.lab.answers[q.id] ? ' checked' : '';
+    note = state.lab.notes[q.id] || '';
+    html += '<div class="lab-q">' +
+      '<label class="q-label"><input type="checkbox" data-qid="' + q.id + '"' + checked + '>' +
+      '<span>' + q.text + '</span></label>' +
+      '<textarea data-note="' + q.id + '" placeholder="Optional note…">' + escapeHtml(note) + '</textarea>' +
+      '</div>';
+  }
+  wrap.innerHTML = html;
+  document.getElementById('labPractice').textContent = LAB_PRACTICES[dayIdx % LAB_PRACTICES.length];
+
+  document.getElementById('labSaveBtn').onclick = function () {
+    var boxes = wrap.querySelectorAll('input[type="checkbox"]');
+    var areas = wrap.querySelectorAll('textarea');
+    var j;
+    for (j = 0; j < boxes.length; j++) {
+      state.lab.answers[boxes[j].getAttribute('data-qid')] = boxes[j].checked;
+    }
+    for (j = 0; j < areas.length; j++) {
+      state.lab.notes[areas[j].getAttribute('data-note')] = areas[j].value;
+    }
+    state.lab.savedAt = new Date().toISOString();
+    saveState();
+    document.getElementById('labSavedMsg').textContent = 'Saved to this device.';
+  };
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function renderWeek() {
+  var now = new Date();
+  var start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var dow = start.getDay();
+  start.setDate(start.getDate() - dow);
+  var html = '';
+  var i;
+  var d;
+  var v;
+  var line;
+  var isToday;
+  for (i = 0; i < 7; i++) {
+    d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    v = VARA[d.getDay()];
+    line = WEEK_LINES[v.planet];
+    isToday = dateKey(d) === dateKey(now);
+    html += '<div class="week-day' + (isToday ? ' wd-today' : '') + '">' +
+      '<div><div class="wd-name">' + v.name.slice(0, 3) + (isToday ? ' · today' : '') + '</div>' +
+      '<div class="wd-planet">' + v.planet + '</div></div>' +
+      '<div><strong style="color:var(--gold-pale)">' + line.best + '</strong><br>' +
+      '<span style="color:var(--ok)">Lean: ' + line.lean + '</span> · ' +
+      '<span style="color:var(--warn)">Watch: ' + line.soft + '</span></div></div>';
+  }
+  document.getElementById('weekGrid').innerHTML = html;
+}
+
+function renderMap() {
+  var order = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Rahu', 'Ketu'];
+  var html = '';
+  var i;
+  var g;
+  var n;
+  for (i = 0; i < order.length; i++) {
+    g = order[i];
+    n = NATAL[g];
+    html += '<div class="graha-row">' +
+      '<div class="graha-glyph" aria-hidden="true">' + GRAHA_GLYPH[g] + '</div>' +
+      '<div><h4>' + g + '</h4>' +
+      '<div class="sign">' + n.sign + ' · ' + n.deg + '</div>' +
+      '<div class="gift"><strong style="color:var(--ok)">Gift:</strong> ' + n.gift + '</div>' +
+      '<div class="lesson"><strong style="color:var(--warn)">Lesson:</strong> ' + n.lesson + '</div>' +
+      '</div></div>';
+  }
+  document.getElementById('grahaMap').innerHTML = html;
+}
+
+function uid() {
+  return 'j' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+}
+
+function renderJournal() {
+  var list = document.getElementById('journalList');
+  var entries = state.journal.slice().sort(function (a, b) {
+    return a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
+  });
+  var html = '';
+  var i;
+  var e;
+  var d;
+  var planet;
+  if (entries.length === 0) {
+    list.innerHTML = '<div class="empty-state">No entries yet. The page is quiet — write one true sentence when you are ready.</div>';
+    return;
+  }
+  for (i = 0; i < entries.length; i++) {
+    e = entries[i];
+    d = new Date(e.date + 'T12:00:00');
+    planet = isNaN(d.getTime()) ? '?' : VARA[d.getDay()].planet;
+    html += '<div class="journal-entry" data-id="' + e.id + '">' +
+      '<div class="meta">' + e.date + ' · ' + planet + ' day</div>' +
+      '<div class="body">' + escapeHtml(e.body) + '</div>' +
+      '<div class="actions btn-row">' +
+      '<button type="button" class="btn btn-ghost" data-edit="' + e.id + '">Edit</button>' +
+      '<button type="button" class="btn btn-ghost" data-del="' + e.id + '">Delete</button>' +
+      '</div></div>';
+  }
+  list.innerHTML = html;
+  list.onclick = function (ev) {
+    var t = ev.target;
+    var id;
+    var j;
+    if (t.getAttribute('data-edit')) {
+      id = t.getAttribute('data-edit');
+      for (j = 0; j < state.journal.length; j++) {
+        if (state.journal[j].id === id) {
+          document.getElementById('journalDate').value = state.journal[j].date;
+          document.getElementById('journalBody').value = state.journal[j].body;
+          editJournalId = id;
+          document.getElementById('journalCancelEdit').style.display = 'inline-block';
+          break;
+        }
+      }
+    }
+    if (t.getAttribute('data-del')) {
+      id = t.getAttribute('data-del');
+      if (window.confirm('Delete this journal entry?')) {
+        state.journal = state.journal.filter(function (x) { return x.id !== id; });
+        saveState();
+        renderJournal();
+      }
+    }
+  };
+}
+
+function setupJournal() {
+  var today = new Date();
+  document.getElementById('journalDate').value = dateKey(today);
+  document.getElementById('journalForm').onsubmit = function (ev) {
+    var dateVal;
+    var bodyVal;
+    var j;
+    ev.preventDefault();
+    dateVal = document.getElementById('journalDate').value;
+    bodyVal = document.getElementById('journalBody').value.trim();
+    if (!dateVal || !bodyVal) { return; }
+    if (editJournalId) {
+      for (j = 0; j < state.journal.length; j++) {
+        if (state.journal[j].id === editJournalId) {
+          state.journal[j].date = dateVal;
+          state.journal[j].body = bodyVal;
+          break;
+        }
+      }
+      editJournalId = null;
+      document.getElementById('journalCancelEdit').style.display = 'none';
+    } else {
+      state.journal.push({ id: uid(), date: dateVal, body: bodyVal });
+    }
+    document.getElementById('journalBody').value = '';
+    saveState();
+    renderJournal();
+  };
+  document.getElementById('journalCancelEdit').onclick = function () {
+    editJournalId = null;
+    document.getElementById('journalBody').value = '';
+    document.getElementById('journalCancelEdit').style.display = 'none';
+  };
+}
+
+function applyDisplayName() {
+  var n = state.displayName || 'Arlette';
+  document.getElementById('displayTitle').textContent = n + ' Life Guide';
+  document.getElementById('setName').value = n;
+}
+
+function setupSettings() {
+  document.getElementById('saveSettingsBtn').onclick = function () {
+    var n = document.getElementById('setName').value.trim() || 'Arlette';
+    state.displayName = n;
+    saveState();
+    applyDisplayName();
+    document.getElementById('settingsMsg').textContent = 'Name saved.';
+  };
+  document.getElementById('exportBtn').onclick = function () {
+    var blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'arlette-life-guide-export.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    document.getElementById('settingsMsg').textContent = 'Export downloaded.';
+  };
+  document.getElementById('importBtn').onclick = function () {
+    document.getElementById('importFile').click();
+  };
+  document.getElementById('importFile').onchange = function (ev) {
+    var file = ev.target.files && ev.target.files[0];
+    var reader;
+    if (!file) { return; }
+    reader = new FileReader();
+    reader.onload = function () {
+      var parsed;
+      try {
+        parsed = JSON.parse(String(reader.result));
+        if (!parsed || typeof parsed !== 'object') { throw new Error('bad'); }
+        state = parsed;
+        if (!state.practices) { state.practices = {}; }
+        if (!state.lab) { state.lab = { answers: {}, notes: {}, savedAt: null }; }
+        if (!state.journal) { state.journal = []; }
+        if (!state.displayName) { state.displayName = 'Arlette'; }
+        saveState();
+        applyDisplayName();
+        renderToday();
+        renderLab();
+        renderJournal();
+        document.getElementById('settingsMsg').textContent = 'Import complete.';
+      } catch (err) {
+        document.getElementById('settingsMsg').textContent = 'Import failed — invalid JSON.';
+      }
+    };
+    reader.readAsText(file);
+  };
+  document.getElementById('resetBtn').onclick = function () {
+    if (window.confirm('Reset all saved data for Arlette Life Guide? This cannot be undone.')) {
+      state = defaultState();
+      saveState();
+      applyDisplayName();
+      renderToday();
+      renderLab();
+      renderJournal();
+      document.getElementById('settingsMsg').textContent = 'Reset complete.';
+    }
+  };
+}
+
+function init() {
+  document.documentElement.classList.add('js');
+  var hint = document.getElementById('openHint');
+  if (hint) {
+    hint.innerHTML = '<strong>Ready.</strong> Tabs and Today are live. Bookmark this Safari page if you like. Data stays on this device.';
+  }
+  renderNav();
+  applyDisplayName();
+  renderToday();
+  renderLab();
+  renderWeek();
+  renderMap();
+  setupJournal();
+  renderJournal();
+  setupSettings();
+}
+
+try {
+  init();
+} catch (err) {
+  var box = document.getElementById('bootError');
+  if (box) {
+    box.className = 'show';
+    box.textContent = 'Something blocked the interactive layer. Scroll for Who is Arlette / Life purpose / Approval lab, or reopen in Safari. (' + (err && err.message ? err.message : 'error') + ')';
+  }
+  if (typeof console !== 'undefined' && console.error) { console.error(err); }
+}
+</script>
+</body>
+</html>
