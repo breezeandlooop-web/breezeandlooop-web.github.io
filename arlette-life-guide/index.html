@@ -838,15 +838,18 @@ noscript {
         <label for="tradeDate">Date</label>
         <input type="date" id="tradeDate" required>
         <label for="tradeSymbol">Market / pair / ticker</label>
-        <input type="text" id="tradeSymbol" placeholder="e.g. EURUSD, BTC, stock" maxlength="40" required>
+        <input type="text" id="tradeSymbol" placeholder="e.g. Max Pain, EURUSD, BTC" maxlength="40" required>
         <label for="tradeSide">Direction</label>
         <select id="tradeSide"><option value="long">Long / buy</option><option value="short">Short / sell</option></select>
-        <label for="tradeRisk">Risk amount (what you could lose on the plan)</label>
-        <input type="number" id="tradeRisk" step="0.01" min="0" placeholder="0.00" required>
+        <label for="tradeLot">Lot size (contracts / units / lots)</label>
+        <input type="text" id="tradeLot" inputmode="decimal" placeholder="e.g. 0.01, 1, 1000" maxlength="24" required>
+        <label for="tradeRisk">Risk amount ($) — what you could lose if stop hits</label>
+        <input type="text" id="tradeRisk" inputmode="decimal" placeholder="e.g. 50 or $50.00" required>
+        <p class="approx" id="tradeSizePreview" style="margin:0;">Lot size and risk will show here as you type.</p>
         <label for="tradeResult">Result</label>
         <select id="tradeResult"><option value="win">Win</option><option value="loss">Loss</option><option value="be">Breakeven</option></select>
-        <label for="tradePnl">P/L amount (+ win / − loss)</label>
-        <input type="number" id="tradePnl" step="0.01" placeholder="0.00" required>
+        <label for="tradePnl">P/L for this trade only (+ win / − loss)</label>
+        <input type="text" id="tradePnl" inputmode="decimal" placeholder="e.g. 30.87 or -50" required>
         <label for="tradeNote">What I followed / broke</label>
         <textarea id="tradeNote" maxlength="400" placeholder="Setup, emotion, rule kept or broken…"></textarea>
         <div class="btn-row"><button type="submit" class="btn">Save trade</button></div>
@@ -923,7 +926,7 @@ noscript {
     </div>
   </section>
 
-  <footer class="app-foot">Arlette Life Guide · v1.4.1 · local only</footer>
+  <footer class="app-foot">Arlette Life Guide · v1.4.2</footer>
 </div>
 
 <script>
@@ -2134,7 +2137,8 @@ function renderTrades() {
     sign = (Number(t.pnl) >= 0 ? '+' : '') + Number(t.pnl).toFixed(2);
     html += '<div class="trade-row ' + t.result + '">' +
       '<strong style="color:var(--gold-pale)">' + t.date + ' · ' + t.symbol + '</strong> · ' + t.side +
-      '<br>Risk ' + Number(t.risk).toFixed(2) + ' · P/L ' + sign + ' · ' + t.result +
+      '<br>Lot size ' + (t.lot != null && t.lot !== '' ? escapeHtml(String(t.lot)) : '—') +
+      ' · Risking $' + Number(t.risk).toFixed(2) + ' · P/L ' + sign + ' · ' + t.result +
       (t.note ? '<br><span style="color:var(--text-dim)">' + escapeHtml(t.note) + '</span>' : '') +
       '<br><button type="button" class="btn btn-ghost" style="margin-top:6px;padding:4px 10px;font-size:0.75rem;" data-del-trade="' + t.id + '">Delete</button>' +
       '</div>';
@@ -2147,15 +2151,66 @@ function escapeHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+function parseMoney(raw) {
+  var s = String(raw == null ? '' : raw).trim();
+  var neg = false;
+  var n;
+  if (!s) { return NaN; }
+  if (s.charAt(0) === '(' && s.charAt(s.length - 1) === ')') {
+    neg = true;
+    s = s.slice(1, -1);
+  }
+  s = s.replace(/\s/g, '').replace(/\$/g, '').replace(/,/g, '');
+  if (s.charAt(0) === '+') { s = s.slice(1); }
+  if (s.charAt(0) === '-') { neg = true; s = s.slice(1); }
+  /* if user pasted two amounts, take the first number only */
+  s = (s.match(/-?\d+(?:\.\d+)?/) || [''])[0];
+  n = Number(s);
+  if (!isFinite(n)) { return NaN; }
+  return neg ? -Math.abs(n) : n;
+}
+
+function parseLot(raw) {
+  var s = String(raw == null ? '' : raw).trim().replace(/,/g, '');
+  var m;
+  if (!s) { return ''; }
+  m = s.match(/-?\d+(?:\.\d+)?/);
+  return m ? m[0] : s;
+}
+
+function updateTradeSizePreview() {
+  var el = document.getElementById('tradeSizePreview');
+  var lot = parseLot(document.getElementById('tradeLot').value);
+  var risk = parseMoney(document.getElementById('tradeRisk').value);
+  if (!el) { return; }
+  if (!lot && !(isFinite(risk) && risk >= 0)) {
+    el.textContent = 'Lot size and risk will show here as you type.';
+    return;
+  }
+  el.innerHTML = '<strong style="color:var(--gold-pale)">Lot size: ' + (lot || '—') +
+    '</strong> · <strong style="color:var(--gold-pale)">Risking: $' +
+    (isFinite(risk) && risk >= 0 ? risk.toFixed(2) : '—') + '</strong>';
+}
+
 function setupTrading() {
   var form = document.getElementById('tradeForm');
   var list = document.getElementById('tradeList');
+  var lotEl;
+  var riskEl;
   if (!form) { return; }
   document.getElementById('tradeDate').value = dateKey(new Date());
+  lotEl = document.getElementById('tradeLot');
+  riskEl = document.getElementById('tradeRisk');
+  if (lotEl) { lotEl.oninput = updateTradeSizePreview; }
+  if (riskEl) { riskEl.oninput = updateTradeSizePreview; }
+  updateTradeSizePreview();
   form.onsubmit = function (ev) {
     var todayGate = state.tradeGate[dateKey(new Date())] || {};
     var i;
     var ok = true;
+    var risk;
+    var pnl;
+    var lot;
     ev.preventDefault();
     for (i = 0; i < TRADE_GATE.length; i++) {
       if (!getGateEntry(todayGate, TRADE_GATE[i].id).checked) { ok = false; break; }
@@ -2163,21 +2218,42 @@ function setupTrading() {
     if (!ok) {
       if (!window.confirm('Pre-trade gate is incomplete. Log anyway as a practice note?')) { return; }
     }
+    lot = parseLot(document.getElementById('tradeLot').value);
+    risk = parseMoney(document.getElementById('tradeRisk').value);
+    pnl = parseMoney(document.getElementById('tradePnl').value);
+    if (!lot) {
+      window.alert('Enter a lot size (contracts / units / lots).');
+      document.getElementById('tradeLot').focus();
+      return;
+    }
+    if (!(isFinite(risk) && risk >= 0)) {
+      window.alert('Enter risk as a number — $50 or 50 is fine.');
+      document.getElementById('tradeRisk').focus();
+      return;
+    }
+    if (!isFinite(pnl)) {
+      window.alert('Enter P/L as one number for this trade — e.g. 30.87 or -50.');
+      document.getElementById('tradePnl').focus();
+      return;
+    }
     state.trades.push({
       id: uid(),
       date: document.getElementById('tradeDate').value,
       symbol: document.getElementById('tradeSymbol').value.trim(),
       side: document.getElementById('tradeSide').value,
-      risk: Number(document.getElementById('tradeRisk').value),
+      lot: lot,
+      risk: risk,
       result: document.getElementById('tradeResult').value,
-      pnl: Number(document.getElementById('tradePnl').value),
+      pnl: pnl,
       note: document.getElementById('tradeNote').value.trim()
     });
     saveState();
     document.getElementById('tradeSymbol').value = '';
+    document.getElementById('tradeLot').value = '';
     document.getElementById('tradeRisk').value = '';
     document.getElementById('tradePnl').value = '';
     document.getElementById('tradeNote').value = '';
+    updateTradeSizePreview();
     renderTrades();
   };
   if (list) {
