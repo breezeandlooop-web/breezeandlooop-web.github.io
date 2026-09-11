@@ -571,6 +571,16 @@ noscript {
 .trade-row.win { border-left: 3px solid var(--ok); }
 .trade-row.loss { border-left: 3px solid var(--warn); }
 .trade-row.be { border-left: 3px solid var(--muted); }
+
+.gate-item { display: block; }
+.gate-item .gate-row { display: flex; gap: 10px; align-items: flex-start; }
+.gate-item .gate-note {
+  width: 100%; margin-top: 8px; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--card-border); background: rgba(0,0,0,0.2);
+  color: var(--text); font-size: 0.8rem; min-height: 52px; resize: vertical;
+}
+.gate-item .gate-note-label { font-size: 0.7rem; color: var(--muted); margin-top: 6px; display: block; }
+
 .rule-pill {
   display: inline-block; font-size: 0.72rem; padding: 3px 8px; border-radius: 999px;
   border: 1px solid var(--card-border); color: var(--gold-pale); margin: 2px 4px 2px 0;
@@ -816,6 +826,7 @@ noscript {
     <div class="card" style="margin-top:14px;">
       <div class="eyebrow">Before you click</div>
       <h2>Pre-trade gate</h2>
+      <p class="approx">Check each box, then leave a short note under it — why it’s true today.</p>
       <ul class="money-check-list" id="tradeGateList"></ul>
       <p class="approx" id="tradeGateMsg"></p>
     </div>
@@ -912,7 +923,7 @@ noscript {
     </div>
   </section>
 
-  <footer class="app-foot">Arlette Life Guide · v1.4 · local only</footer>
+  <footer class="app-foot">Arlette Life Guide · v1.4.1 · local only</footer>
 </div>
 
 <script>
@@ -1998,6 +2009,23 @@ function renderTradeRules() {
   el.innerHTML = html;
 }
 
+function getGateEntry(day, id) {
+  var v = day[id];
+  if (v && typeof v === 'object') {
+    return { checked: !!v.checked, note: v.note ? String(v.note) : '' };
+  }
+  return { checked: !!v, note: '' };
+}
+
+function setGateEntry(today, id, patch) {
+  var cur;
+  if (!state.tradeGate[today]) { state.tradeGate[today] = {}; }
+  cur = getGateEntry(state.tradeGate[today], id);
+  if (patch && typeof patch.checked === 'boolean') { cur.checked = patch.checked; }
+  if (patch && typeof patch.note === 'string') { cur.note = patch.note; }
+  state.tradeGate[today][id] = cur;
+}
+
 function renderTradeGate() {
   var today = dateKey(new Date());
   var day = state.tradeGate[today] || {};
@@ -2005,17 +2033,25 @@ function renderTradeGate() {
   var html = '';
   var i;
   var g;
+  var entry;
   var all = true;
   if (!list) { return; }
   for (i = 0; i < TRADE_GATE.length; i++) {
     g = TRADE_GATE[i];
-    if (!day[g.id]) { all = false; }
-    html += '<li><input type="checkbox" data-trade-gate="' + g.id + '"' + (day[g.id] ? ' checked' : '') + '><span>' + g.label + '</span></li>';
+    entry = getGateEntry(day, g.id);
+    if (!entry.checked) { all = false; }
+    html += '<li class="gate-item">' +
+      '<div class="gate-row">' +
+      '<input type="checkbox" data-trade-gate="' + g.id + '"' + (entry.checked ? ' checked' : '') + '>' +
+      '<span>' + g.label + '</span></div>' +
+      '<span class="gate-note-label">Note</span>' +
+      '<textarea class="gate-note" data-trade-gate-note="' + g.id + '" maxlength="300" placeholder="Why this is true today…">' +
+      escapeHtml(entry.note) + '</textarea></li>';
   }
   list.innerHTML = html;
   document.getElementById('tradeGateMsg').textContent = all
     ? 'Gate clear for today — still follow size and stop.'
-    : 'All four boxes before a live trade. Skill > impulse.';
+    : 'All four boxes (notes optional but recommended) before a live trade.';
 }
 
 function setupTradeGate() {
@@ -2025,14 +2061,39 @@ function setupTradeGate() {
     var t = ev.target;
     var id;
     var today;
+    var noteEl;
     if (!t || !t.getAttribute) { return; }
     id = t.getAttribute('data-trade-gate');
     if (!id) { return; }
     today = dateKey(new Date());
-    if (!state.tradeGate[today]) { state.tradeGate[today] = {}; }
-    state.tradeGate[today][id] = !!t.checked;
+    noteEl = list.querySelector('[data-trade-gate-note="' + id + '"]');
+    setGateEntry(today, id, { checked: !!t.checked, note: noteEl ? noteEl.value : '' });
     saveState();
-    renderTradeGate();
+    /* update message without wiping notes — only refresh msg */
+    (function () {
+      var day = state.tradeGate[today] || {};
+      var all = true;
+      var j;
+      for (j = 0; j < TRADE_GATE.length; j++) {
+        if (!getGateEntry(day, TRADE_GATE[j].id).checked) { all = false; break; }
+      }
+      document.getElementById('tradeGateMsg').textContent = all
+        ? 'Gate clear for today — still follow size and stop.'
+        : 'All four boxes (notes optional but recommended) before a live trade.';
+    })();
+  };
+  list.oninput = function (ev) {
+    var t = ev.target;
+    var id;
+    var today;
+    var box;
+    if (!t || !t.getAttribute) { return; }
+    id = t.getAttribute('data-trade-gate-note');
+    if (!id) { return; }
+    today = dateKey(new Date());
+    box = list.querySelector('[data-trade-gate="' + id + '"]');
+    setGateEntry(today, id, { checked: box ? !!box.checked : getGateEntry(state.tradeGate[today] || {}, id).checked, note: t.value });
+    saveState();
   };
 }
 
@@ -2097,7 +2158,7 @@ function setupTrading() {
     var ok = true;
     ev.preventDefault();
     for (i = 0; i < TRADE_GATE.length; i++) {
-      if (!todayGate[TRADE_GATE[i].id]) { ok = false; break; }
+      if (!getGateEntry(todayGate, TRADE_GATE[i].id).checked) { ok = false; break; }
     }
     if (!ok) {
       if (!window.confirm('Pre-trade gate is incomplete. Log anyway as a practice note?')) { return; }
