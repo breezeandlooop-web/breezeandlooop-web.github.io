@@ -616,6 +616,38 @@ noscript {
 
 
 
+
+.herm-grid { display: grid; gap: 12px; }
+@media (min-width: 720px) {
+  .herm-grid.two { grid-template-columns: 1fr 1fr; }
+}
+.herm-principle {
+  border: 1px solid rgba(200,180,140,0.22); border-radius: 12px;
+  padding: 12px 14px; background: rgba(0,0,0,0.18); margin: 8px 0;
+}
+.herm-principle h4 { margin: 0 0 4px; color: var(--gold-pale); font-size: 0.95rem; }
+.herm-principle .law { font-size: 0.72rem; color: var(--gold-soft); letter-spacing: 0.04em; text-transform: uppercase; }
+.herm-principle p { margin: 6px 0 0; font-size: 0.84rem; color: var(--text-dim); }
+.herm-entry {
+  border-left: 3px solid var(--gold-soft); padding: 10px 12px; margin: 10px 0;
+  background: rgba(0,0,0,0.15); border-radius: 0 10px 10px 0;
+}
+.herm-entry .he-date { color: var(--gold-pale); font-weight: 600; font-size: 0.85rem; }
+.herm-entry .he-tag { display: inline-block; font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.05em; padding: 2px 7px; border-radius: 999px; margin-right: 6px;
+  border: 1px solid rgba(180,160,120,0.35); color: var(--gold-soft); }
+.vibe-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+.vibe-row label {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem;
+  padding: 6px 10px; border-radius: 999px; border: 1px solid var(--card-border);
+  cursor: pointer; color: var(--text-dim);
+}
+.vibe-row input { accent-color: var(--gold-soft); }
+.today-herm {
+  margin-top: 12px; padding: 12px 14px; border-radius: 12px;
+  border: 1px solid rgba(200,180,140,0.28); background: rgba(40,60,50,0.25);
+}
+
 </style>
 </head>
 <body>
@@ -646,6 +678,7 @@ noscript {
   <button type="button" data-go="money">Money lab</button>
   <button type="button" data-go="trading">Trading</button>
   <button type="button" data-go="honey">Honey Tasks</button>
+  <button type="button" data-go="hermetic">Hermetic</button>
   <button type="button" data-go="journal">Journal</button>
   <button type="button" data-go="settings">Settings</button>
 </nav>
@@ -945,6 +978,81 @@ noscript {
     </div>
   </section>
 
+
+  <!-- 7e. HERMETIC / KYBALION -->
+  <section class="panel" id="panel-hermetic" data-section="hermetic">
+    <div class="card">
+      <div class="eyebrow">Kybalion · Hermetic practice</div>
+      <h2>Alchemy desk</h2>
+      <p class="approx">Laws to notice and train — not magic shortcuts. Transmute lack-frequency into wholeness; create beauty; honour tough tides without becoming them. Contemplative practice for your chart, tested against lived life.</p>
+      <div class="today-herm" id="hermTodayCard"></div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="eyebrow">Polarity</div>
+      <h2>Lack → whole</h2>
+      <p class="approx">Same pole, different degree. Name the lack story honestly, then write the whole truth and one act that matches wholeness (not rescue, not performance).</p>
+      <form class="trade-form" id="hermTransmuteForm">
+        <label for="hermDate">Date</label>
+        <input type="date" id="hermDate" required>
+        <label for="hermLack">Lack frequency (what I’m telling myself / grasping for)</label>
+        <textarea id="hermLack" maxlength="500" placeholder="e.g. If I don’t please them I’ll be cut off… / money vanishing… / nobody sees me…" required></textarea>
+        <label for="hermWhole">Whole frequency (truth + next act from sufficiency)</label>
+        <textarea id="hermWhole" maxlength="500" placeholder="e.g. I belong without erasing myself. Saturn Pocket first. One craft step before praise…" required></textarea>
+        <label>Vibration check (body / mind right now)</label>
+        <div class="vibe-row" id="hermVibeRow">
+          <label><input type="radio" name="hermVibe" value="contracted"> Contracted</label>
+          <label><input type="radio" name="hermVibe" value="stirring" checked> Stirring</label>
+          <label><input type="radio" name="hermVibe" value="open"> Open / whole</label>
+        </div>
+        <div class="btn-row"><button type="submit" class="btn">Save transmute</button></div>
+      </form>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="eyebrow">Rhythm</div>
+      <h2>Beautiful · tough · true</h2>
+      <p class="approx">Pendulum law: highs and lows both move. Log both so tough times don’t erase beauty, and beauty doesn’t deny the hard.</p>
+      <form class="trade-form" id="hermRhythmForm">
+        <label for="hermRhythmDate">Date</label>
+        <input type="date" id="hermRhythmDate" required>
+        <div class="herm-grid two">
+          <div>
+            <label for="hermBeautiful">Beautiful moment I created or recognized</label>
+            <textarea id="hermBeautiful" maxlength="400" placeholder="Light on yarn, a kind word I didn’t chase, a meal I paid for myself…" required></textarea>
+          </div>
+          <div>
+            <label for="hermTough">Tough tide I named without drama</label>
+            <textarea id="hermTough" maxlength="400" placeholder="Rejection sting, money fear, aloof shell, mother/son friction…" required></textarea>
+          </div>
+        </div>
+        <label for="hermLesson">What the swing taught (one line)</label>
+        <input type="text" id="hermLesson" maxlength="200" placeholder="e.g. The wave passed; I kept the Saturn Pocket." required>
+        <div class="btn-row"><button type="submit" class="btn">Save rhythm note</button></div>
+      </form>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="eyebrow">Cause &amp; Correspondence</div>
+      <h2>Create &amp; attract (practice, not wishing)</h2>
+      <p class="approx">Attraction here means: become the match. Outer mirrors inner (Correspondence). Seed causes you can keep (Cause &amp; Effect). Gender = active make + receptive receive — both yours.</p>
+      <ul class="money-check-list" id="hermCreateList"></ul>
+      <p class="approx" id="hermCreateMsg"></p>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="eyebrow">Seven laws</div>
+      <h2>Kybalion map · for you</h2>
+      <div id="hermPrinciples"></div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="eyebrow">Log</div>
+      <h2>Alchemy trail</h2>
+      <div id="hermLog"></div>
+    </div>
+  </section>
+
   <!-- 8. JOURNAL -->
   <section class="panel" id="panel-journal" data-section="journal">
     <div class="card">
@@ -986,7 +1094,7 @@ noscript {
     </div>
   </section>
 
-  <footer class="app-foot">Arlette Life Guide · v1.4.3</footer>
+  <footer class="app-foot">Arlette Life Guide · v1.4.4</footer>
 </div>
 
 <script>
@@ -1184,6 +1292,7 @@ var SECTIONS = [
   { id: 'money', label: 'Money lab' },
   { id: 'trading', label: 'Trading' },
   { id: 'honey', label: 'Honey Tasks' },
+  { id: 'hermetic', label: 'Hermetic' },
   { id: 'journal', label: 'Journal' },
   { id: 'settings', label: 'Settings' }
 ];
@@ -1262,6 +1371,7 @@ function defaultState() {
     moneyChecks: {},
     tradeGate: {},
     trades: [],
+    hermetic: { entries: [], create: {} },
     editingId: null,
     matter: {},
     gate: {}
@@ -1280,6 +1390,9 @@ function normalizeState(parsed) {
   if (!parsed.moneyChecks) { parsed.moneyChecks = {}; }
   if (!parsed.tradeGate) { parsed.tradeGate = {}; }
   if (!parsed.trades) { parsed.trades = []; }
+  if (!parsed.hermetic) { parsed.hermetic = { entries: [], create: {} }; }
+  if (!parsed.hermetic.entries) { parsed.hermetic.entries = []; }
+  if (!parsed.hermetic.create) { parsed.hermetic.create = {}; }
   if (!parsed.displayName) { parsed.displayName = 'Arlette'; }
   if (!parsed.matter) { parsed.matter = {}; }
   if (!parsed.gate) { parsed.gate = {}; }
@@ -2832,6 +2945,200 @@ function setupSettings() {
   };
 }
 
+
+/* Kybalion weekday lean (Hermetic layer) */
+var HERM_DAY = {
+  0: { planet: 'Sun', principle: 'Mentalism', line: 'All is Mind. Today: catch the lack-story before it directs the day. Choose one thought that is whole, then act from it.' },
+  1: { planet: 'Moon', principle: 'Rhythm', line: 'Tides. Honour the mood without marrying it. Log one beautiful beat and one tough beat — both are the pendulum.' },
+  2: { planet: 'Mars', principle: 'Cause & Effect', line: 'Action seeds result. One clean cause today: a boundary, a stitch, a fixed risk — no revenge heat.' },
+  3: { planet: 'Mercury', principle: 'Correspondence', line: 'As within, so without. Soften the inner crab-shell script; notice what outer scene softens with it.' },
+  4: { planet: 'Jupiter', principle: 'Vibration', line: 'Expand without flash. Raise frequency by skill, teaching, craft — not by begging the room to rescue you.' },
+  5: { planet: 'Venus', principle: 'Polarity · Gender', line: 'Harmony of opposites. Attract by making beauty and receiving it — Venus Pocket pleasure without apology, after Saturn Pocket is fed.' },
+  6: { planet: 'Saturn', principle: 'Cause & Effect · discipline', line: 'Time harvests thought. Structure is love. Belonging without self-erasure is today’s long work.' }
+};
+
+var HERM_PRINCIPLES = [
+  { name: 'Mentalism', law: 'All is Mind', forYou: 'Your Gemini Sun–Mercury can spin lack stories fast. Practice: name the story, then pick one whole sentence and stick to it for an hour.' },
+  { name: 'Correspondence', law: 'As above, so below', forYou: 'Inner shell ↔ outer aloofness / triangulation. Soften inside first; don’t demand the room change before you do.' },
+  { name: 'Vibration', law: 'Nothing rests', forYou: 'Lack vibrates as grasping and rush. Wholeness vibrates as craft, breath, Saturn Pocket. Change the rate by what you do with your hands.' },
+  { name: 'Polarity', law: 'Everything is dual', forYou: 'Lack and plenty are degrees of the same pole. Transmute by sliding toward sufficiency — not by fighting lack as an enemy.' },
+  { name: 'Rhythm', law: 'Everything flows', forYou: 'Tough tides after betrayal are real. Beautiful moments are real. Log both so the pendulum doesn’t erase either.' },
+  { name: 'Cause & Effect', law: 'Every cause has its effect', forYou: 'Pleasing to be saved seeds more lack. Skill, teaching, written payoff plans seed holding. Choose causes you can keep.' },
+  { name: 'Gender', law: 'Masculine & feminine in all', forYou: 'Active: make, stitch, publish, ask. Receptive: receive praise without collapsing into needing it. Both are power.' }
+];
+
+var HERM_CREATE = [
+  { id: 'beauty', label: 'I will create one beautiful moment today (hands, light, meal, stitch, song) — not wait for someone to gift it' },
+  { id: 'saturnfirst', label: 'Saturn Pocket is tended first; Venus pleasure comes from surplus, not from hole-filling' },
+  { id: 'wholeinvite', label: 'I invite people/experiences from wholeness — not to rescue me or prove I exist' },
+  { id: 'namehard', label: 'I can name a tough tide without drama or self-erasure' },
+  { id: 'norahu', label: 'No Rahu shortcut today (no fake check energy, no silent take, no flash money hunger)' },
+  { id: 'praise', label: 'If praise comes, I receive it — then return to the work, not the craving' }
+];
+
+function renderHermToday() {
+  var el = document.getElementById('hermTodayCard');
+  var d = new Date();
+  var h = HERM_DAY[d.getDay()];
+  if (!el || !h) { return; }
+  el.innerHTML = '<div class="law">' + h.planet + ' day · ' + h.principle + '</div>' +
+    '<p style="margin:8px 0 0;color:var(--text);font-size:0.9rem;">' + h.line + '</p>';
+}
+
+function renderHermPrinciples() {
+  var el = document.getElementById('hermPrinciples');
+  var html = '';
+  var i, p;
+  if (!el) { return; }
+  for (i = 0; i < HERM_PRINCIPLES.length; i++) {
+    p = HERM_PRINCIPLES[i];
+    html += '<div class="herm-principle"><div class="law">' + p.law + '</div><h4>' + p.name +
+      '</h4><p><strong style="color:var(--gold-soft)">For you:</strong> ' + p.forYou + '</p></div>';
+  }
+  el.innerHTML = html;
+}
+
+function renderHermCreate() {
+  var list = document.getElementById('hermCreateList');
+  var msg = document.getElementById('hermCreateMsg');
+  var today = dateKey(new Date());
+  var day = (state.hermetic.create && state.hermetic.create[today]) || {};
+  var html = '';
+  var i, g, all = true;
+  if (!list) { return; }
+  for (i = 0; i < HERM_CREATE.length; i++) {
+    g = HERM_CREATE[i];
+    if (!day[g.id]) { all = false; }
+    html += '<li class="gate-item"><label class="gate-row"><input type="checkbox" data-herm-create="' + g.id + '"' +
+      (day[g.id] ? ' checked' : '') + '><span>' + g.label + '</span></label></li>';
+  }
+  list.innerHTML = html;
+  if (msg) {
+    msg.textContent = all
+      ? 'Create-and-attract gate clear for today — live it, don’t just check it.'
+      : 'Check what you will actually practice today. Wholeness is done in deeds.';
+  }
+}
+
+function renderHermLog() {
+  var el = document.getElementById('hermLog');
+  var rows;
+  var html = '';
+  var i, e;
+  if (!el) { return; }
+  rows = (state.hermetic.entries || []).slice().sort(function (a, b) {
+    return a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
+  });
+  if (!rows.length) {
+    el.innerHTML = '<p class="honey-empty">No alchemy notes yet. Save a transmute or a rhythm entry.</p>';
+    return;
+  }
+  for (i = 0; i < rows.length; i++) {
+    e = rows[i];
+    if (e.kind === 'transmute') {
+      html += '<div class="herm-entry">' +
+        '<div class="he-date"><span class="he-tag">transmute</span>' + escapeHtml(e.date) +
+        (e.vibe ? ' · ' + escapeHtml(e.vibe) : '') + '</div>' +
+        '<p style="margin:6px 0 0;font-size:0.84rem;color:var(--warn);"><strong>Lack:</strong> ' + escapeHtml(e.lack) + '</p>' +
+        '<p style="margin:4px 0 0;font-size:0.84rem;color:var(--ok);"><strong>Whole:</strong> ' + escapeHtml(e.whole) + '</p>' +
+        '<button type="button" class="btn btn-ghost" style="margin-top:6px;padding:4px 10px;font-size:0.75rem;" data-del-herm="' + e.id + '">Delete</button>' +
+        '</div>';
+    } else {
+      html += '<div class="herm-entry">' +
+        '<div class="he-date"><span class="he-tag">rhythm</span>' + escapeHtml(e.date) + '</div>' +
+        '<p style="margin:6px 0 0;font-size:0.84rem;color:var(--ok);"><strong>Beautiful:</strong> ' + escapeHtml(e.beautiful) + '</p>' +
+        '<p style="margin:4px 0 0;font-size:0.84rem;color:var(--warn);"><strong>Tough:</strong> ' + escapeHtml(e.tough) + '</p>' +
+        '<p style="margin:4px 0 0;font-size:0.84rem;color:var(--text-dim);"><strong>Lesson:</strong> ' + escapeHtml(e.lesson) + '</p>' +
+        '<button type="button" class="btn btn-ghost" style="margin-top:6px;padding:4px 10px;font-size:0.75rem;" data-del-herm="' + e.id + '">Delete</button>' +
+        '</div>';
+    }
+  }
+  el.innerHTML = html;
+}
+
+function setupHermetic() {
+  var tForm = document.getElementById('hermTransmuteForm');
+  var rForm = document.getElementById('hermRhythmForm');
+  var list = document.getElementById('hermCreateList');
+  var log = document.getElementById('hermLog');
+  if (document.getElementById('hermDate')) {
+    document.getElementById('hermDate').value = dateKey(new Date());
+  }
+  if (document.getElementById('hermRhythmDate')) {
+    document.getElementById('hermRhythmDate').value = dateKey(new Date());
+  }
+  if (tForm) {
+    tForm.onsubmit = function (ev) {
+      var vibeEl = tForm.querySelector('input[name="hermVibe"]:checked');
+      ev.preventDefault();
+      state.hermetic.entries.push({
+        id: uid(),
+        kind: 'transmute',
+        date: document.getElementById('hermDate').value,
+        lack: document.getElementById('hermLack').value.trim(),
+        whole: document.getElementById('hermWhole').value.trim(),
+        vibe: vibeEl ? vibeEl.value : 'stirring'
+      });
+      saveState();
+      document.getElementById('hermLack').value = '';
+      document.getElementById('hermWhole').value = '';
+      renderHermLog();
+    };
+  }
+  if (rForm) {
+    rForm.onsubmit = function (ev) {
+      ev.preventDefault();
+      state.hermetic.entries.push({
+        id: uid(),
+        kind: 'rhythm',
+        date: document.getElementById('hermRhythmDate').value,
+        beautiful: document.getElementById('hermBeautiful').value.trim(),
+        tough: document.getElementById('hermTough').value.trim(),
+        lesson: document.getElementById('hermLesson').value.trim()
+      });
+      saveState();
+      document.getElementById('hermBeautiful').value = '';
+      document.getElementById('hermTough').value = '';
+      document.getElementById('hermLesson').value = '';
+      renderHermLog();
+    };
+  }
+  if (list) {
+    list.onchange = function (ev) {
+      var t = ev.target;
+      var id;
+      var today;
+      if (!t || !t.getAttribute) { return; }
+      id = t.getAttribute('data-herm-create');
+      if (!id) { return; }
+      today = dateKey(new Date());
+      if (!state.hermetic.create[today]) { state.hermetic.create[today] = {}; }
+      state.hermetic.create[today][id] = !!t.checked;
+      saveState();
+      renderHermCreate();
+    };
+  }
+  if (log) {
+    log.onclick = function (ev) {
+      var btn = ev.target.closest('[data-del-herm]');
+      if (!btn) { return; }
+      state.hermetic.entries = state.hermetic.entries.filter(function (e) {
+        return e.id !== btn.getAttribute('data-del-herm');
+      });
+      saveState();
+      renderHermLog();
+    };
+  }
+}
+
+function renderHermetic() {
+  renderHermToday();
+  renderHermPrinciples();
+  renderHermCreate();
+  renderHermLog();
+}
+
+
 function init() {
   document.documentElement.classList.add('js');
   var hint = document.getElementById('openHint');
@@ -2854,6 +3161,8 @@ function init() {
   renderTrades();
   setupHoney();
   renderHoney();
+  setupHermetic();
+  renderHermetic();
   setupJournal();
   renderJournal();
   setupSettings();
