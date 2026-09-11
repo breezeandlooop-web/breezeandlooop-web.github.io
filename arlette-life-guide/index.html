@@ -501,6 +501,34 @@ noscript {
 .lab-counts { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 8px; }
 .src-tag { font-size: 0.68rem; color: var(--muted); letter-spacing: 0.04em; margin-top: 6px; }
 
+.honey-add { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.honey-add input[type="text"] {
+  flex: 1; min-width: 180px; padding: 10px 12px; border-radius: 10px;
+  border: 1px solid var(--card-border); background: rgba(0,0,0,0.2);
+  color: var(--text); font-size: 0.92rem;
+}
+.honey-cols { display: grid; gap: 12px; margin-top: 14px; }
+@media (min-width: 720px) {
+  .honey-cols { grid-template-columns: 1fr 1fr 1fr; }
+}
+.honey-col h3 { font-size: 0.88rem; color: var(--gold-soft); margin: 0 0 8px; }
+.honey-item {
+  font-size: 0.84rem; color: var(--text-dim); padding: 10px;
+  border-radius: 10px; background: rgba(0,0,0,0.18);
+  border: 1px solid var(--card-border); margin-bottom: 8px;
+}
+.honey-item .honey-text { color: var(--text); margin-bottom: 8px; line-height: 1.4; }
+.honey-item.done .honey-text { text-decoration: line-through; opacity: 0.65; }
+.honey-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.honey-actions button {
+  font-size: 0.72rem; padding: 4px 8px; border-radius: 999px;
+  border: 1px solid var(--card-border); background: transparent;
+  color: var(--gold-pale); cursor: pointer;
+}
+.honey-actions button:hover { border-color: var(--gold); color: var(--gold); }
+.honey-empty { font-size: 0.8rem; color: var(--muted); font-style: italic; }
+
+
 </style>
 </head>
 <body>
@@ -513,7 +541,7 @@ noscript {
   </header>
 
   <p class="disclaimer" id="disclaimer">
-    Soft note: this is a reflective life guide drawn from Vedic planetary symbolism — not medical, legal, or financial advice, and not fate. Use what resonates; leave the rest. Birth time unknown, so Moon is approximate and houses/Lagna are omitted entirely.
+    Soft note: this is a reflective life guide drawn from Vedic planetary symbolism — not medical, legal, or financial advice, and not fate. Use what resonates; leave the rest. Working birth ~12:40 local (provisional Meena Lagna). Degrees recalculated; still not a hospital lock.
   </p>
 
   <div class="open-hint" id="openHint">
@@ -528,6 +556,7 @@ noscript {
   <button type="button" data-go="lab">Approval lab</button>
   <button type="button" data-go="week">Week</button>
   <button type="button" data-go="map">Natal map</button>
+  <button type="button" data-go="honey">Honey Tasks</button>
   <button type="button" data-go="journal">Journal</button>
   <button type="button" data-go="settings">Settings</button>
 </nav>
@@ -710,6 +739,33 @@ noscript {
     </div>
   </section>
 
+  <!-- 7b. HONEY TASKS -->
+  <section class="panel" id="panel-honey" data-section="honey">
+    <div class="card">
+      <div class="eyebrow">Sweet obligations you choose</div>
+      <h2>Honey Tasks</h2>
+      <p class="approx">Catch inspiring ideas. Turn them into Do — or set them gently to Not now. Local only · clears spark focus each new day; Do / Not / Done keep a short trail.</p>
+      <form class="honey-add" id="honeyForm">
+        <input type="text" id="honeyInput" placeholder="A sweet idea for today…" maxlength="200" autocomplete="off" required>
+        <button type="submit" class="btn">Add spark</button>
+      </form>
+      <div class="honey-cols">
+        <div class="honey-col">
+          <h3>Sparks · today</h3>
+          <div id="honeySparks"></div>
+        </div>
+        <div class="honey-col">
+          <h3>Honey Do</h3>
+          <div id="honeyDo"></div>
+        </div>
+        <div class="honey-col">
+          <h3>Not now</h3>
+          <div id="honeyNot"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- 8. JOURNAL -->
   <section class="panel" id="panel-journal" data-section="journal">
     <div class="card">
@@ -751,7 +807,7 @@ noscript {
     </div>
   </section>
 
-  <footer class="app-foot">Arlette Life Guide · v1.2.1 · local only</footer>
+  <footer class="app-foot">Arlette Life Guide · v1.3 · local only</footer>
 </div>
 
 <script>
@@ -946,6 +1002,7 @@ var SECTIONS = [
   { id: 'lab', label: 'Approval lab' },
   { id: 'week', label: 'Week' },
   { id: 'map', label: 'Natal map' },
+  { id: 'honey', label: 'Honey Tasks' },
   { id: 'journal', label: 'Journal' },
   { id: 'settings', label: 'Settings' }
 ];
@@ -1020,6 +1077,7 @@ function defaultState() {
     practices: {},
     lab: { answers: {}, notes: {}, savedAt: null, history: [] },
     journal: [],
+    honey: [],
     editingId: null,
     matter: {},
     gate: {}
@@ -1034,6 +1092,7 @@ function normalizeState(parsed) {
   if (!parsed.lab.notes) { parsed.lab.notes = {}; }
   if (!parsed.lab.history) { parsed.lab.history = []; }
   if (!parsed.journal) { parsed.journal = []; }
+  if (!parsed.honey) { parsed.honey = []; }
   if (!parsed.displayName) { parsed.displayName = 'Arlette'; }
   if (!parsed.matter) { parsed.matter = {}; }
   if (!parsed.gate) { parsed.gate = {}; }
@@ -1822,6 +1881,141 @@ function renderJournal() {
   };
 }
 
+
+function ensureHoneyDay() {
+  var today = dateKey(new Date());
+  var i;
+  var item;
+  var changed = false;
+  if (!state.honey) { state.honey = []; }
+  /* Sparks from prior days quietly become Not now — ideas kept, pressure dropped */
+  for (i = 0; i < state.honey.length; i++) {
+    item = state.honey[i];
+    if (item.status === 'spark' && item.day && item.day !== today) {
+      item.status = 'not';
+      item.rolled = true;
+      changed = true;
+    }
+  }
+  /* Keep trail lean: drop done/not older than 14 days */
+  state.honey = state.honey.filter(function (h) {
+    if (h.status === 'spark' || h.status === 'do') { return true; }
+    if (!h.day) { return true; }
+    return daysBetween(h.day, today) <= 14;
+  });
+  if (changed) { saveState(); }
+}
+
+function honeyItemHtml(item) {
+  var actions = '';
+  var cls = 'honey-item' + (item.status === 'done' ? ' done' : '');
+  if (item.status === 'spark') {
+    actions = '<button type="button" data-honey="do" data-id="' + item.id + '">Do</button>' +
+      '<button type="button" data-honey="not" data-id="' + item.id + '">Not now</button>' +
+      '<button type="button" data-honey="del" data-id="' + item.id + '">Remove</button>';
+  } else if (item.status === 'do') {
+    actions = '<button type="button" data-honey="done" data-id="' + item.id + '">Done</button>' +
+      '<button type="button" data-honey="not" data-id="' + item.id + '">Not now</button>' +
+      '<button type="button" data-honey="spark" data-id="' + item.id + '">Back to spark</button>';
+  } else if (item.status === 'not') {
+    actions = '<button type="button" data-honey="do" data-id="' + item.id + '">Do</button>' +
+      '<button type="button" data-honey="spark" data-id="' + item.id + '">Back to spark</button>' +
+      '<button type="button" data-honey="del" data-id="' + item.id + '">Remove</button>';
+  } else if (item.status === 'done') {
+    actions = '<button type="button" data-honey="do" data-id="' + item.id + '">Undo</button>' +
+      '<button type="button" data-honey="del" data-id="' + item.id + '">Remove</button>';
+  }
+  return '<div class="' + cls + '"><div class="honey-text"></div><div class="honey-actions">' + actions + '</div></div>';
+}
+
+function fillHoneyList(el, items) {
+  var i;
+  var wrap;
+  var textEl;
+  el.innerHTML = '';
+  if (!items.length) {
+    el.innerHTML = '<p class="honey-empty">Nothing here yet.</p>';
+    return;
+  }
+  for (i = 0; i < items.length; i++) {
+    wrap = document.createElement('div');
+    wrap.innerHTML = honeyItemHtml(items[i]);
+    textEl = wrap.querySelector('.honey-text');
+    textEl.textContent = items[i].text;
+    el.appendChild(wrap.firstChild);
+  }
+}
+
+function renderHoney() {
+  var today = dateKey(new Date());
+  var sparks = [];
+  var dos = [];
+  var nots = [];
+  var i;
+  var h;
+  ensureHoneyDay();
+  for (i = 0; i < state.honey.length; i++) {
+    h = state.honey[i];
+    if (h.status === 'spark' && h.day === today) { sparks.push(h); }
+    else if (h.status === 'do' || h.status === 'done') { dos.push(h); }
+    else if (h.status === 'not') { nots.push(h); }
+  }
+  fillHoneyList(document.getElementById('honeySparks'), sparks);
+  fillHoneyList(document.getElementById('honeyDo'), dos);
+  fillHoneyList(document.getElementById('honeyNot'), nots);
+}
+
+function setHoneyStatus(id, status) {
+  var i;
+  var today = dateKey(new Date());
+  for (i = 0; i < state.honey.length; i++) {
+    if (state.honey[i].id === id) {
+      state.honey[i].status = status;
+      if (status === 'spark') { state.honey[i].day = today; }
+      break;
+    }
+  }
+  saveState();
+  renderHoney();
+}
+
+function removeHoney(id) {
+  state.honey = state.honey.filter(function (h) { return h.id !== id; });
+  saveState();
+  renderHoney();
+}
+
+function setupHoney() {
+  var root = document.getElementById('panel-honey');
+  document.getElementById('honeyForm').onsubmit = function (ev) {
+    var text;
+    ev.preventDefault();
+    text = document.getElementById('honeyInput').value.trim();
+    if (!text) { return; }
+    state.honey.unshift({
+      id: uid(),
+      text: text,
+      status: 'spark',
+      day: dateKey(new Date())
+    });
+    document.getElementById('honeyInput').value = '';
+    saveState();
+    renderHoney();
+  };
+  root.onclick = function (ev) {
+    var btn = ev.target.closest('button[data-honey]');
+    var id;
+    var act;
+    if (!btn) { return; }
+    id = btn.getAttribute('data-id');
+    act = btn.getAttribute('data-honey');
+    if (act === 'del') { removeHoney(id); return; }
+    if (act === 'do' || act === 'done' || act === 'not' || act === 'spark') {
+      setHoneyStatus(id, act === 'done' ? 'done' : act);
+    }
+  };
+}
+
 function setupJournal() {
   var today = new Date();
   document.getElementById('journalDate').value = dateKey(today);
@@ -1897,6 +2091,7 @@ function setupSettings() {
         applyDisplayName();
         renderToday();
         renderLab();
+        renderHoney();
         renderJournal();
         document.getElementById('settingsMsg').textContent = 'Import complete.';
       } catch (err) {
@@ -1912,6 +2107,7 @@ function setupSettings() {
       applyDisplayName();
       renderToday();
       renderLab();
+      renderHoney();
       renderJournal();
       document.getElementById('settingsMsg').textContent = 'Reset complete.';
     }
@@ -1930,6 +2126,10 @@ function init() {
   renderLab();
   renderWeek();
   renderMap();
+  if (typeof renderHouses === 'function') { renderHouses(); }
+  if (typeof renderMoneyRules === 'function') { renderMoneyRules(); }
+  setupHoney();
+  renderHoney();
   setupJournal();
   renderJournal();
   setupSettings();
