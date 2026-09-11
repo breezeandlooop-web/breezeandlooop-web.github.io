@@ -528,6 +528,55 @@ noscript {
 .honey-actions button:hover { border-color: var(--gold); color: var(--gold); }
 .honey-empty { font-size: 0.8rem; color: var(--muted); font-style: italic; }
 
+.money-lesson {
+  margin-top: 10px; border: 1px solid var(--card-border); border-radius: 12px;
+  overflow: hidden; background: rgba(0,0,0,0.12);
+}
+.money-lesson summary {
+  list-style: none; cursor: pointer; padding: 12px 14px;
+  color: var(--gold-pale); font-weight: 600; font-size: 0.9rem;
+  display: flex; justify-content: space-between; gap: 8px; align-items: center;
+}
+.money-lesson summary::-webkit-details-marker { display: none; }
+.money-lesson summary::after { content: '+'; color: var(--gold); font-weight: 400; }
+.money-lesson[open] summary::after { content: '–'; }
+.money-lesson .body { padding: 0 14px 14px; font-size: 0.84rem; color: var(--text-dim); line-height: 1.45; }
+.money-lesson .body strong { color: var(--gold-soft); }
+.money-check-list { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 8px; }
+.money-check-list li {
+  display: flex; gap: 10px; align-items: flex-start; font-size: 0.84rem; color: var(--text-dim);
+  padding: 8px 10px; border-radius: 10px; background: rgba(0,0,0,0.15); border: 1px solid var(--card-border);
+}
+.money-check-list input { margin-top: 3px; accent-color: var(--gold); }
+.trade-form { display: grid; gap: 8px; margin-top: 12px; }
+.trade-form label { font-size: 0.75rem; color: var(--gold-soft); }
+.trade-form input, .trade-form select, .trade-form textarea {
+  width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--card-border);
+  background: rgba(0,0,0,0.2); color: var(--text); font-size: 0.88rem;
+}
+.trade-form textarea { min-height: 60px; resize: vertical; }
+.trade-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px;
+}
+.trade-stat {
+  text-align: center; padding: 10px 6px; border-radius: 10px;
+  border: 1px solid var(--card-border); background: rgba(0,0,0,0.15);
+}
+.trade-stat .n { font-size: 1.1rem; color: var(--gold-pale); font-weight: 600; }
+.trade-stat .l { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+.trade-row {
+  font-size: 0.82rem; padding: 10px; border-radius: 10px; margin-top: 8px;
+  border: 1px solid var(--card-border); background: rgba(0,0,0,0.12);
+}
+.trade-row.win { border-left: 3px solid var(--ok); }
+.trade-row.loss { border-left: 3px solid var(--warn); }
+.trade-row.be { border-left: 3px solid var(--muted); }
+.rule-pill {
+  display: inline-block; font-size: 0.72rem; padding: 3px 8px; border-radius: 999px;
+  border: 1px solid var(--card-border); color: var(--gold-pale); margin: 2px 4px 2px 0;
+}
+
+
 
 </style>
 </head>
@@ -556,6 +605,8 @@ noscript {
   <button type="button" data-go="lab">Approval lab</button>
   <button type="button" data-go="week">Week</button>
   <button type="button" data-go="map">Natal map</button>
+  <button type="button" data-go="money">Money lab</button>
+  <button type="button" data-go="trading">Trading</button>
   <button type="button" data-go="honey">Honey Tasks</button>
   <button type="button" data-go="journal">Journal</button>
   <button type="button" data-go="settings">Settings</button>
@@ -704,25 +755,20 @@ noscript {
       <h2>Natal map &amp; houses</h2>
       <p class="approx">Lahiri sidereal · Georgetown · ~12:40 local UTC−3 · Meena working Lagna · whole-sign · not hospital-locked · degrees recalculated 2026-09-10</p>
       <div class="lagna-note">
-        <strong>Working facts (provisional):</strong> Birth 1 Jul 1977 · Georgetown · local ~12:40 (UTC−3 in 1977).
-        Lagna Meena ~13° · Uttara Bhadrapada pada 3 (only if time ~12:05–12:50; earlier Meena = Purva Bhadrapada; after ~12:55 = Revati).
-        Moon Dhanu ~23°19′ Purva Ashadha · 10th (whole sign). Ketu in 1st · Mars in 2nd · Venus+Jupiter in 3rd · Sun+Mercury in 4th · Saturn in 5th · Rahu in 7th.
-        Sun–Mercury orb ~2° (both Ardra). Not a hospital lock — revise if exact time appears.
+        <strong>Planet facts (verified day-chart):</strong> 1 Jul 1977 · Georgetown · Lahiri.
+        Venus own Vrishabha · Jupiter with Venus · Mars own Mesha Bharani · Sun+Mercury Ardra (~2° orb) · Saturn Ashlesha · Moon Purva Ashadha ~23° · Rahu Chitra · Ketu Revati.
+        Working clock ~12:40 / Meena Lagna still provisional — <em>not</em> used in Money or Trading labs.
       </div>
       <h3 style="margin-top:18px;color:var(--gold-soft);font-size:0.95rem;">Grahas</h3>
       <div class="graha-map" id="grahaMap"></div>
     </div>
     <div class="card" style="margin-top:14px;">
-      <div class="eyebrow">Whole sign from Meena</div>
-      <h2>House map</h2>
-      <div id="houseMap"></div>
-    </div>
-    <div class="card" style="margin-top:14px;">
-      <div class="eyebrow">Mars in 2nd · Bharani</div>
-      <h2>Money rules</h2>
-      <p class="approx">Saturn Pocket first · Venus Pocket second · train the till so Mars doesn’t run it</p>
-      <ul class="money-rules" id="moneyRules"></ul>
-      <p class="approx" style="margin-top:12px;"><strong style="color:var(--gold-pale);">Motto:</strong> Mars may want it. Saturn must count it. Venus may enjoy only what’s left.</p>
+      <div class="eyebrow">Parked</div>
+      <h2>Houses</h2>
+      <p class="approx">House attributions are <strong>not used</strong> for Money or Trading coaching until birth time is confirmed. Optional working sketch lives folded below.</p>
+      <details class="money-lesson"><summary>Show provisional house sketch</summary>
+        <div class="body"><div id="houseMap"></div></div>
+      </details>
     </div>
     <div class="card" style="margin-top:14px;">
       <div class="eyebrow">From Purva Ashadha Moon · approx</div>
@@ -736,6 +782,65 @@ noscript {
         <li><strong>Rahu</strong> — → mid-2023</li>
         <li><strong>Jupiter</strong> — mid-2023 → ~2039 (current)</li>
       </ul>
+    </div>
+  </section>
+
+
+  <!-- 7c. MONEY LAB (planets only) -->
+  <section class="panel" id="panel-money" data-section="money">
+    <div class="card">
+      <div class="eyebrow">Planets only · interactive</div>
+      <h2>Money lab</h2>
+      <p class="approx">Teaching from your day-chart grahas — no houses. Tap each planet to learn. Check off today’s practices. Not financial advice.</p>
+      <p class="approx" style="margin-top:8px;"><strong style="color:var(--gold-pale);">Motto:</strong> Jupiter and Venus can bring it. Saturn keeps it. Mars must not burn it. Rahu must not redefine it.</p>
+      <div id="moneyLessons"></div>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <div class="eyebrow">Today’s drill</div>
+      <h2>Practice checklist</h2>
+      <p class="approx" id="moneyCheckDate"></p>
+      <ul class="money-check-list" id="moneyCheckList"></ul>
+      <p class="approx" style="margin-top:10px;" id="moneyCheckMsg"></p>
+    </div>
+  </section>
+
+  <!-- 7d. TRADING DESK -->
+  <section class="panel" id="panel-trading" data-section="trading">
+    <div class="card">
+      <div class="eyebrow">Skill building · risk first</div>
+      <h2>Trading desk</h2>
+      <p class="approx">Rules mapped to your money planets. Track wins and losses honestly. This is a practice log — not investment advice; you can lose money trading.</p>
+      <h3 style="color:var(--gold-soft);font-size:0.9rem;margin-top:12px;">Hard rules</h3>
+      <div id="tradeRules"></div>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <div class="eyebrow">Before you click</div>
+      <h2>Pre-trade gate</h2>
+      <ul class="money-check-list" id="tradeGateList"></ul>
+      <p class="approx" id="tradeGateMsg"></p>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <div class="eyebrow">Log</div>
+      <h2>Wins &amp; losses</h2>
+      <div class="trade-stats" id="tradeStats"></div>
+      <form class="trade-form" id="tradeForm">
+        <label for="tradeDate">Date</label>
+        <input type="date" id="tradeDate" required>
+        <label for="tradeSymbol">Market / pair / ticker</label>
+        <input type="text" id="tradeSymbol" placeholder="e.g. EURUSD, BTC, stock" maxlength="40" required>
+        <label for="tradeSide">Direction</label>
+        <select id="tradeSide"><option value="long">Long / buy</option><option value="short">Short / sell</option></select>
+        <label for="tradeRisk">Risk amount (what you could lose on the plan)</label>
+        <input type="number" id="tradeRisk" step="0.01" min="0" placeholder="0.00" required>
+        <label for="tradeResult">Result</label>
+        <select id="tradeResult"><option value="win">Win</option><option value="loss">Loss</option><option value="be">Breakeven</option></select>
+        <label for="tradePnl">P/L amount (+ win / − loss)</label>
+        <input type="number" id="tradePnl" step="0.01" placeholder="0.00" required>
+        <label for="tradeNote">What I followed / broke</label>
+        <textarea id="tradeNote" maxlength="400" placeholder="Setup, emotion, rule kept or broken…"></textarea>
+        <div class="btn-row"><button type="submit" class="btn">Save trade</button></div>
+      </form>
+      <div id="tradeList"></div>
     </div>
   </section>
 
@@ -794,7 +899,7 @@ noscript {
         <label>Birth note</label>
         <p style="font-size:0.88rem;color:var(--text-dim);">1 July 1977 · Georgetown, Guyana · Vedic Lahiri · working chart ~12:40 local</p>
         <label>Time window</label>
-        <p style="font-size:0.88rem;color:var(--text-dim);">Working ~12:40 local · Guyana UTC−3 (1977) · Meena ~13° Uttara Bhadrapada (prov.) · Moon ~23°19′ Purva Ashadha · whole-sign houses · degrees ±few′ · revise if hospital time appears</p>
+        <p style="font-size:0.88rem;color:var(--text-dim);">Planet coaching active (Money/Trading). Working ~12:40 / Meena houses parked until hospital time. Moon ~23°19′ Purva Ashadha · degrees ±few′</p>
         <div class="btn-row" style="margin-top:16px;">
           <button type="button" class="btn" id="saveSettingsBtn">Save name</button>
           <button type="button" class="btn btn-ghost" id="exportBtn">Export JSON</button>
@@ -807,7 +912,7 @@ noscript {
     </div>
   </section>
 
-  <footer class="app-foot">Arlette Life Guide · v1.3 · local only</footer>
+  <footer class="app-foot">Arlette Life Guide · v1.4 · local only</footer>
 </div>
 
 <script>
@@ -1002,6 +1107,8 @@ var SECTIONS = [
   { id: 'lab', label: 'Approval lab' },
   { id: 'week', label: 'Week' },
   { id: 'map', label: 'Natal map' },
+  { id: 'money', label: 'Money lab' },
+  { id: 'trading', label: 'Trading' },
   { id: 'honey', label: 'Honey Tasks' },
   { id: 'journal', label: 'Journal' },
   { id: 'settings', label: 'Settings' }
@@ -1078,6 +1185,9 @@ function defaultState() {
     lab: { answers: {}, notes: {}, savedAt: null, history: [] },
     journal: [],
     honey: [],
+    moneyChecks: {},
+    tradeGate: {},
+    trades: [],
     editingId: null,
     matter: {},
     gate: {}
@@ -1093,6 +1203,9 @@ function normalizeState(parsed) {
   if (!parsed.lab.history) { parsed.lab.history = []; }
   if (!parsed.journal) { parsed.journal = []; }
   if (!parsed.honey) { parsed.honey = []; }
+  if (!parsed.moneyChecks) { parsed.moneyChecks = {}; }
+  if (!parsed.tradeGate) { parsed.tradeGate = {}; }
+  if (!parsed.trades) { parsed.trades = []; }
   if (!parsed.displayName) { parsed.displayName = 'Arlette'; }
   if (!parsed.matter) { parsed.matter = {}; }
   if (!parsed.gate) { parsed.gate = {}; }
@@ -1758,7 +1871,7 @@ function renderWeek() {
 
 var HOUSES = [
   { h: 1, sign: 'Meena', who: 'Ketu', note: 'Absorbent self; phases; soft inside / can read aloof' },
-  { h: 2, sign: 'Mesha', who: 'Mars Bharani', note: 'Money, voice, values — heat; train the ledger' },
+  { h: 2, sign: 'Mesha', who: 'Mars Bharani', note: '(Parked) provisional sketch only' },
   { h: 3, sign: 'Vrishabha', who: 'Venus + Jupiter', note: 'Craft-dharma · hands · making · brand' },
   { h: 4, sign: 'Mithuna', who: 'Sun + Mercury Ardra', note: 'Home/roots mind-storm; belonging work' },
   { h: 5, sign: 'Karka', who: 'Saturn Ashlesha', note: 'Children & creativity as duty + structure' },
@@ -1771,37 +1884,252 @@ var HOUSES = [
   { h: 12, sign: 'Kumbha', who: '—', note: 'Solitude to empty the sponge' }
 ];
 
-var MONEY_RULES = [
-  ['Saturn Pocket first (70%)', 'Rent, food, debt minimums, utilities — before Venus spends.'],
-  ['Venus Pocket second (30%)', 'Yarn, looks, craft, pleasure — only from this pocket.'],
-  ['Lump sum law', 'Split the day it lands. Park debt share where you can’t one-tap it.'],
-  ['No silent take', 'If it isn’t yours on paper, it isn’t yours.'],
-  ['Credit = plan or no', 'Written payoff date/amount, or don’t take it.'],
-  ['Someone else paying', 'Name it out loud — or don’t go / pay your half.'],
-  ['24-hour cool', 'Non-essential want from lack: wait one sleep.'],
-  ['Weekly money date', '15 minutes, same day — balances, debt, pockets.'],
-  ['Earn > chase', 'Prefer 3rd-house craft/work money over patrons and charm.']
-];
 
 function renderHouses() {
-  var html = '<table class="house-table"><thead><tr><th>#</th><th>Sign</th><th>Occupants</th><th>Note</th></tr></thead><tbody>';
+  var el = document.getElementById('houseMap');
+  if (!el) { return; }
+  var html = '<p class="approx" style="margin-bottom:8px;">Optional sketch only — not used for coaching.</p>';
+  html += '<table class="house-table"><thead><tr><th>#</th><th>Sign</th><th>Occupants</th><th>Note</th></tr></thead><tbody>';
   var i, row;
   for (i = 0; i < HOUSES.length; i++) {
     row = HOUSES[i];
     html += '<tr><td>' + row.h + '</td><td>' + row.sign + '</td><td>' + row.who + '</td><td>' + row.note + '</td></tr>';
   }
   html += '</tbody></table>';
-  document.getElementById('houseMap').innerHTML = html;
+  el.innerHTML = html;
 }
 
-function renderMoneyRules() {
+var MONEY_LESSONS = [
+  { id: 'venus', title: 'Venus · own Taurus (Krittika)', body: '<strong>Role:</strong> comfort, taste, value, what feels “enough” to spend on beauty.<br><strong>Teach:</strong> Venus is strong — pleasure spend is real. It only comes from the Venus Pocket <em>after</em> Saturn is fed.<br><strong>Practice:</strong> Before any yarn/looks/treat buy, ask: “Is Saturn Pocket already covered this week?”' },
+  { id: 'jupiter', title: 'Jupiter · with Venus (Mrigashira) · current MD', body: '<strong>Role:</strong> natural wealth significator; growth, teaching, craft dharma.<br><strong>Teach:</strong> Fruit comes through real skill and offering — not through being rescued.<br><strong>Practice:</strong> One income action from craft/skill/teaching this week (even small).' },
+  { id: 'mars', title: 'Mars · own Aries (Bharani)', body: '<strong>Role:</strong> heat, courage, grab, burn, consequences.<br><strong>Teach:</strong> Use Mars to <em>earn</em> and to cut bad debt habits — not to empty the pot.<br><strong>Practice:</strong> Lump sums split the day they land. 24-hour cool on non-essential wants from lack. No silent take.' },
+  { id: 'saturn', title: 'Saturn · Cancer (Ashlesha)', body: '<strong>Role:</strong> time, duty, delay, security coil, structure.<br><strong>Teach:</strong> Steady money is Saturn’s job — schedule beats mood.<br><strong>Practice:</strong> 70% Saturn Pocket (rent, food, debt minimums, utilities). Weekly 15-minute money date. Same day each week.' },
+  { id: 'mercury', title: 'Mercury · Gemini Ardra (~2° from Sun)', body: '<strong>Role:</strong> counting, deals, speech, commerce.<br><strong>Teach:</strong> Good at selling/explaining; weak if numbers stay in the head.<br><strong>Practice:</strong> Every in/out written the same day. No “I’ll remember.”' },
+  { id: 'sun', title: 'Sun · Gemini Ardra', body: '<strong>Role:</strong> dignity, visibility, how money affects pride.<br><strong>Teach:</strong> Looking good is fine; status spend is not a substitute for a floor.<br><strong>Practice:</strong> Finish one money task before performing success (post, flex, story).' },
+  { id: 'moon', title: 'Moon · Purva Ashadha', body: '<strong>Role:</strong> emotional weather around enough / conviction.<br><strong>Teach:</strong> When the floor shakes, feelings get loud — don’t let mood write the ledger.<br><strong>Practice:</strong> Money decisions after one meal or one night’s sleep if you’re flooded.' },
+  { id: 'rahu', title: 'Rahu · Virgo Chitra', body: '<strong>Role:</strong> hunger for more, shortcut, uneven appetite.<br><strong>Teach:</strong> Rahu redefines “enough” upward. Patron/rescue money is not the plan.<br><strong>Practice:</strong> If the urge is “they have it / I need a hit of more” — stop and open Saturn Pocket numbers instead.' },
+  { id: 'ketu', title: 'Ketu · Pisces Revati', body: '<strong>Role:</strong> detach, dissolve, drop.<br><strong>Teach:</strong> Can drop craving <em>or</em> drop the ledger. Choose which.<br><strong>Practice:</strong> Detach from comparison; keep the weekly money date anyway.' }
+];
+
+var MONEY_CHECKS = [
+  { id: 'saturn70', label: 'Saturn Pocket checked (rent/food/debt/utilities) before any Venus spend' },
+  { id: 'written', label: 'Today’s money in/out written (Mercury)' },
+  { id: 'marscool', label: 'No impulsive grab/spend from lack (Mars cool or 24h wait)' },
+  { id: 'rahustop', label: 'No rescue/patron/shortcut money fantasy acted on (Rahu)' },
+  { id: 'jupiteract', label: 'One craft/skill/teaching income action done or scheduled (Jupiter)' }
+];
+
+var TRADE_RULES = [
+  { pill: 'Saturn', text: 'Only risk money that is surplus after Saturn Pocket — never rent, food, or debt money.' },
+  { pill: 'Mars', text: 'Fixed risk per trade before entry. No adding to losers. No revenge trade after a loss.' },
+  { pill: 'Mercury', text: 'Written plan first: market, direction, entry idea, stop, target, risk $. No plan = no trade.' },
+  { pill: 'Rahu', text: 'No FOMO, no “sure thing,” no size-up because someone else is winning.' },
+  { pill: 'Venus', text: 'Trading is not Venus Pocket entertainment. If you’re bored or chasing a feeling, sit out.' },
+  { pill: 'Jupiter', text: 'Skill over lottery: review the log weekly; one lesson beats one dopamine win.' },
+  { pill: 'Moon', text: 'If emotional weather is stormy, reduce size or skip — Moon does not get the mouse.' },
+  { pill: 'Sun', text: 'No trading to look successful. Ego size is not position size.' }
+];
+
+var TRADE_GATE = [
+  { id: 'saturnok', label: 'Saturn Pocket is covered; this risk is surplus only' },
+  { id: 'planwritten', label: 'Plan written (entry idea, stop, target, risk $)' },
+  { id: 'riskfixed', label: 'Risk $ is fixed and I accept a full loss of that amount' },
+  { id: 'calm', label: 'I am not revenge-trading, FOMO-trading, or mood-trading' }
+];
+
+function renderMoneyLab() {
+  var box = document.getElementById('moneyLessons');
   var html = '';
   var i;
-  for (i = 0; i < MONEY_RULES.length; i++) {
-    html += '<li><strong>' + MONEY_RULES[i][0] + '</strong> — ' + MONEY_RULES[i][1] + '</li>';
+  var L;
+  if (!box) { return; }
+  for (i = 0; i < MONEY_LESSONS.length; i++) {
+    L = MONEY_LESSONS[i];
+    html += '<details class="money-lesson"><summary>' + L.title + '</summary><div class="body">' + L.body + '</div></details>';
   }
-  document.getElementById('moneyRules').innerHTML = html;
+  box.innerHTML = html;
+  renderMoneyChecks();
 }
+
+function renderMoneyChecks() {
+  var today = dateKey(new Date());
+  var day = state.moneyChecks[today] || {};
+  var list = document.getElementById('moneyCheckList');
+  var html = '';
+  var i;
+  var c;
+  var checked;
+  if (!list) { return; }
+  document.getElementById('moneyCheckDate').textContent = 'Checklist for ' + today + ' · resets each calendar day';
+  for (i = 0; i < MONEY_CHECKS.length; i++) {
+    c = MONEY_CHECKS[i];
+    checked = day[c.id] ? ' checked' : '';
+    html += '<li><input type="checkbox" data-money-check="' + c.id + '"' + checked + '><span>' + c.label + '</span></li>';
+  }
+  list.innerHTML = html;
+}
+
+function setupMoneyLab() {
+  var list = document.getElementById('moneyCheckList');
+  if (!list) { return; }
+  list.onchange = function (ev) {
+    var t = ev.target;
+    var id;
+    var today;
+    if (!t || !t.getAttribute) { return; }
+    id = t.getAttribute('data-money-check');
+    if (!id) { return; }
+    today = dateKey(new Date());
+    if (!state.moneyChecks[today]) { state.moneyChecks[today] = {}; }
+    state.moneyChecks[today][id] = !!t.checked;
+    saveState();
+    document.getElementById('moneyCheckMsg').textContent = 'Saved for ' + today + '.';
+  };
+}
+
+function renderTradeRules() {
+  var el = document.getElementById('tradeRules');
+  var html = '';
+  var i;
+  if (!el) { return; }
+  for (i = 0; i < TRADE_RULES.length; i++) {
+    html += '<p style="font-size:0.84rem;color:var(--text-dim);margin:8px 0;"><span class="rule-pill">' + TRADE_RULES[i].pill + '</span> ' + TRADE_RULES[i].text + '</p>';
+  }
+  el.innerHTML = html;
+}
+
+function renderTradeGate() {
+  var today = dateKey(new Date());
+  var day = state.tradeGate[today] || {};
+  var list = document.getElementById('tradeGateList');
+  var html = '';
+  var i;
+  var g;
+  var all = true;
+  if (!list) { return; }
+  for (i = 0; i < TRADE_GATE.length; i++) {
+    g = TRADE_GATE[i];
+    if (!day[g.id]) { all = false; }
+    html += '<li><input type="checkbox" data-trade-gate="' + g.id + '"' + (day[g.id] ? ' checked' : '') + '><span>' + g.label + '</span></li>';
+  }
+  list.innerHTML = html;
+  document.getElementById('tradeGateMsg').textContent = all
+    ? 'Gate clear for today — still follow size and stop.'
+    : 'All four boxes before a live trade. Skill > impulse.';
+}
+
+function setupTradeGate() {
+  var list = document.getElementById('tradeGateList');
+  if (!list) { return; }
+  list.onchange = function (ev) {
+    var t = ev.target;
+    var id;
+    var today;
+    if (!t || !t.getAttribute) { return; }
+    id = t.getAttribute('data-trade-gate');
+    if (!id) { return; }
+    today = dateKey(new Date());
+    if (!state.tradeGate[today]) { state.tradeGate[today] = {}; }
+    state.tradeGate[today][id] = !!t.checked;
+    saveState();
+    renderTradeGate();
+  };
+}
+
+function tradeStats() {
+  var wins = 0, losses = 0, be = 0, net = 0, i, t;
+  for (i = 0; i < state.trades.length; i++) {
+    t = state.trades[i];
+    net += Number(t.pnl) || 0;
+    if (t.result === 'win') { wins++; }
+    else if (t.result === 'loss') { losses++; }
+    else { be++; }
+  }
+  return { wins: wins, losses: losses, be: be, net: net, n: state.trades.length,
+    wr: (wins + losses) ? Math.round(100 * wins / (wins + losses)) : 0 };
+}
+
+function renderTrades() {
+  var stats = tradeStats();
+  var box = document.getElementById('tradeStats');
+  var list = document.getElementById('tradeList');
+  var html = '';
+  var rows;
+  var i;
+  var t;
+  var sign;
+  if (!box || !list) { return; }
+  box.innerHTML =
+    '<div class="trade-stat"><div class="n">' + stats.n + '</div><div class="l">Trades</div></div>' +
+    '<div class="trade-stat"><div class="n">' + stats.wr + '%</div><div class="l">Win rate*</div></div>' +
+    '<div class="trade-stat"><div class="n">' + (stats.net >= 0 ? '+' : '') + stats.net.toFixed(2) + '</div><div class="l">Net P/L</div></div>';
+  rows = state.trades.slice().sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
+  if (!rows.length) {
+    list.innerHTML = '<p class="honey-empty" style="margin-top:12px;">No trades logged yet.</p><p class="approx">*Win rate ignores breakeven.</p>';
+    return;
+  }
+  for (i = 0; i < rows.length; i++) {
+    t = rows[i];
+    sign = (Number(t.pnl) >= 0 ? '+' : '') + Number(t.pnl).toFixed(2);
+    html += '<div class="trade-row ' + t.result + '">' +
+      '<strong style="color:var(--gold-pale)">' + t.date + ' · ' + t.symbol + '</strong> · ' + t.side +
+      '<br>Risk ' + Number(t.risk).toFixed(2) + ' · P/L ' + sign + ' · ' + t.result +
+      (t.note ? '<br><span style="color:var(--text-dim)">' + escapeHtml(t.note) + '</span>' : '') +
+      '<br><button type="button" class="btn btn-ghost" style="margin-top:6px;padding:4px 10px;font-size:0.75rem;" data-del-trade="' + t.id + '">Delete</button>' +
+      '</div>';
+  }
+  html += '<p class="approx" style="margin-top:10px;">*Win rate = wins ÷ (wins + losses). Local only.</p>';
+  list.innerHTML = html;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function setupTrading() {
+  var form = document.getElementById('tradeForm');
+  var list = document.getElementById('tradeList');
+  if (!form) { return; }
+  document.getElementById('tradeDate').value = dateKey(new Date());
+  form.onsubmit = function (ev) {
+    var todayGate = state.tradeGate[dateKey(new Date())] || {};
+    var i;
+    var ok = true;
+    ev.preventDefault();
+    for (i = 0; i < TRADE_GATE.length; i++) {
+      if (!todayGate[TRADE_GATE[i].id]) { ok = false; break; }
+    }
+    if (!ok) {
+      if (!window.confirm('Pre-trade gate is incomplete. Log anyway as a practice note?')) { return; }
+    }
+    state.trades.push({
+      id: uid(),
+      date: document.getElementById('tradeDate').value,
+      symbol: document.getElementById('tradeSymbol').value.trim(),
+      side: document.getElementById('tradeSide').value,
+      risk: Number(document.getElementById('tradeRisk').value),
+      result: document.getElementById('tradeResult').value,
+      pnl: Number(document.getElementById('tradePnl').value),
+      note: document.getElementById('tradeNote').value.trim()
+    });
+    saveState();
+    document.getElementById('tradeSymbol').value = '';
+    document.getElementById('tradeRisk').value = '';
+    document.getElementById('tradePnl').value = '';
+    document.getElementById('tradeNote').value = '';
+    renderTrades();
+  };
+  if (list) {
+    list.onclick = function (ev) {
+      var btn = ev.target.closest('[data-del-trade]');
+      if (!btn) { return; }
+      state.trades = state.trades.filter(function (t) { return t.id !== btn.getAttribute('data-del-trade'); });
+      saveState();
+      renderTrades();
+    };
+  }
+}
+
 
 function renderMap() {
   var order = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Rahu', 'Ketu'];
@@ -2091,6 +2419,9 @@ function setupSettings() {
         applyDisplayName();
         renderToday();
         renderLab();
+        renderMoneyLab();
+        renderTradeGate();
+        renderTrades();
         renderHoney();
         renderJournal();
         document.getElementById('settingsMsg').textContent = 'Import complete.';
@@ -2107,6 +2438,9 @@ function setupSettings() {
       applyDisplayName();
       renderToday();
       renderLab();
+      renderMoneyLab();
+      renderTradeGate();
+      renderTrades();
       renderHoney();
       renderJournal();
       document.getElementById('settingsMsg').textContent = 'Reset complete.';
@@ -2127,7 +2461,13 @@ function init() {
   renderWeek();
   renderMap();
   if (typeof renderHouses === 'function') { renderHouses(); }
-  if (typeof renderMoneyRules === 'function') { renderMoneyRules(); }
+  renderMoneyLab();
+  setupMoneyLab();
+  renderTradeRules();
+  renderTradeGate();
+  setupTradeGate();
+  setupTrading();
+  renderTrades();
   setupHoney();
   renderHoney();
   setupJournal();
