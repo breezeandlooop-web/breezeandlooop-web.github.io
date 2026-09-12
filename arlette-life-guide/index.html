@@ -666,6 +666,38 @@ noscript {
   border: 1px solid rgba(200,180,140,0.28); background: rgba(40,60,50,0.25);
 }
 
+
+.biz-pipeline {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0;
+}
+@media (max-width: 700px) {
+  .biz-pipeline { grid-template-columns: 1fr 1fr; }
+}
+.biz-pipe {
+  text-align: center; padding: 10px 6px; border-radius: 10px;
+  border: 1px solid var(--card-border); background: rgba(0,0,0,0.15);
+}
+.biz-pipe .n { font-size: 1.2rem; color: var(--gold-pale); font-weight: 600; }
+.biz-pipe .l { font-size: 0.68rem; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
+.biz-card {
+  border: 1px solid rgba(200,180,140,0.22); border-radius: 12px;
+  padding: 12px 14px; margin: 10px 0; background: rgba(0,0,0,0.16);
+}
+.biz-card .biz-title { color: var(--gold-pale); font-weight: 600; font-size: 0.95rem; }
+.biz-card .biz-meta { color: var(--muted); font-size: 0.75rem; margin-top: 3px; }
+.biz-stage {
+  display: inline-block; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 2px 8px; border-radius: 999px; margin-right: 6px;
+  border: 1px solid rgba(180,160,120,0.35); color: var(--gold-soft);
+}
+.biz-stage.spark { border-color: rgba(160,160,200,0.45); color: #c8c8e8; }
+.biz-stage.shape { border-color: rgba(180,160,120,0.45); color: var(--gold-soft); }
+.biz-stage.build { border-color: rgba(120,170,140,0.45); color: var(--ok); }
+.biz-stage.weight { border-color: rgba(200,170,100,0.55); color: var(--gold-pale); background: rgba(180,150,80,0.12); }
+.biz-log-line { font-size: 0.8rem; color: var(--text-dim); margin: 4px 0; padding-left: 8px; border-left: 2px solid rgba(180,160,120,0.3); }
+.biz-filter { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+.biz-filter button.active { outline: 1px solid var(--gold-soft); }
+
 </style>
 </head>
 <body>
@@ -697,6 +729,7 @@ noscript {
   <button type="button" data-go="trading">Trading</button>
   <button type="button" data-go="honey">Honey Tasks</button>
   <button type="button" data-go="hermetic">Hermetic</button>
+  <button type="button" data-go="business">Business Hub</button>
   <button type="button" data-go="journal">Journal</button>
   <button type="button" data-go="settings">Settings</button>
 </nav>
@@ -1073,6 +1106,56 @@ noscript {
     </div>
   </section>
 
+
+  <!-- 7f. BUSINESS HUB -->
+  <section class="panel" id="panel-business" data-section="business">
+    <div class="card">
+      <div class="eyebrow">Idea → Weight</div>
+      <h2>Business Hub</h2>
+      <p class="approx">Track work from spark to <strong>weight</strong> — the real shipped outcome (CRM live, prospects imported, invoice sent, brand piece delivered). Honey Tasks stay light sparks; this hub is for business weight you can count.</p>
+      <div class="biz-pipeline" id="bizPipeline"></div>
+      <p class="approx" style="margin-top:8px;"><strong>Spark</strong> raw ask · <strong>Shape</strong> scope/plan · <strong>Build</strong> making it · <strong>Weight</strong> real result in the world</p>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="eyebrow">Log</div>
+      <h2>New initiative</h2>
+      <form class="trade-form" id="bizForm">
+        <label for="bizTitle">Name</label>
+        <input type="text" id="bizTitle" maxlength="80" placeholder="e.g. Client HTML CRM" required>
+        <label for="bizClient">Client / brand (optional)</label>
+        <input type="text" id="bizClient" maxlength="60" placeholder="e.g. consultancy client, Breeze &amp; Loop">
+        <label for="bizStage">Stage</label>
+        <select id="bizStage">
+          <option value="spark">Spark — idea / ask</option>
+          <option value="shape">Shape — ideation / scope</option>
+          <option value="build" selected>Build — making it</option>
+          <option value="weight">Weight — shipped / real outcome</option>
+        </select>
+        <label for="bizIdea">Idea / ask (what started it)</label>
+        <textarea id="bizIdea" maxlength="500" placeholder="This morning I asked for an HTML CRM…" required></textarea>
+        <label for="bizWeight">Weight so far (what’s real now — leave blank if still spark)</label>
+        <textarea id="bizWeight" maxlength="500" placeholder="e.g. 100 prospects imported · CRM HTML delivered"></textarea>
+        <label for="bizNext">Next action</label>
+        <input type="text" id="bizNext" maxlength="160" placeholder="e.g. Follow up with client on outreach list">
+        <div class="btn-row"><button type="submit" class="btn">Save to Hub</button></div>
+      </form>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <div class="eyebrow">Pipeline board</div>
+      <h2>Initiatives</h2>
+      <div class="biz-filter" id="bizFilter" role="group" aria-label="Filter stage">
+        <button type="button" class="btn btn-ghost active" data-biz-filter="all">All</button>
+        <button type="button" class="btn btn-ghost" data-biz-filter="spark">Spark</button>
+        <button type="button" class="btn btn-ghost" data-biz-filter="shape">Shape</button>
+        <button type="button" class="btn btn-ghost" data-biz-filter="build">Build</button>
+        <button type="button" class="btn btn-ghost" data-biz-filter="weight">Weight</button>
+      </div>
+      <div id="bizList"></div>
+    </div>
+  </section>
+
   <!-- 8. JOURNAL -->
   <section class="panel" id="panel-journal" data-section="journal">
     <div class="card">
@@ -1114,7 +1197,7 @@ noscript {
     </div>
   </section>
 
-  <footer class="app-foot">Arlette Life Guide · v1.4.5</footer>
+  <footer class="app-foot">Arlette Life Guide · v1.4.6</footer>
 </div>
 
 <script>
@@ -1313,6 +1396,7 @@ var SECTIONS = [
   { id: 'trading', label: 'Trading' },
   { id: 'honey', label: 'Honey Tasks' },
   { id: 'hermetic', label: 'Hermetic' },
+  { id: 'business', label: 'Business Hub' },
   { id: 'journal', label: 'Journal' },
   { id: 'settings', label: 'Settings' }
 ];
@@ -1392,6 +1476,7 @@ function defaultState() {
     tradeGate: {},
     trades: [],
     hermetic: { entries: [], create: {} },
+    business: { projects: [], seededCrm: false },
     editingId: null,
     matter: {},
     gate: {}
@@ -1413,6 +1498,9 @@ function normalizeState(parsed) {
   if (!parsed.hermetic) { parsed.hermetic = { entries: [], create: {} }; }
   if (!parsed.hermetic.entries) { parsed.hermetic.entries = []; }
   if (!parsed.hermetic.create) { parsed.hermetic.create = {}; }
+  if (!parsed.business) { parsed.business = { projects: [], seededCrm: false }; }
+  if (!parsed.business.projects) { parsed.business.projects = []; }
+  if (typeof parsed.business.seededCrm !== 'boolean') { parsed.business.seededCrm = false; }
   if (!parsed.displayName) { parsed.displayName = 'Arlette'; }
   if (!parsed.matter) { parsed.matter = {}; }
   if (!parsed.gate) { parsed.gate = {}; }
@@ -3159,6 +3247,269 @@ function renderHermetic() {
 }
 
 
+var BIZ_STAGES = [
+  { id: 'spark', label: 'Spark', hint: 'Raw idea / ask' },
+  { id: 'shape', label: 'Shape', hint: 'Ideation & scope' },
+  { id: 'build', label: 'Build', hint: 'Making it' },
+  { id: 'weight', label: 'Weight', hint: 'Shipped outcome' }
+];
+var bizListFilter = 'all';
+var BIZ_STAGE_ORDER = { spark: 0, shape: 1, build: 2, weight: 3 };
+
+function bizStageLabel(id) {
+  var i;
+  for (i = 0; i < BIZ_STAGES.length; i++) {
+    if (BIZ_STAGES[i].id === id) { return BIZ_STAGES[i].label; }
+  }
+  return id || 'Spark';
+}
+
+function ensureBizSeed() {
+  var p;
+  if (!state.business) { state.business = { projects: [], seededCrm: false }; }
+  if (state.business.seededCrm) { return; }
+  /* One-time seed: this morning's client HTML CRM + 100 prospects */
+  p = {
+    id: uid(),
+    title: 'Client HTML CRM',
+    client: 'Client (consultancy)',
+    stage: 'build',
+    idea: 'Asked for an HTML CRM for a client — idea through to usable system.',
+    weight: '100 prospects imported into the CRM.',
+    next: 'Confirm outreach workflow with client; note any fields still missing.',
+    created: '2026-09-12',
+    updated: dateKey(new Date()),
+    log: [
+      { at: '2026-09-12', text: 'Spark: requested HTML CRM for client.' },
+      { at: '2026-09-12', text: 'Weight note: 100 prospects imported.' }
+    ]
+  };
+  state.business.projects.unshift(p);
+  state.business.seededCrm = true;
+  saveState();
+}
+
+function bizCounts() {
+  var c = { spark: 0, shape: 0, build: 0, weight: 0 };
+  var i, st;
+  for (i = 0; i < state.business.projects.length; i++) {
+    st = state.business.projects[i].stage || 'spark';
+    if (c[st] == null) { c[st] = 0; }
+    c[st]++;
+  }
+  return c;
+}
+
+function renderBizPipeline() {
+  var el = document.getElementById('bizPipeline');
+  var c = bizCounts();
+  var html = '';
+  var i, s;
+  if (!el) { return; }
+  for (i = 0; i < BIZ_STAGES.length; i++) {
+    s = BIZ_STAGES[i];
+    html += '<div class="biz-pipe"><div class="n">' + (c[s.id] || 0) + '</div><div class="l">' + s.label + '</div></div>';
+  }
+  el.innerHTML = html;
+}
+
+function advanceBizStage(cur) {
+  var order = ['spark', 'shape', 'build', 'weight'];
+  var i = order.indexOf(cur);
+  if (i < 0 || i >= order.length - 1) { return cur; }
+  return order[i + 1];
+}
+
+function renderBizList() {
+  var list = document.getElementById('bizList');
+  var rows;
+  var html = '';
+  var i, p, j, logs;
+  if (!list) { return; }
+  rows = state.business.projects.slice().filter(function (pr) {
+    return bizListFilter === 'all' || pr.stage === bizListFilter;
+  }).sort(function (a, b) {
+    var da = BIZ_STAGE_ORDER[a.stage] != null ? BIZ_STAGE_ORDER[a.stage] : 0;
+    var db = BIZ_STAGE_ORDER[b.stage] != null ? BIZ_STAGE_ORDER[b.stage] : 0;
+    if (da !== db) { return da - db; }
+    return (a.updated < b.updated) ? 1 : (a.updated > b.updated ? -1 : 0);
+  });
+  if (!rows.length) {
+    list.innerHTML = '<p class="honey-empty">No initiatives in this filter. Add one above — Spark through Weight.</p>';
+    return;
+  }
+  for (i = 0; i < rows.length; i++) {
+    p = rows[i];
+    html += '<div class="biz-card" data-biz-id="' + p.id + '">' +
+      '<div class="biz-title"><span class="biz-stage ' + escapeHtml(p.stage) + '">' + escapeHtml(bizStageLabel(p.stage)) + '</span>' +
+      escapeHtml(p.title) + '</div>' +
+      '<div class="biz-meta">' + (p.client ? escapeHtml(p.client) + ' · ' : '') +
+      'Updated ' + escapeHtml(p.updated || p.created || '') + '</div>' +
+      '<p style="margin:8px 0 0;font-size:0.84rem;color:var(--text-dim);"><strong style="color:var(--gold-soft)">Idea:</strong> ' +
+      escapeHtml(p.idea || '') + '</p>';
+    if (p.weight) {
+      html += '<p style="margin:4px 0 0;font-size:0.84rem;color:var(--ok);"><strong>Weight:</strong> ' + escapeHtml(p.weight) + '</p>';
+    }
+    if (p.next) {
+      html += '<p style="margin:4px 0 0;font-size:0.84rem;color:var(--text);"><strong style="color:var(--gold-pale)">Next:</strong> ' + escapeHtml(p.next) + '</p>';
+    }
+    logs = p.log || [];
+    if (logs.length) {
+      html += '<div style="margin-top:8px;">';
+      for (j = Math.max(0, logs.length - 4); j < logs.length; j++) {
+        html += '<div class="biz-log-line">' + escapeHtml(logs[j].at) + ' — ' + escapeHtml(logs[j].text) + '</div>';
+      }
+      html += '</div>';
+    }
+    html += '<div class="btn-row" style="margin-top:10px;flex-wrap:wrap;">' +
+      '<button type="button" class="btn btn-ghost" style="padding:4px 10px;font-size:0.75rem;" data-biz-advance="' + p.id + '">Advance stage</button>' +
+      '<button type="button" class="btn btn-ghost" style="padding:4px 10px;font-size:0.75rem;" data-biz-log="' + p.id + '">Add log note</button>' +
+      '<button type="button" class="btn btn-ghost" style="padding:4px 10px;font-size:0.75rem;" data-biz-weight="' + p.id + '">Update weight</button>' +
+      '<button type="button" class="btn btn-ghost" style="padding:4px 10px;font-size:0.75rem;" data-biz-del="' + p.id + '">Delete</button>' +
+      '</div></div>';
+  }
+  list.innerHTML = html;
+}
+
+function findBiz(id) {
+  var i;
+  for (i = 0; i < state.business.projects.length; i++) {
+    if (state.business.projects[i].id === id) { return state.business.projects[i]; }
+  }
+  return null;
+}
+
+function setupBusiness() {
+  var form = document.getElementById('bizForm');
+  var list = document.getElementById('bizList');
+  var filter = document.getElementById('bizFilter');
+  ensureBizSeed();
+  if (form) {
+    form.onsubmit = function (ev) {
+      var title, idea, weight, next, client, stage, today, proj;
+      ev.preventDefault();
+      title = document.getElementById('bizTitle').value.trim();
+      idea = document.getElementById('bizIdea').value.trim();
+      weight = document.getElementById('bizWeight').value.trim();
+      next = document.getElementById('bizNext').value.trim();
+      client = document.getElementById('bizClient').value.trim();
+      stage = document.getElementById('bizStage').value;
+      if (!title || !idea) { return; }
+      today = dateKey(new Date());
+      proj = {
+        id: uid(),
+        title: title,
+        client: client,
+        stage: stage,
+        idea: idea,
+        weight: weight,
+        next: next,
+        created: today,
+        updated: today,
+        log: [{ at: today, text: 'Logged as ' + bizStageLabel(stage) + ': ' + idea.slice(0, 120) }]
+      };
+      if (weight) {
+        proj.log.push({ at: today, text: 'Weight: ' + weight.slice(0, 160) });
+      }
+      state.business.projects.unshift(proj);
+      saveState();
+      document.getElementById('bizTitle').value = '';
+      document.getElementById('bizClient').value = '';
+      document.getElementById('bizIdea').value = '';
+      document.getElementById('bizWeight').value = '';
+      document.getElementById('bizNext').value = '';
+      document.getElementById('bizStage').value = 'spark';
+      renderBusiness();
+    };
+  }
+  if (filter) {
+    filter.onclick = function (ev) {
+      var btn = ev.target.closest('[data-biz-filter]');
+      var buttons, j;
+      if (!btn) { return; }
+      bizListFilter = btn.getAttribute('data-biz-filter') || 'all';
+      buttons = filter.querySelectorAll('[data-biz-filter]');
+      for (j = 0; j < buttons.length; j++) {
+        buttons[j].classList.toggle('active', buttons[j].getAttribute('data-biz-filter') === bizListFilter);
+      }
+      renderBizList();
+    };
+  }
+  if (list) {
+    list.onclick = function (ev) {
+      var adv = ev.target.closest('[data-biz-advance]');
+      var logBtn = ev.target.closest('[data-biz-log]');
+      var wBtn = ev.target.closest('[data-biz-weight]');
+      var del = ev.target.closest('[data-biz-del]');
+      var proj, note, today, nextStage;
+      today = dateKey(new Date());
+      if (adv) {
+        proj = findBiz(adv.getAttribute('data-biz-advance'));
+        if (!proj) { return; }
+        nextStage = advanceBizStage(proj.stage);
+        if (nextStage === proj.stage) {
+          window.alert('Already at Weight — update the weight note if the outcome grew.');
+          return;
+        }
+        proj.stage = nextStage;
+        proj.updated = today;
+        if (!proj.log) { proj.log = []; }
+        proj.log.push({ at: today, text: 'Advanced to ' + bizStageLabel(nextStage) + '.' });
+        saveState();
+        renderBusiness();
+        return;
+      }
+      if (logBtn) {
+        proj = findBiz(logBtn.getAttribute('data-biz-log'));
+        if (!proj) { return; }
+        note = window.prompt('Log note for “' + proj.title + '”:');
+        if (!note || !note.trim()) { return; }
+        if (!proj.log) { proj.log = []; }
+        proj.log.push({ at: today, text: note.trim() });
+        proj.updated = today;
+        saveState();
+        renderBusiness();
+        return;
+      }
+      if (wBtn) {
+        proj = findBiz(wBtn.getAttribute('data-biz-weight'));
+        if (!proj) { return; }
+        note = window.prompt('Update weight (what’s real now):', proj.weight || '');
+        if (note == null) { return; }
+        proj.weight = note.trim();
+        proj.updated = today;
+        if (proj.weight && proj.stage !== 'weight') {
+          if (window.confirm('Mark this initiative as Weight (shipped)?')) {
+            proj.stage = 'weight';
+          }
+        }
+        if (!proj.log) { proj.log = []; }
+        proj.log.push({ at: today, text: 'Weight updated: ' + (proj.weight || '(cleared)') });
+        saveState();
+        renderBusiness();
+        return;
+      }
+      if (del) {
+        if (!window.confirm('Delete this initiative?')) { return; }
+        state.business.projects = state.business.projects.filter(function (x) {
+          return x.id !== del.getAttribute('data-biz-del');
+        });
+        saveState();
+        renderBusiness();
+      }
+    };
+  }
+}
+
+function renderBusiness() {
+  ensureBizSeed();
+  renderBizPipeline();
+  renderBizList();
+}
+
+
+
+
 function init() {
   document.documentElement.classList.add('js');
   var hint = document.getElementById('openHint');
@@ -3183,6 +3534,8 @@ function init() {
   renderHoney();
   setupHermetic();
   renderHermetic();
+  setupBusiness();
+  renderBusiness();
   setupJournal();
   renderJournal();
   setupSettings();
