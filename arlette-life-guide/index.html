@@ -636,13 +636,31 @@ noscript {
 .herm-entry .he-tag { display: inline-block; font-size: 0.65rem; text-transform: uppercase;
   letter-spacing: 0.05em; padding: 2px 7px; border-radius: 999px; margin-right: 6px;
   border: 1px solid rgba(180,160,120,0.35); color: var(--gold-soft); }
-.vibe-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
-.vibe-row label {
-  display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem;
-  padding: 6px 10px; border-radius: 999px; border: 1px solid var(--card-border);
-  cursor: pointer; color: var(--text-dim);
+.vibe-row {
+  display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px;
+  align-items: stretch; margin: 4px 0 8px; width: 100%;
+  grid-column: 1 / -1;
 }
-.vibe-row input { accent-color: var(--gold-soft); }
+.trade-form .vibe-row { grid-column: 1 / -1; }
+.vibe-row label {
+  display: inline-flex; flex: 1 1 auto; align-items: center; justify-content: center;
+  gap: 8px; min-width: 7.5rem; margin: 0;
+  font-size: 0.8rem !important; font-weight: 500;
+  padding: 10px 14px; border-radius: 999px;
+  border: 1px solid var(--card-border);
+  background: rgba(0,0,0,0.22);
+  cursor: pointer; color: var(--text-dim) !important;
+  white-space: nowrap; box-sizing: border-box;
+}
+.vibe-row label:has(input:checked) {
+  border-color: var(--gold-soft);
+  color: var(--gold-pale) !important;
+  background: rgba(180,160,120,0.18);
+}
+.vibe-row input[type="radio"] {
+  width: auto !important; max-width: none; margin: 0;
+  flex: 0 0 auto; accent-color: var(--gold-soft);
+}
 .today-herm {
   margin-top: 12px; padding: 12px 14px; border-radius: 12px;
   border: 1px solid rgba(200,180,140,0.28); background: rgba(40,60,50,0.25);
@@ -999,11 +1017,13 @@ noscript {
         <textarea id="hermLack" maxlength="500" placeholder="e.g. If I don’t please them I’ll be cut off… / money vanishing… / nobody sees me…" required></textarea>
         <label for="hermWhole">Whole frequency (truth + next act from sufficiency)</label>
         <textarea id="hermWhole" maxlength="500" placeholder="e.g. I belong without erasing myself. Saturn Pocket first. One craft step before praise…" required></textarea>
-        <label>Vibration check (body / mind right now)</label>
-        <div class="vibe-row" id="hermVibeRow">
-          <label><input type="radio" name="hermVibe" value="contracted"> Contracted</label>
-          <label><input type="radio" name="hermVibe" value="stirring" checked> Stirring</label>
-          <label><input type="radio" name="hermVibe" value="open"> Open / whole</label>
+        <div class="vibe-field" style="grid-column:1/-1;">
+          <div class="approx" style="margin:0 0 6px;color:var(--gold-soft);font-size:0.75rem;">Vibration check (body / mind right now)</div>
+          <div class="vibe-row" id="hermVibeRow" role="radiogroup" aria-label="Vibration check">
+            <label><input type="radio" name="hermVibe" value="contracted"> Contracted</label>
+            <label><input type="radio" name="hermVibe" value="stirring" checked> Stirring</label>
+            <label><input type="radio" name="hermVibe" value="open"> Open / whole</label>
+          </div>
         </div>
         <div class="btn-row"><button type="submit" class="btn">Save transmute</button></div>
       </form>
@@ -1094,7 +1114,7 @@ noscript {
     </div>
   </section>
 
-  <footer class="app-foot">Arlette Life Guide · v1.4.4</footer>
+  <footer class="app-foot">Arlette Life Guide · v1.4.5</footer>
 </div>
 
 <script>
