@@ -589,16 +589,32 @@ noscript {
 .week-decision .wd-note { color: var(--text-dim); font-size: 0.82rem; margin-top: 6px; }
 .trade-filter { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0 4px; }
 .trade-filter button.active { outline: 1px solid var(--gold-soft); }
-@media print {
-  body * { visibility: hidden !important; }
-  #printWeekSheet, #printWeekSheet * { visibility: visible !important; }
-  #printWeekSheet {
-    position: absolute; left: 0; top: 0; width: 100%; padding: 24px;
-    background: #fff !important; color: #111 !important;
-  }
-  #printWeekSheet .week-decision { border-color: #ccc; background: #fafafa; }
-  #printWeekSheet .wd-head, #printWeekSheet h1, #printWeekSheet h2 { color: #111 !important; }
+#printWeekSheet {
+  display: none; background: #fff; color: #111; padding: 24px;
 }
+body.is-printing .wrap { display: none !important; }
+body.is-printing #printWeekSheet {
+  display: block !important; position: static; width: auto; min-height: 100vh;
+}
+@media print {
+  body.is-printing .wrap { display: none !important; }
+  body.is-printing #printWeekSheet {
+    display: block !important; position: static; width: 100%;
+    background: #fff !important; color: #111 !important; padding: 12px;
+  }
+  #printWeekSheet .week-decision, #printWeekSheet .journal-print-entry {
+    border: 1px solid #ccc; background: #fafafa; padding: 10px; margin: 8px 0;
+  }
+  #printWeekSheet h1, #printWeekSheet h2, #printWeekSheet .wd-head { color: #111 !important; }
+}
+.save-ok { color: var(--ok); font-size: 0.8rem; margin-top: 6px; }
+.save-bad { color: var(--warn); font-size: 0.8rem; margin-top: 6px; }
+.storage-banner {
+  margin: 10px 0 0; padding: 10px 12px; border-radius: 10px;
+  border: 1px solid rgba(200,180,140,0.28); background: rgba(0,0,0,0.18);
+  font-size: 0.8rem; color: var(--text-dim);
+}
+.storage-banner strong { color: var(--gold-pale); }
 
 .gate-item { display: block; }
 .gate-item .gate-row { display: flex; gap: 10px; align-items: flex-start; }
@@ -996,7 +1012,7 @@ noscript {
       <p class="approx" id="tradeWeekRange"></p>
       <div class="trade-stats" id="tradeWeekStats"></div>
       <div id="tradeWeekList"></div>
-      <p class="approx" style="margin-top:10px;">PDF tip: tap Print → Destination “Save as PDF” (Safari/Chrome).</p>
+      <p class="approx" style="margin-top:10px;">PDF tip: tap Print week → in the print dialog choose Destination “Save as PDF”. Nothing auto-downloads a PDF file — Safari/Chrome creates it when you print.</p>
     </div>
   </section>
 
@@ -1161,13 +1177,17 @@ noscript {
     <div class="card">
       <div class="eyebrow">Private notes</div>
       <h2>Journal</h2>
+      <div class="storage-banner" id="journalStorageBanner"></div>
+      <p class="approx" style="margin-top:8px;">Entries save on <em>this</em> browser address only. Prefer one bookmark: the GitHub Pages link. A Downloads file and Pages do not share journals.</p>
       <form class="journal-form" id="journalForm">
         <input type="date" id="journalDate" required>
         <textarea id="journalBody" placeholder="What is true for you today?" required></textarea>
         <div class="btn-row">
           <button type="submit" class="btn">Save entry</button>
           <button type="button" class="btn btn-ghost" id="journalCancelEdit" style="display:none;">Cancel edit</button>
+          <button type="button" class="btn btn-ghost" id="printJournalBtn">Print journal / Save as PDF</button>
         </div>
+        <p id="journalSaveMsg" class="approx" style="margin-top:8px;"></p>
       </form>
       <div id="journalList"></div>
     </div>
@@ -1192,12 +1212,14 @@ noscript {
           <button type="button" class="btn btn-ghost" id="resetBtn">Reset all</button>
         </div>
         <input type="file" id="importFile" accept="application/json,.json" style="display:none;">
+        <div class="storage-banner" id="settingsStorageBanner" style="margin-top:14px;"></div>
+        <p class="approx" style="margin-top:8px;">Export JSON often — that’s your backup if Safari clears site data. Import restores journals, trades, hermetic, and business hub.</p>
         <p id="settingsMsg" class="approx" style="margin-top:10px;"></p>
       </div>
     </div>
   </section>
 
-  <footer class="app-foot">Arlette Life Guide · v1.4.6</footer>
+  <footer class="app-foot">Arlette Life Guide · v1.4.7</footer>
 </div>
 
 <script>
@@ -1532,10 +1554,68 @@ function loadState() {
   }
 }
 
+var lastSaveOk = true;
+var lastSaveError = '';
+
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch (e) { /* ignore quota */ }
+    lastSaveOk = true;
+    lastSaveError = '';
+    return true;
+  } catch (e) {
+    lastSaveOk = false;
+    lastSaveError = (e && e.message) ? e.message : 'Storage blocked';
+    return false;
+  }
+}
+
+function storageOriginLabel() {
+  var href = '';
+  try { href = String(location.href || ''); } catch (e) { href = ''; }
+  if (href.indexOf('http') === 0) {
+    return 'Web (GitHub Pages / https) — keep using this same link';
+  }
+  if (href.indexOf('file:') === 0) {
+    return 'Local file — journals stay on this file path only; use Pages for one home';
+  }
+  return 'This browser context';
+}
+
+function refreshStorageBanners() {
+  var jn = (state.journal && state.journal.length) || 0;
+  var tr = (state.trades && state.trades.length) || 0;
+  var he = (state.hermetic && state.hermetic.entries && state.hermetic.entries.length) || 0;
+  var biz = (state.business && state.business.projects && state.business.projects.length) || 0;
+  var html = '<strong>Storage:</strong> ' + storageOriginLabel() +
+    '<br><strong>On this device now:</strong> ' + jn + ' journal · ' + tr + ' trades · ' +
+    he + ' hermetic · ' + biz + ' business' +
+    (lastSaveOk ? '' : '<br><span class="save-bad">Last save failed: ' + escapeHtml(lastSaveError) +
+      ' — try Export JSON, or leave Private Browsing.</span>');
+  var a = document.getElementById('journalStorageBanner');
+  var b = document.getElementById('settingsStorageBanner');
+  if (a) { a.innerHTML = html; }
+  if (b) { b.innerHTML = html; }
+}
+
+function runPrintSheet(buildFn) {
+  var sheet = document.getElementById('printWeekSheet');
+  if (!sheet) {
+    window.alert('Print sheet missing — reopen the latest Life Guide.');
+    return;
+  }
+  buildFn(sheet);
+  sheet.style.display = 'block';
+  sheet.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('is-printing');
+  setTimeout(function () {
+    window.print();
+    setTimeout(function () {
+      document.body.classList.remove('is-printing');
+      sheet.style.display = 'none';
+      sheet.setAttribute('aria-hidden', 'true');
+    }, 600);
+  }, 50);
 }
 
 var state = loadState();
@@ -2525,13 +2605,42 @@ function buildPrintWeekSheet() {
 }
 
 function printWeekPdf() {
-  var sheet = document.getElementById('printWeekSheet');
-  buildPrintWeekSheet();
-  if (sheet) { sheet.style.display = 'block'; }
-  window.print();
-  setTimeout(function () {
-    if (sheet) { sheet.style.display = 'none'; }
-  }, 400);
+  runPrintSheet(function (sheet) {
+    buildPrintWeekSheet();
+    /* buildPrintWeekSheet writes into #printWeekSheet already */
+  });
+}
+
+function buildPrintJournalSheet(sheet) {
+  var entries = (state.journal || []).slice().sort(function (a, b) {
+    return a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
+  });
+  var html;
+  var i;
+  var e;
+  var d;
+  var planet;
+  html = '<h1 style="font-size:1.35rem;margin:0 0 6px;">Arlette · Journal</h1>' +
+    '<p style="margin:0 0 14px;font-size:0.9rem;">' + entries.length + ' entries · printed ' +
+    dateKey(new Date()) + '</p>';
+  if (!entries.length) {
+    html += '<p>No journal entries saved in this browser yet.</p>';
+  } else {
+    for (i = 0; i < entries.length; i++) {
+      e = entries[i];
+      d = new Date(e.date + 'T12:00:00');
+      planet = isNaN(d.getTime()) ? '?' : VARA[d.getDay()].planet;
+      html += '<div class="journal-print-entry">' +
+        '<div class="wd-head" style="font-weight:600;">' + escapeHtml(e.date) + ' · ' + planet + ' day</div>' +
+        '<div style="margin-top:6px;white-space:pre-wrap;">' + escapeHtml(e.body) + '</div></div>';
+    }
+  }
+  html += '<p style="margin-top:18px;font-size:0.75rem;color:#555;">Private contemplative journal · Arlette Life Guide</p>';
+  sheet.innerHTML = html;
+}
+
+function printJournalPdf() {
+  runPrintSheet(buildPrintJournalSheet);
 }
 
 function renderTrades() {
@@ -2770,10 +2879,12 @@ function renderJournal() {
   var e;
   var d;
   var planet;
+  refreshStorageBanners();
   if (entries.length === 0) {
-    list.innerHTML = '<div class="empty-state">No entries yet. The page is quiet — write one true sentence when you are ready.</div>';
+    list.innerHTML = '<div class="empty-state">No entries yet on <em>this</em> browser address. If you wrote elsewhere (Downloads file vs Pages), open that same link — or Import JSON from Settings.</div>';
     return;
   }
+  html += '<p class="approx" style="margin:10px 0 8px;">Showing all ' + entries.length + ' entries saved here (newest first).</p>';
   for (i = 0; i < entries.length; i++) {
     e = entries[i];
     d = new Date(e.date + 'T12:00:00');
@@ -2951,15 +3062,18 @@ function setupHoney() {
 
 function setupJournal() {
   var today = new Date();
+  var msg;
   document.getElementById('journalDate').value = dateKey(today);
   document.getElementById('journalForm').onsubmit = function (ev) {
     var dateVal;
     var bodyVal;
     var j;
+    var ok;
     ev.preventDefault();
     dateVal = document.getElementById('journalDate').value;
     bodyVal = document.getElementById('journalBody').value.trim();
-    if (!dateVal || !bodyVal) { return; }
+    msg = document.getElementById('journalSaveMsg');
+    if (!bodyVal) { return; }
     if (editJournalId) {
       for (j = 0; j < state.journal.length; j++) {
         if (state.journal[j].id === editJournalId) {
@@ -2974,14 +3088,27 @@ function setupJournal() {
       state.journal.push({ id: uid(), date: dateVal, body: bodyVal });
     }
     document.getElementById('journalBody').value = '';
-    saveState();
+    ok = saveState();
     renderJournal();
+    refreshStorageBanners();
+    if (msg) {
+      if (ok) {
+        msg.className = 'save-ok';
+        msg.textContent = 'Saved on this device · ' + state.journal.length + ' journal entries here.';
+      } else {
+        msg.className = 'save-bad';
+        msg.textContent = 'Could not save (' + lastSaveError + '). Export JSON from Settings, or leave Private Browsing / use the Pages link.';
+      }
+    }
   };
   document.getElementById('journalCancelEdit').onclick = function () {
     editJournalId = null;
     document.getElementById('journalBody').value = '';
     document.getElementById('journalCancelEdit').style.display = 'none';
   };
+  if (document.getElementById('printJournalBtn')) {
+    document.getElementById('printJournalBtn').onclick = printJournalPdf;
+  }
 }
 
 function applyDisplayName() {
@@ -3028,7 +3155,10 @@ function setupSettings() {
         renderTradeGate();
         renderTrades();
         renderHoney();
+        if (typeof renderHermetic === 'function') { renderHermetic(); }
+        if (typeof renderBusiness === 'function') { renderBusiness(); }
         renderJournal();
+        refreshStorageBanners();
         document.getElementById('settingsMsg').textContent = 'Import complete.';
       } catch (err) {
         document.getElementById('settingsMsg').textContent = 'Import failed — invalid JSON.';
@@ -3047,7 +3177,10 @@ function setupSettings() {
       renderTradeGate();
       renderTrades();
       renderHoney();
+      if (typeof renderHermetic === 'function') { renderHermetic(); }
+      if (typeof renderBusiness === 'function') { renderBusiness(); }
       renderJournal();
+      refreshStorageBanners();
       document.getElementById('settingsMsg').textContent = 'Reset complete.';
     }
   };
@@ -3539,6 +3672,7 @@ function init() {
   setupJournal();
   renderJournal();
   setupSettings();
+  refreshStorageBanners();
 }
 
 try {
