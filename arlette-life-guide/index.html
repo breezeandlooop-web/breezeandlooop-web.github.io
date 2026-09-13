@@ -714,6 +714,13 @@ body.is-printing #printWeekSheet {
 .biz-filter { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
 .biz-filter button.active { outline: 1px solid var(--gold-soft); }
 
+
+.day-alert-card {
+  margin-top: 12px; padding: 12px 14px; border-radius: 12px;
+  border: 1px solid rgba(200,180,140,0.28); background: rgba(0,0,0,0.18);
+}
+.day-alert-card .approx { margin: 6px 0 0; }
+
 </style>
 </head>
 <body>
@@ -756,6 +763,16 @@ body.is-printing #printWeekSheet {
     <div id="lightsSlot"></div>
     <div id="gateSlot"></div>
     <div id="matterSlot"></div>
+    <div class="card day-alert-card" id="dayAlertCard">
+      <div class="eyebrow">Day alerts</div>
+      <h2 style="font-size:1.05rem;margin:4px 0 0;">Browser notification</h2>
+      <p class="approx">Optional OS banner while this site is allowed. For a morning push even when the page is closed, use the Jupiter chat day-card (8:10 AM Barbados).</p>
+      <div class="btn-row" style="margin-top:10px;">
+        <button type="button" class="btn" id="enableDayAlertBtn">Enable day alerts</button>
+        <button type="button" class="btn btn-ghost" id="testDayAlertBtn">Send today’s alert now</button>
+      </div>
+      <p class="approx" id="dayAlertMsg" style="margin-top:8px;"></p>
+    </div>
     <div class="card" id="todayCard">
       <div class="eyebrow" id="todayDateLabel">Today</div>
       <h2 id="todayVaraTitle">Daily Life Guide</h2>
@@ -1219,7 +1236,7 @@ body.is-printing #printWeekSheet {
     </div>
   </section>
 
-  <footer class="app-foot">Arlette Life Guide · v1.4.7</footer>
+  <footer class="app-foot">Arlette Life Guide · v1.4.8</footer>
 </div>
 
 <script>
@@ -3643,6 +3660,99 @@ function renderBusiness() {
 
 
 
+
+var DAY_ALERT_KEY = 'arletteDayAlertLast';
+
+function dayAlertPermission() {
+  if (typeof Notification === 'undefined') { return 'unsupported'; }
+  return Notification.permission;
+}
+
+function todayAlertBody() {
+  var d = new Date();
+  var v = VARA[d.getDay()];
+  var herm = (typeof HERM_DAY !== 'undefined' && HERM_DAY[d.getDay()]) ? HERM_DAY[d.getDay()] : null;
+  var line = v.name + ' · ' + v.planet + ' day';
+  if (herm) {
+    line += ' · ' + herm.principle + '. ' + herm.line;
+  } else {
+    line += '. Open Life Guide for today’s practices.';
+  }
+  if (line.length > 180) { line = line.slice(0, 177) + '…'; }
+  return line;
+}
+
+function showDayNotification(force) {
+  var msg = document.getElementById('dayAlertMsg');
+  var today = dateKey(new Date());
+  var last;
+  if (typeof Notification === 'undefined') {
+    if (msg) { msg.textContent = 'This browser does not support notifications.'; }
+    return;
+  }
+  if (Notification.permission !== 'granted') {
+    if (msg) { msg.textContent = 'Alerts not enabled yet — tap Enable day alerts.'; }
+    return;
+  }
+  try { last = localStorage.getItem(DAY_ALERT_KEY); } catch (e) { last = null; }
+  if (!force && last === today) {
+    if (msg) { msg.textContent = 'Already sent today’s browser alert on this device.'; }
+    return;
+  }
+  try {
+    new Notification('Arlette · ' + VARA[new Date().getDay()].planet + ' day', {
+      body: todayAlertBody(),
+      tag: 'arlette-day-' + today
+    });
+    try { localStorage.setItem(DAY_ALERT_KEY, today); } catch (e2) { /* ignore */ }
+    if (msg) { msg.textContent = 'Day alert sent. (Browser banners need site permission; morning push also comes via Jupiter chat at 8:10.)'; }
+  } catch (err) {
+    if (msg) { msg.textContent = 'Could not show notification.'; }
+  }
+}
+
+function refreshDayAlertMsg() {
+  var msg = document.getElementById('dayAlertMsg');
+  var p;
+  if (!msg) { return; }
+  p = dayAlertPermission();
+  if (p === 'unsupported') {
+    msg.textContent = 'Notifications unsupported here — rely on the Jupiter morning day-card.';
+  } else if (p === 'granted') {
+    msg.textContent = 'Browser day alerts enabled for this site.';
+  } else if (p === 'denied') {
+    msg.textContent = 'Blocked in browser settings — allow notifications for this site, or use Jupiter chat push at 8:10.';
+  } else {
+    msg.textContent = 'Not enabled yet.';
+  }
+}
+
+function setupDayAlerts() {
+  var en = document.getElementById('enableDayAlertBtn');
+  var test = document.getElementById('testDayAlertBtn');
+  refreshDayAlertMsg();
+  if (en) {
+    en.onclick = function () {
+      var msg = document.getElementById('dayAlertMsg');
+      if (typeof Notification === 'undefined') {
+        if (msg) { msg.textContent = 'Notifications unsupported in this browser.'; }
+        return;
+      }
+      Notification.requestPermission().then(function (perm) {
+        refreshDayAlertMsg();
+        if (perm === 'granted') { showDayNotification(true); }
+      });
+    };
+  }
+  if (test) {
+    test.onclick = function () { showDayNotification(true); };
+  }
+  if (dayAlertPermission() === 'granted') {
+    showDayNotification(false);
+  }
+}
+
+
 function init() {
   document.documentElement.classList.add('js');
   var hint = document.getElementById('openHint');
@@ -3651,6 +3761,7 @@ function init() {
   }
   renderNav();
   applyDisplayName();
+  setupDayAlerts();
   renderToday();
   renderLab();
   renderWeek();
