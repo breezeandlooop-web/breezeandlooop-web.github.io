@@ -721,6 +721,19 @@ body.is-printing #printWeekSheet {
 }
 .day-alert-card .approx { margin: 6px 0 0; }
 
+
+.grat-grid { display: grid; gap: 8px; margin-top: 8px; }
+.grat-grid input {
+  width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--card-border);
+  background: rgba(0,0,0,0.2); color: var(--text); font-size: 0.88rem; box-sizing: border-box;
+}
+.grat-status { font-size: 0.8rem; color: var(--gold-soft); margin-top: 8px; }
+.grat-history-item {
+  border-left: 3px solid var(--gold-soft); padding: 8px 12px; margin: 8px 0;
+  background: rgba(0,0,0,0.15); border-radius: 0 10px 10px 0; font-size: 0.84rem; color: var(--text-dim);
+}
+.grat-history-item strong { color: var(--gold-pale); }
+
 </style>
 </head>
 <body>
@@ -752,6 +765,7 @@ body.is-printing #printWeekSheet {
   <button type="button" data-go="trading">Trading</button>
   <button type="button" data-go="honey">Honey Tasks</button>
   <button type="button" data-go="hermetic">Hermetic</button>
+  <button type="button" data-go="gratitude">Gratitude</button>
   <button type="button" data-go="business">Business Hub</button>
   <button type="button" data-go="journal">Journal</button>
   <button type="button" data-go="settings">Settings</button>
@@ -1207,6 +1221,40 @@ body.is-printing #printWeekSheet {
     </div>
   </section>
 
+
+  <!-- GRATITUDE -->
+  <section class="panel" id="panel-gratitude" data-section="gratitude">
+    <div class="card">
+      <div class="eyebrow">Morning · Evening · five each</div>
+      <h2>Gratitude</h2>
+      <p class="approx">Required practice: <strong>5 morning</strong> and <strong>5 evening</strong> each day. Concrete beats vague. Saves on this browser — Export JSON to keep a backup.</p>
+      <p class="approx" id="gratTodayLabel"></p>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <div class="eyebrow">Sunrise list</div>
+      <h2>Morning · 5</h2>
+      <form class="trade-form" id="gratMorningForm">
+        <div class="grat-grid" id="gratMorningInputs"></div>
+        <div class="btn-row" style="margin-top:10px;"><button type="submit" class="btn">Save morning gratitude</button></div>
+        <p class="grat-status" id="gratMorningStatus"></p>
+      </form>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <div class="eyebrow">Sunset list</div>
+      <h2>Evening · 5</h2>
+      <form class="trade-form" id="gratEveningForm">
+        <div class="grat-grid" id="gratEveningInputs"></div>
+        <div class="btn-row" style="margin-top:10px;"><button type="submit" class="btn">Save evening gratitude</button></div>
+        <p class="grat-status" id="gratEveningStatus"></p>
+      </form>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <div class="eyebrow">Trail</div>
+      <h2>Recent days</h2>
+      <div id="gratHistory"></div>
+    </div>
+  </section>
+
   <!-- 8. JOURNAL -->
   <section class="panel" id="panel-journal" data-section="journal">
     <div class="card">
@@ -1254,7 +1302,7 @@ body.is-printing #printWeekSheet {
     </div>
   </section>
 
-  <footer class="app-foot">Arlette Life Guide · v1.4.9</footer>
+  <footer class="app-foot">Arlette Life Guide · v1.5.0</footer>
 </div>
 
 <script>
@@ -1453,6 +1501,7 @@ var SECTIONS = [
   { id: 'trading', label: 'Trading' },
   { id: 'honey', label: 'Honey Tasks' },
   { id: 'hermetic', label: 'Hermetic' },
+  { id: 'gratitude', label: 'Gratitude' },
   { id: 'business', label: 'Business Hub' },
   { id: 'journal', label: 'Journal' },
   { id: 'settings', label: 'Settings' }
@@ -1533,6 +1582,7 @@ function defaultState() {
     tradeGate: {},
     trades: [],
     hermetic: { entries: [], create: {} },
+    gratitude: {},
     business: { projects: [], seededCrm: false },
     editingId: null,
     matter: {},
@@ -1555,6 +1605,7 @@ function normalizeState(parsed) {
   if (!parsed.hermetic) { parsed.hermetic = { entries: [], create: {} }; }
   if (!parsed.hermetic.entries) { parsed.hermetic.entries = []; }
   if (!parsed.hermetic.create) { parsed.hermetic.create = {}; }
+  if (!parsed.gratitude || typeof parsed.gratitude !== 'object') { parsed.gratitude = {}; }
   if (!parsed.business) { parsed.business = { projects: [], seededCrm: false }; }
   if (!parsed.business.projects) { parsed.business.projects = []; }
   if (typeof parsed.business.seededCrm !== 'boolean') { parsed.business.seededCrm = false; }
@@ -1622,9 +1673,10 @@ function refreshStorageBanners() {
   var tr = (state.trades && state.trades.length) || 0;
   var he = (state.hermetic && state.hermetic.entries && state.hermetic.entries.length) || 0;
   var biz = (state.business && state.business.projects && state.business.projects.length) || 0;
+  var gd = state.gratitude ? Object.keys(state.gratitude).length : 0;
   var html = '<strong>Storage:</strong> ' + storageOriginLabel() +
     '<br><strong>On this device now:</strong> ' + jn + ' journal · ' + tr + ' trades · ' +
-    he + ' hermetic · ' + biz + ' business' +
+    he + ' hermetic · ' + biz + ' business · ' + gd + ' gratitude days' +
     (lastSaveOk ? '' : '<br><span class="save-bad">Last save failed: ' + escapeHtml(lastSaveError) +
       ' — try Export JSON, or leave Private Browsing.</span>');
   var a = document.getElementById('journalStorageBanner');
@@ -3192,6 +3244,7 @@ function setupSettings() {
         renderHoney();
         if (typeof renderHermetic === 'function') { renderHermetic(); }
         if (typeof renderBusiness === 'function') { renderBusiness(); }
+        if (typeof setupGratitude === 'function') { setupGratitude(); }
         renderJournal();
         refreshStorageBanners();
         document.getElementById('settingsMsg').textContent = 'Import complete.';
@@ -3214,6 +3267,7 @@ function setupSettings() {
       renderHoney();
       if (typeof renderHermetic === 'function') { renderHermetic(); }
       if (typeof renderBusiness === 'function') { renderBusiness(); }
+      if (typeof setupGratitude === 'function') { setupGratitude(); }
       renderJournal();
       refreshStorageBanners();
       document.getElementById('settingsMsg').textContent = 'Reset complete.';
@@ -3771,6 +3825,149 @@ function setupDayAlerts() {
 }
 
 
+
+function gratDay(dateStr) {
+  if (!state.gratitude[dateStr]) {
+    state.gratitude[dateStr] = {
+      morning: ['', '', '', '', ''],
+      evening: ['', '', '', '', '']
+    };
+  }
+  if (!state.gratitude[dateStr].morning || state.gratitude[dateStr].morning.length !== 5) {
+    state.gratitude[dateStr].morning = ['', '', '', '', ''];
+  }
+  if (!state.gratitude[dateStr].evening || state.gratitude[dateStr].evening.length !== 5) {
+    state.gratitude[dateStr].evening = ['', '', '', '', ''];
+  }
+  return state.gratitude[dateStr];
+}
+
+function gratFilled(arr) {
+  var n = 0;
+  var i;
+  for (i = 0; i < 5; i++) {
+    if (arr[i] && String(arr[i]).trim()) { n++; }
+  }
+  return n;
+}
+
+function renderGratInputs(slot) {
+  var today = dateKey(new Date());
+  var day = gratDay(today);
+  var box = document.getElementById(slot === 'morning' ? 'gratMorningInputs' : 'gratEveningInputs');
+  var status = document.getElementById(slot === 'morning' ? 'gratMorningStatus' : 'gratEveningStatus');
+  var arr = day[slot];
+  var html = '';
+  var i;
+  var n;
+  if (!box) { return; }
+  for (i = 0; i < 5; i++) {
+    html += '<label for="grat-' + slot + '-' + i + '">' + (i + 1) + '</label>' +
+      '<input type="text" id="grat-' + slot + '-' + i + '" maxlength="160" placeholder="I am grateful for…" value="' +
+      escapeHtml(arr[i] || '') + '">';
+  }
+  box.innerHTML = html;
+  n = gratFilled(arr);
+  if (status) {
+    status.textContent = n === 5
+      ? 'Complete · 5/5 ' + slot + ' saved for today.'
+      : n + '/5 filled — save when you have five.';
+  }
+}
+
+function renderGratHistory() {
+  var el = document.getElementById('gratHistory');
+  var keys;
+  var html = '';
+  var i;
+  var k;
+  var d;
+  var m;
+  var e;
+  if (!el) { return; }
+  keys = Object.keys(state.gratitude || {}).sort(function (a, b) {
+    return a < b ? 1 : a > b ? -1 : 0;
+  });
+  if (!keys.length) {
+    el.innerHTML = '<p class="honey-empty">No gratitude days yet. Fill morning or evening above.</p>';
+    return;
+  }
+  for (i = 0; i < Math.min(keys.length, 14); i++) {
+    k = keys[i];
+    d = state.gratitude[k];
+    m = gratFilled(d.morning || []);
+    e = gratFilled(d.evening || []);
+    html += '<div class="grat-history-item"><strong>' + escapeHtml(k) + '</strong> · morning ' + m + '/5 · evening ' + e + '/5';
+    if (m === 5) {
+      html += '<br>AM: ' + escapeHtml((d.morning || []).filter(function (x) { return x && String(x).trim(); }).join(' · '));
+    }
+    if (e === 5) {
+      html += '<br>PM: ' + escapeHtml((d.evening || []).filter(function (x) { return x && String(x).trim(); }).join(' · '));
+    }
+    html += '</div>';
+  }
+  el.innerHTML = html;
+}
+
+function saveGratSlot(slot) {
+  var today = dateKey(new Date());
+  var day = gratDay(today);
+  var arr = [];
+  var i;
+  var val;
+  var status = document.getElementById(slot === 'morning' ? 'gratMorningStatus' : 'gratEveningStatus');
+  var ok;
+  for (i = 0; i < 5; i++) {
+    val = document.getElementById('grat-' + slot + '-' + i);
+    arr.push(val ? val.value.trim() : '');
+  }
+  if (gratFilled(arr) < 5) {
+    if (status) {
+      status.textContent = 'Need all 5 before saving · ' + gratFilled(arr) + '/5 so far.';
+    }
+    return;
+  }
+  day[slot] = arr;
+  ok = saveState();
+  renderGratInputs(slot);
+  renderGratHistory();
+  refreshStorageBanners();
+  if (status) {
+    status.textContent = ok
+      ? 'Saved · 5/5 ' + slot + ' gratitude for ' + today + '.'
+      : 'Could not save — Export JSON from Settings or check Private Browsing.';
+  }
+}
+
+function setupGratitude() {
+  var label = document.getElementById('gratTodayLabel');
+  var mf = document.getElementById('gratMorningForm');
+  var ef = document.getElementById('gratEveningForm');
+  if (label) {
+    label.textContent = 'Today · ' + dateKey(new Date()) + ' · Jupiter chat also remotes you at 8:15 AM and 7:15 PM.';
+  }
+  renderGratInputs('morning');
+  renderGratInputs('evening');
+  renderGratHistory();
+  if (mf) {
+    mf.onsubmit = function (ev) {
+      ev.preventDefault();
+      saveGratSlot('morning');
+    };
+  }
+  if (ef) {
+    ef.onsubmit = function (ev) {
+      ev.preventDefault();
+      saveGratSlot('evening');
+    };
+  }
+}
+
+function renderGratitude() {
+  setupGratitude();
+}
+
+
 function init() {
   document.documentElement.classList.add('js');
   var hint = document.getElementById('openHint');
@@ -3796,6 +3993,7 @@ function init() {
   renderHoney();
   setupHermetic();
   renderHermetic();
+  setupGratitude();
   setupBusiness();
   renderBusiness();
   setupJournal();
