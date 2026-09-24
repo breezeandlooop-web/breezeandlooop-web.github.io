@@ -656,6 +656,9 @@
       <nav id="nav"></nav>
       <div class="aside-actions">
         <button class="btn primary" type="button" id="btnExport">Export as text</button>
+        <button class="btn" type="button" id="btnExportJson">Export data (JSON)</button>
+        <button class="btn" type="button" id="btnImportJson">Import data (JSON)</button>
+        <input type="file" id="importFile" accept="application/json,.json" hidden />
         <button class="btn" type="button" id="btnClear">Clear all fields</button>
       </div>
       <div class="save-status" id="saveStatus">Saves on this device only</div>
@@ -2883,6 +2886,31 @@ function downloadBlob(filename, content, mime) {
   URL.revokeObjectURL(a.href);
 }
 
+
+function importJSONBackup(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      const incoming = parsed && parsed.data && typeof parsed.data === "object" ? parsed.data : parsed;
+      if (!incoming || typeof incoming !== "object") throw new Error("No OS data in file");
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(incoming));
+      if (parsed && parsed.active) localStorage.setItem("arlette-os-active", parsed.active);
+      data = load();
+      if (parsed && parsed.active) active = parsed.active;
+      save();
+      render();
+      const status = document.getElementById("saveStatus");
+      if (status) status.textContent = "Imported from " + (file.name || "JSON") + " — saved on this device";
+    } catch (e) {
+      alert("Could not import that file. Use an Arlette OS JSON export.\n\n" + (e && e.message ? e.message : e));
+    }
+  };
+  reader.onerror = () => alert("Could not read that file.");
+  reader.readAsText(file);
+}
+
 function exportJSONBackup() {
   const stamp = new Date().toISOString().slice(0, 16).replace("T", "_").replace(":", "-");
   const payload = {
@@ -2917,6 +2945,17 @@ function runAutoBackupIfRequested() {
 }
 
 document.getElementById("btnExport").addEventListener("click", exportText);
+document.getElementById("btnExportJson").addEventListener("click", exportJSONBackup);
+document.getElementById("btnImportJson").addEventListener("click", () => {
+  document.getElementById("importFile").click();
+});
+document.getElementById("importFile").addEventListener("change", (e) => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  if (!confirm("Replace all fields on THIS device with the imported file? Current phone/Mac data here will be overwritten.")) return;
+  importJSONBackup(file);
+});
 document.getElementById("btnClear").addEventListener("click", () => {
   if (!confirm("Clear every field in Arlette OS? This cannot be undone.")) return;
   data = { intention: { ...INTENTION_DEFAULTS }, money: { ...MONEY_DEFAULTS }, offer: { ...OFFER_DEFAULTS }, classes: { ...CLASSES_DEFAULTS }, body: { ...BODY_DEFAULTS }, time: { ...TIME_DEFAULTS } };
