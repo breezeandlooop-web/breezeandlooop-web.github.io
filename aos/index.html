@@ -1,0 +1,2931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Arlette OS</title>
+<style>
+  :root {
+    --cream: #f6f0e6;
+    --paper: #fbf7f0;
+    --sand: #e9e0d2;
+    --olive: #5a6b48;
+    --olive-deep: #3f4c34;
+    --terracotta: #b56a4c;
+    --gold: #c4a574;
+    --ink: #2b2925;
+    --muted: #7a746a;
+    --line: #ddd4c5;
+    --shadow: 0 10px 40px rgba(43, 41, 37, 0.06);
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgba(196, 165, 116, 0.18), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(90, 107, 72, 0.12), transparent 55%),
+      var(--cream);
+    line-height: 1.5;
+  }
+  .shell {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  aside {
+    padding: 2.25rem 1.5rem;
+    border-right: 1px solid var(--line);
+    background: rgba(251, 247, 240, 0.65);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  .mark {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.55rem;
+    letter-spacing: 0.02em;
+    color: var(--olive-deep);
+    margin: 0 0 0.25rem;
+  }
+  .mark span { color: var(--terracotta); }
+  .tagline { font-size: 0.8rem; color: var(--muted); margin: 0 0 2rem; }
+  nav { display: flex; flex-direction: column; gap: 0.35rem; }
+  nav button {
+    appearance: none; border: 0; background: transparent; text-align: left;
+    padding: 0.7rem 0.85rem; border-radius: 12px; color: var(--ink);
+    font: inherit; font-size: 0.95rem; cursor: pointer;
+  }
+  nav button:hover { background: var(--sand); }
+  nav button.active { background: var(--olive); color: var(--paper); }
+  .aside-actions { margin-top: 2rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  .btn {
+    appearance: none; border: 1px solid var(--line); background: var(--paper);
+    color: var(--ink); border-radius: 999px; padding: 0.55rem 0.9rem;
+    font: inherit; font-size: 0.85rem; cursor: pointer;
+  }
+  .btn:hover { border-color: var(--gold); }
+  .btn.primary { background: var(--terracotta); border-color: var(--terracotta); color: #fff; }
+  .save-status { font-size: 0.75rem; color: var(--muted); min-height: 1.2em; margin-top: 0.75rem; }
+  .js-fallback {
+    max-width: 28rem;
+    margin: 1.5rem auto;
+    padding: 1.25rem 1.35rem;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .js-fallback h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--olive-deep);
+    margin: 0 0 0.6rem;
+  }
+  .js-fallback p { margin: 0 0 0.7rem; color: var(--ink); font-size: 0.95rem; }
+  .js-fallback ol { margin: 0 0 0.7rem; padding-left: 1.2rem; color: var(--ink); }
+  .js-fallback li { margin-bottom: 0.35rem; }
+  .js-fallback .muted { color: var(--muted); font-size: 0.85rem; margin: 0; }
+  main { padding: 2.25rem 2.5rem 3.5rem; }
+  .panel { display: none; }
+  .panel.active { display: block; animation: rise 0.25s ease; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+  }
+  .hero { margin-bottom: 1.35rem; }
+  .hero h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 500; font-size: 2rem; margin: 0 0 0.35rem; color: var(--olive-deep);
+  }
+  .hero p { margin: 0; color: var(--muted); max-width: 40rem; }
+  .card {
+    background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 1.25rem 1.35rem 1.4rem; margin-bottom: 1rem;
+  }
+  .card h2 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.05rem; font-weight: 500; margin: 0 0 0.9rem; color: var(--terracotta);
+  }
+  label.field { display: block; margin-bottom: 0.85rem; }
+  label.field span, .field-label {
+    display: block; font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--muted); margin-bottom: 0.35rem;
+  }
+  textarea, input[type="text"], input[type="number"] {
+    width: 100%; border: 1px solid var(--line); background: var(--cream);
+    border-radius: 12px; padding: 0.7rem 0.8rem; font: inherit; color: var(--ink);
+  }
+  textarea { resize: vertical; min-height: 2.6rem; }
+  textarea.tall { min-height: 5rem; }
+  textarea:focus, input:focus {
+    outline: 2px solid rgba(196, 165, 116, 0.55);
+    border-color: var(--gold); background: #fff;
+  }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem 1rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.85rem; }
+  footer.note, .note { margin-top: 1.25rem; font-size: 0.8rem; color: var(--muted); }
+
+  /* Money-specific */
+  .balance-tile {
+    background: linear-gradient(160deg, #fffdf9, var(--cream));
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 1rem 1rem 1.1rem;
+  }
+  .balance-tile.total {
+    background: linear-gradient(160deg, var(--olive), var(--olive-deep));
+    border-color: var(--olive-deep);
+    color: #f7f1e8;
+  }
+  .balance-tile.total .field-label { color: rgba(247, 241, 230, 0.75); }
+  .balance-tile.trading { border-color: rgba(181, 106, 76, 0.35); }
+  .balance-input {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.75rem;
+    font-weight: 500;
+    border: 0 !important;
+    background: transparent !important;
+    padding: 0.15rem 0 !important;
+    outline: none !important;
+    width: 100%;
+    color: inherit;
+  }
+  .balance-tile.total .balance-input { color: #f7f1e8; cursor: default; }
+  .currency {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 0.15rem;
+  }
+  .balance-tile.total .currency { color: rgba(196, 165, 116, 0.95); }
+  .split-row {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 1rem;
+  }
+  .hint {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin: -0.35rem 0 0.9rem;
+  }
+  .tool-block {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 0.95rem 1rem 1rem;
+    margin: 0 0 0.85rem;
+    background: linear-gradient(160deg, #fffdf9, var(--cream));
+  }
+  .tool-block.pain { border-color: rgba(181, 106, 76, 0.45); }
+  .tool-block.gain { border-color: rgba(90, 107, 72, 0.45); }
+  .tool-block.structure { border-color: rgba(180, 150, 50, 0.55); }
+  .tool-block.structure .tool-title { color: #8a7340; }
+  .tool-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1rem;
+    color: var(--olive-deep);
+    margin: 0 0 0.45rem;
+  }
+  .tool-block.pain .tool-title { color: var(--terracotta); }
+  .tool-purpose, .tool-use {
+    margin: 0 0 0.55rem;
+    font-size: 0.9rem;
+    color: var(--ink);
+  }
+  .tool-use { margin-bottom: 0; }
+  .soon { opacity: 0.7; font-style: italic; }
+
+
+  /* Offer & Work */
+  .lane-tile {
+    background: linear-gradient(160deg, #fffdf9, var(--cream));
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 1rem 1.05rem 1.1rem;
+  }
+  .lane-tile.hire { border-color: rgba(90, 107, 72, 0.4); }
+  .lane-tile.sell { border-color: rgba(181, 106, 76, 0.4); }
+  .lane-kicker {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 0.35rem;
+  }
+  .lane-tile.hire .lane-kicker { color: var(--olive); }
+  .lane-tile.sell .lane-kicker { color: var(--terracotta); }
+  .lane-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.15rem;
+    margin: 0 0 0.65rem;
+    color: var(--olive-deep);
+  }
+  .pipe-col {
+    background: linear-gradient(160deg, #fffdf9, var(--cream));
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 0.85rem 0.9rem 1rem;
+  }
+  .pipe-col h3 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin: 0 0 0.55rem;
+    color: var(--terracotta);
+  }
+
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    aside { position: relative; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    nav { flex-direction: row; flex-wrap: wrap; }
+    .grid-2, .grid-3, .grid-4, .split-row { grid-template-columns: 1fr; }
+    main { padding: 1.5rem 1.15rem 2.5rem; }
+  }
+
+  .lanes-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .lane-tile .steps-wrap {
+    margin: 0.35rem 0 0.75rem;
+    padding: 0.75rem 0.8rem;
+    background: rgba(246, 240, 230, 0.65);
+    border-radius: 12px;
+    border: 1px dashed var(--line);
+  }
+  .lane-tile .steps-wrap .field { margin-bottom: 0.55rem; }
+  .lane-tile .steps-wrap .field:last-child { margin-bottom: 0; }
+  .field-label {
+    display: block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 0.45rem;
+  }
+  .lane-head { margin-bottom: 0.35rem; }
+  .lane-name-field span { display: none; }
+  .lane-name-field input {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--olive-deep);
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    padding: 0.25rem 0 0.4rem;
+  }
+  .lane-tile.brand { border-color: rgba(196, 165, 116, 0.55); }
+  .lane-tile.brand .lane-kicker { color: #8a7340; }
+  .lane-tile.delivery { border-color: rgba(90, 107, 72, 0.35); }
+  @media (max-width: 900px) {
+    .lanes-grid { grid-template-columns: 1fr; }
+  }
+
+
+  .class-col {
+    background: linear-gradient(160deg, #fffdf9, var(--cream));
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 0.85rem 0.9rem 1rem;
+  }
+  .class-col h3 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin: 0 0 0.55rem;
+  }
+  .class-col.in-progress { border-color: rgba(90, 107, 72, 0.45); }
+  .class-col.in-progress h3 { color: var(--olive); }
+  .class-col.completed { border-color: rgba(196, 165, 116, 0.55); }
+  .class-col.completed h3 { color: #8a7340; }
+  .class-col.dropped { border-color: rgba(122, 116, 106, 0.45); }
+  .class-col.dropped h3 { color: var(--muted); }
+
+
+  .classes-focus {
+    border-color: rgba(90, 107, 72, 0.35);
+  }
+  .classes-board .class-col textarea.classes-list {
+    min-height: 14rem;
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+
+
+  .body-brief { border-color: rgba(181, 106, 76, 0.35); }
+  .body-staples { border-color: rgba(90, 107, 72, 0.35); }
+  .body-weekly { border-color: rgba(196, 165, 116, 0.45); }
+  .body-supplements { border-color: rgba(181, 106, 76, 0.4); }
+  .body-fiber { border-color: rgba(90, 107, 72, 0.45); }
+  .item-list-row.flat { grid-template-columns: auto 1fr auto; }
+  .item-list-add.flat { grid-template-columns: 1fr auto; }
+  .workout-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+    margin: 0.75rem 0 1rem;
+  }
+  .workout-tile {
+    background: linear-gradient(160deg, #fffdf9, var(--cream));
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 0.85rem 0.9rem 1rem;
+  }
+  .workout-tile.strength { border-color: rgba(181, 106, 76, 0.4); }
+  .workout-tile.pilates { border-color: rgba(90, 107, 72, 0.4); }
+  .workout-tile.yoga { border-color: rgba(196, 165, 116, 0.55); }
+  .workout-tile.cardio { border-color: rgba(90, 107, 72, 0.3); }
+  @media (max-width: 900px) {
+    .workout-grid { grid-template-columns: 1fr; }
+  }
+
+
+  .item-list { margin-top: 0.55rem; }
+  .item-list-ul {
+    list-style: none;
+    margin: 0 0 0.75rem;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .item-list-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 0.55rem;
+    align-items: center;
+    background: linear-gradient(160deg, #fffdf9, var(--cream));
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 0.4rem 0.5rem 0.4rem 0.55rem;
+  }
+  .item-list-row.done {
+    opacity: 0.62;
+  }
+  .item-list-row.done .item-list-text {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .item-list-row input[type="checkbox"] {
+    width: 1.05rem;
+    height: 1.05rem;
+    accent-color: var(--olive);
+  }
+  .item-list-text {
+    border: 0 !important;
+    background: transparent !important;
+    padding: 0.25rem 0 !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+  .item-list-del {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0.15rem 0.35rem;
+    border-radius: 8px;
+  }
+  .item-list-del:hover { color: var(--terracotta); background: rgba(181, 106, 76, 0.08); }
+  .item-list-empty {
+    color: var(--muted);
+    font-size: 0.9rem;
+    padding: 0.55rem 0.2rem;
+  }
+  .item-list-add {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.5rem;
+    margin-bottom: 0.55rem;
+  }
+  .item-group {
+    margin-top: 0.9rem;
+  }
+  .item-group:first-child {
+    margin-top: 0.2rem;
+  }
+  .item-group-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--olive);
+    margin: 0 0 0.4rem;
+    letter-spacing: 0.02em;
+  }
+  select.item-list-group {
+    appearance: none;
+    border: 1px solid var(--line);
+    background: #fffdf9;
+    color: var(--ink);
+    border-radius: 10px;
+    padding: 0.3rem 0.55rem;
+    font-size: 0.78rem;
+    max-width: 9.5rem;
+    cursor: pointer;
+  }
+  select.item-list-group:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+  .item-list-add select.item-list-group {
+    max-width: 10.5rem;
+  }
+  .item-list-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+  .btn.ghost {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--muted);
+  }
+  .btn.ghost:hover { border-color: var(--gold); color: var(--ink); }
+
+
+  /* Time & Rhythm · astrology */
+  .time-frame { border-color: rgba(196, 165, 116, 0.5); }
+  .time-frame .frame-meta {
+    font-size: 0.82rem; color: var(--muted); margin: 0 0 0.75rem;
+  }
+  .today-strip {
+    display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: start;
+    background: linear-gradient(160deg, #fffdf9, var(--cream));
+    border: 1px solid var(--line); border-radius: 14px; padding: 0.9rem 1rem;
+  }
+  .today-glyph {
+    font-size: 2rem; line-height: 1; color: var(--olive-deep);
+    width: 3rem; height: 3rem; display: grid; place-items: center;
+    border-radius: 50%; background: rgba(90, 107, 72, 0.1);
+  }
+  .today-strip .kicker {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);
+  }
+  .today-strip .day-name {
+    font-family: Georgia, "Times New Roman", serif; font-size: 1.15rem; color: var(--olive-deep); margin: 0.15rem 0;
+  }
+  .planet-board {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem; margin-top: 0.75rem;
+  }
+  @media (max-width: 980px) {
+    .planet-board { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 640px) {
+    .planet-board { grid-template-columns: 1fr; }
+  }
+  .planet-card {
+    background: linear-gradient(160deg, #fffdf9, var(--cream));
+    border: 1px solid var(--line); border-radius: 14px; padding: 0.85rem 0.9rem 1rem;
+  }
+  .planet-card .pc-top { display: flex; gap: 0.55rem; align-items: baseline; margin-bottom: 0.35rem; }
+  .planet-card .pc-glyph { font-size: 1.25rem; color: var(--terracotta); }
+  .planet-card .pc-name {
+    font-family: Georgia, "Times New Roman", serif; font-size: 1rem; color: var(--olive-deep);
+  }
+  .planet-card .pc-sanskrit { font-size: 0.75rem; color: var(--muted); margin-left: auto; }
+  .planet-card .pc-sign { font-size: 0.78rem; color: #8a7340; margin-bottom: 0.45rem; }
+  .planet-card .pc-label {
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0.35rem 0 0.15rem;
+  }
+  .planet-card .pc-gift, .planet-card .pc-lesson { font-size: 0.86rem; margin: 0; color: var(--ink); }
+  .planet-card .pc-lesson { color: var(--muted); }
+  .planet-card textarea {
+    margin-top: 0.45rem; min-height: 3.2rem; font-size: 0.86rem;
+  }
+  .polarity-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;
+  }
+  @media (max-width: 800px) { .polarity-grid { grid-template-columns: 1fr; } }
+  .card.strength-panel { border-color: rgba(90, 107, 72, 0.45); }
+  .card.soft-panel { border-color: rgba(181, 106, 76, 0.4); }
+  .polarity-list { margin: 0 0 0.75rem; padding-left: 1.1rem; font-size: 0.9rem; }
+  .polarity-list li { margin-bottom: 0.35rem; }
+  .week-rhythm {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; margin-top: 0.6rem;
+  }
+  @media (max-width: 900px) { .week-rhythm { grid-template-columns: 1fr 1fr; } }
+  .week-day-card {
+    background: linear-gradient(160deg, #fffdf9, var(--cream));
+    border: 1px solid var(--line); border-radius: 12px; padding: 0.55rem 0.55rem 0.65rem;
+  }
+  .week-day-card.is-today { border-color: var(--gold); box-shadow: 0 0 0 1px rgba(196,165,116,0.35); }
+  .week-day-card .wd-name { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+  .week-day-card .wd-planet {
+    font-family: Georgia, "Times New Roman", serif; font-size: 0.92rem; color: var(--olive-deep); margin: 0.15rem 0 0.35rem;
+  }
+  .week-day-card textarea { min-height: 3.4rem; font-size: 0.8rem; padding: 0.45rem; }
+
+  /* Intention cycle */
+  .intention-quote {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.05rem;
+    color: var(--olive-deep);
+    font-style: italic;
+    margin: 0 0 0.85rem;
+    max-width: 36rem;
+  }
+  .cycle-flow {
+    font-size: 0.8rem;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+    margin: 0 0 0.85rem;
+  }
+  .intention-cycle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+  }
+  .cycle-stage {
+    background: linear-gradient(160deg, #fffdf9, var(--cream));
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 1rem 1.05rem 1.1rem;
+  }
+  .cycle-stage .stage-kicker {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--gold);
+    margin-bottom: 0.25rem;
+  }
+  .cycle-stage .stage-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.15rem;
+    margin: 0 0 0.25rem;
+    color: var(--olive-deep);
+  }
+  .cycle-stage .stage-want {
+    font-size: 0.9rem;
+    color: var(--ink);
+    margin: 0 0 0.3rem;
+  }
+  .cycle-stage .stage-line {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-style: italic;
+    margin: 0 0 0.75rem;
+  }
+  .cycle-note {
+    margin: 0.85rem 0 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+    max-width: 40rem;
+  }
+  @media (max-width: 900px) {
+    .intention-cycle { grid-template-columns: 1fr; }
+  }
+
+  /* Three Timelines */
+  .horizons-bridge {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: 0 0 0.85rem;
+    max-width: 40rem;
+  }
+  .timelines-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.85rem;
+  }
+  .timeline-card {
+    background: linear-gradient(160deg, #fffdf9, var(--cream));
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 1rem 1.05rem 1.1rem;
+  }
+  .timeline-card .tl-kicker {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--gold);
+    margin-bottom: 0.25rem;
+  }
+  .timeline-card .tl-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.1rem;
+    margin: 0 0 0.2rem;
+    color: var(--olive-deep);
+  }
+  .timeline-card .tl-sub {
+    font-size: 0.85rem;
+    color: var(--ink);
+    margin: 0 0 0.55rem;
+  }
+  .timeline-card .tl-prompt {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-style: italic;
+    margin: 0 0 0.65rem;
+  }
+  .timeline-card .tl-chips {
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+    margin: 0 0 0.65rem;
+  }
+  .timeline-card textarea.tall {
+    min-height: 5.5rem;
+  }
+  @media (max-width: 900px) {
+    .timelines-grid { grid-template-columns: 1fr; }
+  }
+
+
+</style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <p class="mark">Arlette <span>OS</span></p>
+      <p class="tagline">Your life, run as a system</p>
+      <nav id="nav"></nav>
+      <div class="aside-actions">
+        <button class="btn primary" type="button" id="btnExport">Export as text</button>
+        <button class="btn" type="button" id="btnClear">Clear all fields</button>
+      </div>
+      <div class="save-status" id="saveStatus">Saves on this device only</div>
+    </aside>
+    <main id="main">
+      <div class="js-fallback" id="jsFallback">
+        <h1>Open in Safari</h1>
+        <p>This preview only shows the shell. Arlette OS needs Safari (or Chrome) so the desks can load.</p>
+        <ol>
+          <li>Tap the share icon (square with arrow).</li>
+          <li>Choose <strong>Open in Safari</strong> (or Copy to Files, then open the file in Safari).</li>
+          <li>Or AirDrop <code>Arlette-OS.html</code> from your Mac Desktop and open it in Safari.</li>
+        </ol>
+        <p class="muted">If you already opened it in Safari and still see this message, tell me — we’ll dig further.</p>
+      </div>
+    </main>
+  </div>
+<noscript>
+  <p style="padding:1rem;font-family:sans-serif;max-width:28rem;margin:1rem auto;">Turn on JavaScript, or open Arlette-OS.html in Safari.</p>
+</noscript>
+
+<script>
+const STORAGE_KEY = "arlette-os-v2";
+const NAV = [
+  { id: "intention", title: "Intention" },
+  { id: "money", title: "Money" },
+  { id: "offer", title: "Offer & Work" },
+  { id: "classes", title: "Classes" },
+  { id: "body", title: "Body & Energy" },
+  { id: "home", title: "Home & Admin" },
+  { id: "relationships", title: "Relationships & Network" },
+  { id: "time", title: "Time & Rhythm" }
+];
+
+const INTENTION_DEFAULTS = {
+  awareness: "",
+  intention: "",
+  action: "",
+  goal: "",
+  horizon90: "",
+  horizon18: "",
+  horizon5: "",
+  seasonNote: "",
+  weeklyCheck: "",
+  aligned: "",
+  offCycle: ""
+};
+
+const MONEY_DEFAULTS = {
+  bank: "89.95",
+  trading: "44",
+  cash: "",
+  bufferTarget: "",
+  bufferNote: "",
+  periodIn: "Period from 22 Sep\nStarted trading: 51 USD\nWins: 67.77 + 99.50 + 59.70 = 226.97 BBD",
+  periodOut: "Supermarket 89.35\nEsso cooking gas + vehicle gas 66.82\nTotal out: 156.17 BBD",
+  comingDue: "",
+  streams: "Trading (PainX / GainX)",
+  tradingRules: "",
+  toolNotes: "",
+  check1: "",
+  check2: "",
+  check3: "",
+  healthy: "",
+  broken: "",
+  updatedNote: "23 Sep — live: CIBC 89.95 BBD · Trading 44 USD. Period log kept (start 51 USD; made 226.97; spent 156.17).",
+  snapshotVersion: 4
+};
+
+const OFFER_DEFAULTS = {
+  // Lane 1 — Hire
+  l1Name: "Hire / employed",
+  l1Goal: "",
+  l1Status: "",
+  l1Step1: "",
+  l1Step2: "",
+  l1Step3: "",
+  l1Step4: "",
+  l1Step5: "",
+  l1Next: "",
+  // Lane 2 — Sell / consultancy
+  l2Name: "Sell / consultancy",
+  l2Goal: "",
+  l2Status: "",
+  l2Step1: "",
+  l2Step2: "",
+  l2Step3: "",
+  l2Step4: "",
+  l2Step5: "",
+  l2Next: "",
+  // Lane 3 — Brand & presence
+  l3Name: "Brand & presence",
+  l3Goal: "",
+  l3Status: "",
+  l3Step1: "",
+  l3Step2: "",
+  l3Step3: "",
+  l3Step4: "",
+  l3Step5: "",
+  l3Next: "",
+  // Lane 4 — Delivery & clients
+  l4Name: "Delivery & clients",
+  l4Goal: "",
+  l4Status: "",
+  l4Step1: "",
+  l4Step2: "",
+  l4Step3: "",
+  l4Step4: "",
+  l4Step5: "",
+  l4Next: "",
+  focusNow: "",
+  warm: "",
+  talking: "",
+  closed: "",
+  hireRoles: "",
+  sellOffers: "",
+  pricing: "",
+  delivery: "",
+  brand: "",
+  learning: "",
+  classesInProgress: "Systems thinking — OpenLearn\nOperations management — OpenLearn\nBPMN / process mapping — Camunda + Bizagi\nResponsive Web Design — freeCodeCamp\nMake AI Work for You — Google (YouTube)\nZapier / Make — FreeAcademy (later / Week 6)",
+  classesCompleted: "",
+  classesDropped: "",
+  classesNote: "Pulled from our 18 Sep chat + AGDS Study Studio / checklist. All listed as In progress because chats show the path and Study Studio work on systems thinking, not a clear finish or drop. Move any that are done or dropped.",
+  check1: "",
+  check2: "",
+  check3: "",
+  healthy: "",
+  broken: "",
+  offerSnapshot: 4
+};
+
+
+
+const CLASSES_DEFAULTS = {
+  focusClass: "",
+  focusStep: "",
+  inProgress: "Systems thinking — OpenLearn\nOperations management — OpenLearn\nBPMN / process mapping — Camunda + Bizagi\nResponsive Web Design — freeCodeCamp\nMake AI Work for You — Google (YouTube)\nZapier / Make — FreeAcademy (later / Week 6)",
+  completed: "",
+  dropped: "",
+  pathNote: "Free systems-consultancy path from 18 Sep. Study Studio lives in AGDS-Systems-Kit. Move a class when status changes.",
+  why: "Formalize systems intuition so you can sell operating systems for small businesses with clear language.",
+  weeklyCheck: "",
+  healthy: "",
+  broken: "",
+  classesSnapshot: 1
+};
+
+
+const FOOD_GROUPS = [
+  { id: "produce", label: "Produce" },
+  { id: "protein", label: "Meat, fish & eggs" },
+  { id: "dairy", label: "Dairy & alternatives" },
+  { id: "bakery", label: "Bakery & bread" },
+  { id: "pantry", label: "Pantry & dry goods" },
+  { id: "frozen", label: "Frozen" },
+  { id: "drinks", label: "Drinks" },
+  { id: "household", label: "Household & personal" },
+  { id: "other", label: "Other" }
+];
+const FOOD_GROUP_IDS = FOOD_GROUPS.map((g) => g.id);
+
+const BODY_DEFAULTS = {
+  brief: "5′11″. Lactose intolerant — high-grade cheeses only, sparingly. Perimenopausal. Fibroids. Filter food and workouts through this.",
+  limits: "",
+  staples: [],
+  weeklyGroceries: [],
+  supplements: [],
+  fiberFoods: [
+    { id: "fiber0", text: "oats / oatmeal", done: false, group: "pantry" },
+    { id: "fiber1", text: "brown rice", done: false, group: "pantry" },
+    { id: "fiber2", text: "quinoa", done: false, group: "pantry" },
+    { id: "fiber3", text: "black beans or kidney beans", done: false, group: "pantry" },
+    { id: "fiber4", text: "black-eyed peas", done: false, group: "pantry" },
+    { id: "fiber5", text: "pigeon peas", done: false, group: "pantry" },
+    { id: "fiber6", text: "lentils or split peas", done: false, group: "pantry" },
+    { id: "fiber7", text: "chickpeas", done: false, group: "pantry" },
+    { id: "fiber8", text: "chia seeds", done: false, group: "pantry" },
+    { id: "fiber9", text: "ground flaxseed", done: false, group: "pantry" },
+    { id: "fiber10", text: "almonds (small handful)", done: false, group: "pantry" },
+    { id: "fiber11", text: "callaloo or spinach", done: false, group: "produce" },
+    { id: "fiber12", text: "broccoli", done: false, group: "produce" },
+    { id: "fiber13", text: "cabbage", done: false, group: "produce" },
+    { id: "fiber14", text: "carrots", done: false, group: "produce" },
+    { id: "fiber15", text: "green peas", done: false, group: "produce" },
+    { id: "fiber16", text: "avocado", done: false, group: "produce" },
+    { id: "fiber17", text: "sweet potato with skin", done: false, group: "produce" },
+    { id: "fiber18", text: "potato with skin", done: false, group: "produce" },
+    { id: "fiber19", text: "pear or apple with skin", done: false, group: "produce" },
+    { id: "fiber20", text: "guava", done: false, group: "produce" },
+    { id: "fiber21", text: "berries (fresh or frozen)", done: false, group: "produce" },
+    { id: "fiber22", text: "banana", done: false, group: "produce" },
+    { id: "fiber23", text: "orange", done: false, group: "produce" }
+  ],
+  workoutFocus: "",
+  strength: "",
+  pilates: "",
+  yoga: "",
+  cardio: "",
+  drainedDay: "",
+  sleep: "",
+  drains: "",
+  weeklyCheck: "",
+  healthy: "",
+  broken: "",
+  bodySnapshot: 4
+};
+
+
+const WEEKDAY_RULERS = [
+  { id: "sun", day: "Sunday", planet: "Sun", sanskrit: "Ravi", glyph: "☉" },
+  { id: "mon", day: "Monday", planet: "Moon", sanskrit: "Soma", glyph: "☾" },
+  { id: "tue", day: "Tuesday", planet: "Mars", sanskrit: "Mangala", glyph: "♂" },
+  { id: "wed", day: "Wednesday", planet: "Mercury", sanskrit: "Budha", glyph: "☿" },
+  { id: "thu", day: "Thursday", planet: "Jupiter", sanskrit: "Guru", glyph: "♃" },
+  { id: "fri", day: "Friday", planet: "Venus", sanskrit: "Shukra", glyph: "♀" },
+  { id: "sat", day: "Saturday", planet: "Saturn", sanskrit: "Shani", glyph: "♄" }
+];
+
+const NATAL_PLANETS = [
+  { id: "sun", name: "Sun", sanskrit: "Ravi", glyph: "☉",
+    sign: "Mithuna (Gemini) · ~16°07′ · Ardra pada 3",
+    dignity: "In Gemini",
+    nature: "Karaka of soul, vitality, authority, father, clarity of purpose.",
+    fact: "Conjoined Mercury within ~2° (same nakshatra family: Ardra)." },
+  { id: "moon", name: "Moon", sanskrit: "Soma", glyph: "☾",
+    sign: "Dhanu (Sagittarius) · ~23°19′ · Purva Ashadha pada 3",
+    dignity: "In Sagittarius (degree approximate until birth time locked)",
+    nature: "Karaka of mind, emotion, mother, daily rhythm, receptivity.",
+    fact: "Sidereal Moon place is working/approximate without exact birth time." },
+  { id: "mercury", name: "Mercury", sanskrit: "Budha", glyph: "☿",
+    sign: "Mithuna (Gemini) · ~18°07′ · Ardra pada 4",
+    dignity: "In own sign (Gemini)",
+    nature: "Karaka of intellect, speech, commerce, calculation, adaptability.",
+    fact: "Close to the Sun (~2°); combust risk to weigh, not assume." },
+  { id: "venus", name: "Venus", sanskrit: "Shukra", glyph: "♀",
+    sign: "Vrishabha (Taurus) · ~1°12′ · Krittika pada 2",
+    dignity: "In own sign (Taurus)",
+    nature: "Karaka of pleasure, beauty, relationships, arts, comfort, values.",
+    fact: "Shares Taurus with Jupiter." },
+  { id: "mars", name: "Mars", sanskrit: "Mangala", glyph: "♂",
+    sign: "Mesha (Aries) · ~25°08′ · Bharani pada 4",
+    dignity: "In own sign (Aries)",
+    nature: "Karaka of energy, courage, conflict, initiative, heat, drive.",
+    fact: "Own-sign Mars; Bharani is Venus-ruled nakshatra." },
+  { id: "jupiter", name: "Jupiter", sanskrit: "Guru", glyph: "♃",
+    sign: "Vrishabha (Taurus) · ~26°21′ · Mrigashira pada 1",
+    dignity: "In Taurus (friend/neutral by many schools; not own or exaltation)",
+    nature: "Karaka of wisdom, expansion, dharma, teachers, fortune, meaning.",
+    fact: "Shares Taurus with Venus." },
+  { id: "saturn", name: "Saturn", sanskrit: "Shani", glyph: "♄",
+    sign: "Karka (Cancer) · ~21°37′ · Ashlesha pada 2",
+    dignity: "In Cancer (traditionally challenging / uncomfortable placement)",
+    nature: "Karaka of time, structure, duty, delay, endurance, reality.",
+    fact: "Ashlesha is Mercury-ruled nakshatra." },
+  { id: "rahu", name: "Rahu", sanskrit: "Rahu", glyph: "☊",
+    sign: "Kanya (Virgo) · ~26°45′ mean · Chitra pada 2",
+    dignity: "Mean node in Virgo (shadow planet; no own sign in the same sense)",
+    nature: "Karaka of desire, amplification, foreign/unconventional pull, obsession, innovation.",
+    fact: "Mean node; exactness depends on node formula used." },
+  { id: "ketu", name: "Ketu", sanskrit: "Ketu", glyph: "☋",
+    sign: "Meena (Pisces) · ~26°45′ mean · Revati pada 4",
+    dignity: "Mean node in Pisces (opposite Rahu)",
+    nature: "Karaka of release, past patterns, detachment, spiritual residue, endings.",
+    fact: "Always opposite Rahu; mean node pair with Rahu above." }
+];
+
+const TIME_STRENGTHS = [
+  "Mercury in own sign (Gemini)",
+  "Venus in own sign (Taurus)",
+  "Mars in own sign (Aries)",
+  "Sun and Mercury together in Gemini (Budha-Aditya yoga candidates — orb ~2°; weigh combustion)",
+  "Venus and Jupiter together in Taurus (benefics sharing an earth sign)"
+];
+
+const TIME_SOFT = [
+  "Saturn in Cancer (traditionally a difficult seat for Saturn)",
+  "Moon degree still approximate without confirmed birth time",
+  "Sun–Mercury closeness: check combustion before treating Mercury as fully free",
+  "Rahu / Ketu: mean-node positions — confirm calculation style if you need precision",
+  "No lagna / houses in use until birth time is locked"
+];
+
+const TIME_DEFAULTS = {
+  frameNote: "Lahiri sidereal · 1 Jul 1977 · Georgetown, Guyana. Day-chart planet positions only. No houses until birth time is confirmed.",
+  todayNote: "",
+  strengthNote: "",
+  softNote: "",
+  weeklyCheck: "",
+  healthy: "",
+  broken: "",
+  planetNotes: {},
+  weekNotes: {},
+  timeSnapshot: 2
+};
+
+const GENERIC = {
+  home: {
+    title: "Home & Admin",
+    blurb: "Plants, rooms, environment. Layout coming.",
+    fields: [
+      ["purpose", "Purpose", true],
+      ["plants", "Plants / environment", true],
+      ["rooms", "Rooms / space", true],
+      ["files", "Files / laptop / email", true],
+      ["appointments", "Appointments / transport", true],
+      ["check1", "Weekly check 1", false],
+      ["check2", "Weekly check 2", false],
+      ["check3", "Weekly check 3", false],
+      ["healthy", "Healthy looks like", true],
+      ["broken", "Broken looks like", true]
+    ]
+  },
+  relationships: {
+    title: "Relationships & Network",
+    blurb: "Layout coming.",
+    fields: [
+      ["purpose", "Purpose", true],
+      ["family", "Family", true],
+      ["peers", "Peers / friends", true],
+      ["pro", "Referrals / professional", true],
+      ["check1", "Weekly check 1", false],
+      ["check2", "Weekly check 2", false],
+      ["check3", "Weekly check 3", false],
+      ["healthy", "Healthy looks like", true],
+      ["broken", "Broken looks like", true]
+    ]
+  },
+};
+
+let data = load();
+let active = localStorage.getItem("arlette-os-active") || "intention";
+
+function load() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") || {};
+    if (!raw.intention) raw.intention = { ...INTENTION_DEFAULTS };
+    else raw.intention = { ...INTENTION_DEFAULTS, ...raw.intention };
+    if (!raw.money) raw.money = { ...MONEY_DEFAULTS };
+    else raw.money = { ...MONEY_DEFAULTS, ...raw.money };
+    if (!raw.offer) raw.offer = { ...OFFER_DEFAULTS };
+    else raw.offer = { ...OFFER_DEFAULTS, ...raw.offer };
+    if (!raw.classes) raw.classes = { ...CLASSES_DEFAULTS };
+    else raw.classes = { ...CLASSES_DEFAULTS, ...raw.classes };
+    if (!raw.body) raw.body = { ...BODY_DEFAULTS };
+    else raw.body = { ...BODY_DEFAULTS, ...raw.body };
+    if (!raw.time) raw.time = { ...TIME_DEFAULTS };
+    else raw.time = { ...TIME_DEFAULTS, ...raw.time };
+    if (!raw.time.planetNotes) raw.time.planetNotes = {};
+    if (!raw.time.weekNotes) raw.time.weekNotes = {};
+    if ((raw.time.timeSnapshot || 0) < 1) {
+      raw.time.frameNote = TIME_DEFAULTS.frameNote;
+      raw.time.timeSnapshot = 1;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(raw));
+    }
+    if ((raw.time.timeSnapshot || 0) < 2) {
+      raw.time.frameNote = TIME_DEFAULTS.frameNote;
+      raw.time.planetNotes = {};
+      raw.time.strengthNote = "";
+      raw.time.softNote = "";
+      raw.time.healthy = "";
+      raw.time.broken = "";
+      raw.time.timeSnapshot = 2;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(raw));
+    }
+    if ((raw.body.bodySnapshot || 0) < 1) {
+      raw.body.brief = BODY_DEFAULTS.brief;
+      raw.body.bodySnapshot = 1;
+    }
+    if ((raw.body.bodySnapshot || 0) < 2) {
+      raw.body.staples = linesToList(raw.body.staples);
+      raw.body.weeklyGroceries = linesToList(raw.body.weeklyGroceries);
+      raw.body.bodySnapshot = 2;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(raw));
+    }
+    if ((raw.body.bodySnapshot || 0) < 3) {
+      raw.body.staples = linesToList(raw.body.staples).map((item) => ({
+        ...item,
+        group: FOOD_GROUP_IDS.includes(item.group) ? item.group : guessFoodGroup(item.text)
+      }));
+      raw.body.weeklyGroceries = linesToList(raw.body.weeklyGroceries).map((item) => ({
+        ...item,
+        group: FOOD_GROUP_IDS.includes(item.group) ? item.group : guessFoodGroup(item.text)
+      }));
+      raw.body.bodySnapshot = 3;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(raw));
+    }
+    if ((raw.body.bodySnapshot || 0) < 4) {
+      if (!Array.isArray(raw.body.supplements)) raw.body.supplements = [];
+      else raw.body.supplements = linesToList(raw.body.supplements);
+      const hasFiber = Array.isArray(raw.body.fiberFoods) && raw.body.fiberFoods.length;
+      if (!hasFiber) {
+        raw.body.fiberFoods = (BODY_DEFAULTS.fiberFoods || []).map((item) => ({
+          id: uid(), text: item.text, done: !!item.done,
+          group: FOOD_GROUP_IDS.includes(item.group) ? item.group : guessFoodGroup(item.text)
+        }));
+      } else {
+        raw.body.fiberFoods = normalizeFoodList(raw.body.fiberFoods);
+      }
+      raw.body.bodySnapshot = 4;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(raw));
+    }
+    // Migrate class lists out of Offer if they still live there
+    if ((raw.classes.classesSnapshot || 0) < 1) {
+      if (raw.offer && raw.offer.classesInProgress && !raw.classes.inProgress) {
+        raw.classes.inProgress = raw.offer.classesInProgress;
+      }
+      if (raw.offer && raw.offer.classesCompleted) {
+        raw.classes.completed = raw.offer.classesCompleted;
+      }
+      if (raw.offer && raw.offer.classesDropped) {
+        raw.classes.dropped = raw.offer.classesDropped;
+      }
+      if (raw.offer && raw.offer.classesNote) {
+        raw.classes.pathNote = raw.offer.classesNote;
+      }
+      // Prefer seeded path if still empty
+      if (!raw.classes.inProgress) raw.classes.inProgress = CLASSES_DEFAULTS.inProgress;
+      if (!raw.classes.pathNote) raw.classes.pathNote = CLASSES_DEFAULTS.pathNote;
+      if (!raw.classes.why) raw.classes.why = CLASSES_DEFAULTS.why;
+      raw.classes.classesSnapshot = 1;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(raw));
+    }
+    if ((raw.classes.classesSnapshot || 0) < 2) {
+      // Own Classes page: keep user edits, seed path if blank
+      if (!String(raw.classes.inProgress || "").trim()) {
+        raw.classes.inProgress = CLASSES_DEFAULTS.inProgress;
+      }
+      if (!String(raw.classes.pathNote || "").trim()) {
+        raw.classes.pathNote = CLASSES_DEFAULTS.pathNote;
+      }
+      if (!String(raw.classes.why || "").trim()) {
+        raw.classes.why = CLASSES_DEFAULTS.why;
+      }
+      raw.classes.classesSnapshot = 2;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(raw));
+    }
+    if ((raw.offer.offerSnapshot || 0) < 2) {
+      if (!raw.offer.l1Name) raw.offer.l1Name = OFFER_DEFAULTS.l1Name;
+      if (!raw.offer.l2Name) raw.offer.l2Name = OFFER_DEFAULTS.l2Name;
+      if (!raw.offer.l3Name) raw.offer.l3Name = OFFER_DEFAULTS.l3Name;
+      if (!raw.offer.l4Name) raw.offer.l4Name = OFFER_DEFAULTS.l4Name;
+      if (raw.offer.hireStatus && !raw.offer.l1Status) raw.offer.l1Status = raw.offer.hireStatus;
+      if (raw.offer.hireNext && !raw.offer.l1Next) raw.offer.l1Next = raw.offer.hireNext;
+      if (raw.offer.sellStatus && !raw.offer.l2Status) raw.offer.l2Status = raw.offer.sellStatus;
+      if (raw.offer.sellNext && !raw.offer.l2Next) raw.offer.l2Next = raw.offer.sellNext;
+      raw.offer.offerSnapshot = 2;
+    }
+    if ((raw.offer.offerSnapshot || 0) < 3) {
+      if (raw.offer.classesInProgress == null) raw.offer.classesInProgress = "";
+      if (raw.offer.classesCompleted == null) raw.offer.classesCompleted = "";
+      if (raw.offer.classesDropped == null) raw.offer.classesDropped = "";
+      if (raw.offer.classesNote == null) raw.offer.classesNote = "";
+      raw.offer.offerSnapshot = 3;
+    }
+    if ((raw.offer.offerSnapshot || 0) < 4) {
+      raw.offer.classesInProgress = OFFER_DEFAULTS.classesInProgress;
+      raw.offer.classesCompleted = OFFER_DEFAULTS.classesCompleted;
+      raw.offer.classesDropped = OFFER_DEFAULTS.classesDropped;
+      raw.offer.classesNote = OFFER_DEFAULTS.classesNote;
+      raw.offer.offerSnapshot = 4;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(raw));
+    }
+    // Apply Art's money log; v4 = live CIBC 89.95 + trading 44 USD
+    if ((raw.money.snapshotVersion || 0) < 4) {
+      raw.money.bank = MONEY_DEFAULTS.bank;
+      raw.money.trading = MONEY_DEFAULTS.trading;
+      raw.money.periodIn = MONEY_DEFAULTS.periodIn;
+      raw.money.periodOut = MONEY_DEFAULTS.periodOut;
+      raw.money.streams = MONEY_DEFAULTS.streams || raw.money.streams;
+      raw.money.updatedNote = MONEY_DEFAULTS.updatedNote;
+      raw.money.snapshotVersion = 4;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(raw));
+    }
+    return raw;
+  } catch (e) {
+    return { intention: { ...INTENTION_DEFAULTS }, money: { ...MONEY_DEFAULTS }, offer: { ...OFFER_DEFAULTS }, classes: { ...CLASSES_DEFAULTS }, body: { ...BODY_DEFAULTS }, time: { ...TIME_DEFAULTS } };
+  }
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  localStorage.setItem("arlette-os-active", active);
+  const el = document.getElementById("saveStatus");
+  el.textContent = "Saved · " + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function moneyGet(key) {
+  return (data.money && data.money[key] != null) ? data.money[key] : "";
+}
+
+function moneySet(key, value) {
+  if (!data.money) data.money = { ...MONEY_DEFAULTS };
+  data.money[key] = value;
+  save();
+}
+
+function parseAmt(v) {
+  const n = parseFloat(String(v).replace(/[^0-9.-]/g, ""));
+  return isNaN(n) ? 0 : n;
+}
+
+function formatAmt(n) {
+  return n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+}
+
+function moneyTotal() {
+  // Bank + cash only (BBD). Trading is USD and stays separate.
+  return parseAmt(moneyGet("bank")) + parseAmt(moneyGet("cash"));
+}
+
+function bindMoneyField(el, key, onAfter) {
+  el.addEventListener("input", () => {
+    moneySet(key, el.value);
+    if (onAfter) onAfter();
+  });
+}
+
+function renderMoney(panel) {
+  const hero = document.createElement("div");
+  hero.className = "hero";
+  hero.innerHTML = "<h1>Money</h1><p>Live balances you update by hand. CIBC is BBD. Trading is USD and stays out of the BBD total.</p>";
+  panel.appendChild(hero);
+
+  // Snapshot
+  const snap = document.createElement("div");
+  snap.className = "card";
+  snap.innerHTML = "<h2>Live snapshot</h2><p class=\"hint\">Tap a number and type the new amount. Total updates itself.</p>";
+  const tiles = document.createElement("div");
+  tiles.className = "grid-4";
+
+  function makeBalance(label, key, extraClass, readOnly, currency) {
+    const tile = document.createElement("div");
+    tile.className = "balance-tile" + (extraClass ? " " + extraClass : "");
+    const lab = document.createElement("div");
+    lab.className = "field-label";
+    lab.textContent = label;
+    const input = document.createElement("input");
+    input.type = "text";
+    input.inputMode = "decimal";
+    input.className = "balance-input";
+    input.setAttribute("aria-label", label);
+    if (readOnly) {
+      input.readOnly = true;
+      input.value = formatAmt(moneyTotal());
+      input.id = "moneyTotalDisplay";
+    } else {
+      input.value = moneyGet(key);
+      bindMoneyField(input, key, () => {
+        const t = document.getElementById("moneyTotalDisplay");
+        if (t) t.value = formatAmt(moneyTotal());
+      });
+    }
+    const cur = document.createElement("div");
+    cur.className = "currency";
+    cur.textContent = currency || "BBD";
+    tile.appendChild(lab);
+    tile.appendChild(input);
+    tile.appendChild(cur);
+    return tile;
+  }
+
+  tiles.appendChild(makeBalance("CIBC", "bank", null, false, "BBD"));
+  tiles.appendChild(makeBalance("Trading account", "trading", "trading", false, "USD"));
+  tiles.appendChild(makeBalance("Cash on hand", "cash", null, false, "BBD"));
+  tiles.appendChild(makeBalance("Total (BBD only)", "total", "total", true, "BBD"));
+  snap.appendChild(tiles);
+
+  const updated = document.createElement("label");
+  updated.className = "field";
+  updated.style.marginTop = "1rem";
+  updated.innerHTML = "<span>Last updated note</span>";
+  const updatedTa = document.createElement("input");
+  updatedTa.type = "text";
+  updatedTa.placeholder = "e.g. checked after payday";
+  updatedTa.value = moneyGet("updatedNote");
+  bindMoneyField(updatedTa, "updatedNote");
+  updated.appendChild(updatedTa);
+  snap.appendChild(updated);
+  panel.appendChild(snap);
+
+  // Buffer + period
+  const mid = document.createElement("div");
+  mid.className = "split-row";
+
+  const bufferCard = document.createElement("div");
+  bufferCard.className = "card";
+  bufferCard.innerHTML = "<h2>Buffer</h2><p class=\"hint\">Safe money you want sitting quiet (usually bank, not trading).</p>";
+  bufferCard.appendChild(textField("bufferTarget", "Buffer target (amount)", false));
+  bufferCard.appendChild(textField("bufferNote", "Buffer notes", true));
+  mid.appendChild(bufferCard);
+
+  const periodCard = document.createElement("div");
+  periodCard.className = "card";
+  periodCard.innerHTML = "<h2>This period</h2><p class=\"hint\">Week or month — whatever rhythm you are using.</p>";
+  periodCard.appendChild(textField("periodIn", "Money in", true));
+  periodCard.appendChild(textField("periodOut", "Money out", true));
+  mid.appendChild(periodCard);
+  panel.appendChild(mid);
+
+  // Coming due + streams
+  const mid2 = document.createElement("div");
+  mid2.className = "split-row";
+  const due = document.createElement("div");
+  due.className = "card";
+  due.innerHTML = "<h2>Coming due</h2>";
+  due.appendChild(textField("comingDue", "Bills, top-ups, must-pays", true));
+  mid2.appendChild(due);
+  const streams = document.createElement("div");
+  streams.className = "card";
+  streams.innerHTML = "<h2>Streams</h2>";
+  streams.appendChild(textField("streams", "Where money can come from", true));
+  mid2.appendChild(streams);
+  panel.appendChild(mid2);
+
+  // Trading desk — tools + rules
+  const trade = document.createElement("div");
+  trade.className = "card";
+  trade.innerHTML = `
+    <h2>Trading desk</h2>
+    <p class="hint">Tools on this desk for PainX / GainX. Profit only leaves the desk when you transfer it on purpose.</p>
+
+    <div class="tool-block pain">
+      <div class="tool-title">PPX400 ZoneReject · PainX</div>
+      <p class="tool-purpose"><strong>Purpose:</strong> Builds the orange resistance zones on PainX. A strong green is only a candidate. When a later bar opens in that green’s body and fails to hold above it, the tool paints a zone at that extreme. Mid-grind greens do not become zones.</p>
+      <p class="tool-use"><strong>How you use it:</strong> Trade the reaction from the zone, not the green alone. Price climbs into the orange band → rejects / steps down → that is the sell. Stacked zones = stepped resistance as the dump unfolds. Same idea you are seeing on PainX 800 now.</p>
+    </div>
+
+    <div class="tool-block gain">
+      <div class="tool-title">PPX400 ZoneReject · GainX</div>
+      <p class="tool-purpose"><strong>Purpose:</strong> Mirror of Pain. Builds support zones from an extreme <em>red close</em>. That red is not a level until a later bar opens in its body and fails to hold below it. Mid-grind reds do not become zones.</p>
+      <p class="tool-use"><strong>How you use it:</strong> Trade the reaction from the zone. Price drops into the support band, rejects / spikes up — that is the buy. Same zone logic as Pain, flipped.</p>
+    </div>
+
+    <div class="tool-block structure">
+      <div class="tool-title">PPX400 Market Structure</div>
+      <p class="tool-purpose"><strong>Purpose:</strong> Timing and context for PainX. Labels UPTREND, DOWNTREND, or CONSOLIDATION. When price coils tight, it draws a gold box. Default is sell-only: alerts when price closes below the coil (Pain dump), not on breakouts up.</p>
+      <p class="tool-use"><strong>How you use it:</strong> Wait for COIL LIVE, then a close under the box — that is the dump trigger. Use ZoneReject PainX shelves for where to sell as price steps down. Not a Gain buy tool. Stack: Structure = when; ZoneReject = where.</p>
+    </div>
+  `;
+  trade.appendChild(textField("tradingRules", "Desk rules / risk notes", true));
+  trade.appendChild(textField("toolNotes", "Your notes on these tools (settings, mistakes, what worked)", true));
+  panel.appendChild(trade);
+
+  // Weekly check
+  const check = document.createElement("div");
+  check.className = "card";
+  check.innerHTML = "<h2>Weekly check</h2>";
+  const cg = document.createElement("div");
+  cg.className = "grid-3";
+  ["check1", "check2", "check3"].forEach((k, i) => {
+    const lab = document.createElement("label");
+    lab.className = "field";
+    lab.innerHTML = "<span>Check " + (i + 1) + "</span>";
+    const ta = document.createElement("textarea");
+    ta.rows = 3;
+    ta.placeholder = "…";
+    ta.value = moneyGet(k);
+    bindMoneyField(ta, k);
+    lab.appendChild(ta);
+    cg.appendChild(lab);
+  });
+  check.appendChild(cg);
+  panel.appendChild(check);
+
+  // Signals
+  const sig = document.createElement("div");
+  sig.className = "card";
+  sig.innerHTML = "<h2>Signals</h2>";
+  const sg = document.createElement("div");
+  sg.className = "grid-2";
+  const h = document.createElement("label");
+  h.className = "field";
+  h.innerHTML = "<span>Healthy looks like</span>";
+  const ht = document.createElement("textarea");
+  ht.className = "tall";
+  ht.value = moneyGet("healthy");
+  bindMoneyField(ht, "healthy");
+  h.appendChild(ht);
+  const b = document.createElement("label");
+  b.className = "field";
+  b.innerHTML = "<span>Broken looks like</span>";
+  const bt = document.createElement("textarea");
+  bt.className = "tall";
+  bt.value = moneyGet("broken");
+  bindMoneyField(bt, "broken");
+  b.appendChild(bt);
+  sg.appendChild(h);
+  sg.appendChild(b);
+  sig.appendChild(sg);
+  panel.appendChild(sig);
+
+  const note = document.createElement("p");
+  note.className = "note";
+  note.textContent = "CIBC is BBD. Trading is USD. Change numbers anytime. Data stays on this Mac.";
+  panel.appendChild(note);
+}
+
+
+function offerGet(key) {
+  return (data.offer && data.offer[key] != null) ? data.offer[key] : "";
+}
+function offerSet(key, value) {
+  if (!data.offer) data.offer = { ...OFFER_DEFAULTS };
+  data.offer[key] = value;
+  save();
+}
+function bindOfferField(el, key) {
+  el.addEventListener("input", () => offerSet(key, el.value));
+}
+function offerField(key, label, tall, placeholder) {
+  const lab = document.createElement("label");
+  lab.className = "field";
+  const span = document.createElement("span");
+  span.textContent = label;
+  lab.appendChild(span);
+  const ta = document.createElement(tall ? "textarea" : "input");
+  if (!tall) ta.type = "text";
+  else { ta.className = "tall"; ta.rows = 4; }
+  ta.placeholder = placeholder || "…";
+  ta.value = offerGet(key);
+  bindOfferField(ta, key);
+  lab.appendChild(ta);
+  return lab;
+}
+
+function renderOffer(panel) {
+  const hero = document.createElement("div");
+  hero.className = "hero";
+  hero.innerHTML = "<h1>Offer &amp; Work</h1><p>Everything that earns or builds the earn. Four lanes, each with a major goal and the steps to get there. Fill blanks as you go.</p>";
+  panel.appendChild(hero);
+
+  const lanesCard = document.createElement("div");
+  lanesCard.className = "card";
+  lanesCard.innerHTML = "<h2>Active lanes</h2><p class=\"hint\">Four tracks toward income. For each: name the major goal, write the steps in order, mark status, and keep one clear next action.</p>";
+
+  const lanesGrid = document.createElement("div");
+  lanesGrid.className = "lanes-grid";
+
+  const laneMeta = [
+    { n: 1, tone: "hire", defaultName: "Hire / employed", goalPh: "e.g. land a property-admin role in Barbados", s1: "List roles that fit (title, pay band, commute)", s2: "Applications / replies open this week", s3: "Interview prep and questions", s4: "Follow-up after each contact", s5: "Decision: accept, hold, or walk" },
+    { n: 2, tone: "sell", defaultName: "Sell / consultancy", goalPh: "e.g. first paid systems client", s1: "Write the offer in one plain paragraph", s2: "Price and what’s included / not", s3: "Who to approach (names)", s4: "Send or pitch", s5: "Close or revise from feedback" },
+    { n: 3, tone: "brand", defaultName: "Brand & presence", goalPh: "e.g. people can find and trust the offer", s1: "What you want to be known for", s2: "Site / LinkedIn / visuals to update", s3: "Proof pieces (case, before/after, bio)", s4: "Post or send where buyers look", s5: "Review what got a response" },
+    { n: 4, tone: "delivery", defaultName: "Delivery & clients", goalPh: "e.g. repeatable delivery without chaos", s1: "Intake: what you need from a client to start", s2: "Delivery steps (week by week)", s3: "Tools / templates you reuse", s4: "Handoff and payment rhythm", s5: "After-care / referral ask" }
+  ];
+
+  laneMeta.forEach((meta) => {
+    const p = "l" + meta.n;
+    const tile = document.createElement("div");
+    tile.className = "lane-tile " + meta.tone;
+
+    const head = document.createElement("div");
+    head.className = "lane-head";
+    const kicker = document.createElement("div");
+    kicker.className = "lane-kicker";
+    kicker.textContent = "Lane " + meta.n;
+    head.appendChild(kicker);
+
+    const nameLab = document.createElement("label");
+    nameLab.className = "field lane-name-field";
+    const nameSpan = document.createElement("span");
+    nameSpan.textContent = "Lane name";
+    nameLab.appendChild(nameSpan);
+    const nameIn = document.createElement("input");
+    nameIn.type = "text";
+    nameIn.placeholder = meta.defaultName;
+    nameIn.value = offerGet(p + "Name") || meta.defaultName;
+    bindOfferField(nameIn, p + "Name");
+    nameLab.appendChild(nameIn);
+    head.appendChild(nameLab);
+    tile.appendChild(head);
+
+    tile.appendChild(offerField(p + "Goal", "Major goal", true, meta.goalPh));
+    tile.appendChild(offerField(p + "Status", "Status now", false, "e.g. waiting on reply / drafting / stuck"));
+
+    const stepsWrap = document.createElement("div");
+    stepsWrap.className = "steps-wrap";
+    const stepsLabel = document.createElement("div");
+    stepsLabel.className = "field-label";
+    stepsLabel.textContent = "Steps toward the goal (in order)";
+    stepsWrap.appendChild(stepsLabel);
+    [
+      [p + "Step1", "Step 1", meta.s1],
+      [p + "Step2", "Step 2", meta.s2],
+      [p + "Step3", "Step 3", meta.s3],
+      [p + "Step4", "Step 4", meta.s4],
+      [p + "Step5", "Step 5", meta.s5]
+    ].forEach(([key, lab, ph]) => {
+      stepsWrap.appendChild(offerField(key, lab, false, ph));
+    });
+    tile.appendChild(stepsWrap);
+
+    tile.appendChild(offerField(p + "Next", "Next action (this week)", false, "One concrete move"));
+    lanesGrid.appendChild(tile);
+  });
+
+  lanesCard.appendChild(lanesGrid);
+  panel.appendChild(lanesCard);
+
+  // Focus
+  const focus = document.createElement("div");
+  focus.className = "card";
+  focus.innerHTML = "<h2>Focus this week</h2><p class=\"hint\">Pick the lane that gets most of your energy. Name the step number you are on.</p>";
+  focus.appendChild(offerField("focusNow", "This week I am pushing", true, "e.g. Lane 1 · Step 2 — send Seaside follow-up if no reply by Friday"));
+  panel.appendChild(focus);
+
+  // Pipeline board
+  const pipe = document.createElement("div");
+  pipe.className = "card";
+  pipe.innerHTML = "<h2>Pipeline</h2><p class=\"hint\">Names and one note each. Move people across columns as they progress.</p>";
+  const cols = document.createElement("div");
+  cols.className = "grid-3";
+  [
+    ["warm", "Warm", "People who know you or asked once"],
+    ["talking", "Talking", "Active chats / interviews / quotes"],
+    ["closed", "Closed", "Won, lost, or parked — with why"]
+  ].forEach(([key, title, hint]) => {
+    const col = document.createElement("div");
+    col.className = "pipe-col";
+    col.innerHTML = "<h3>" + title + "</h3><p class=\"hint\" style=\"margin-top:0\">" + hint + "</p>";
+    const ta = document.createElement("textarea");
+    ta.className = "tall";
+    ta.rows = 6;
+    ta.placeholder = "…";
+    ta.value = offerGet(key);
+    bindOfferField(ta, key);
+    col.appendChild(ta);
+    cols.appendChild(col);
+  });
+  pipe.appendChild(cols);
+  panel.appendChild(pipe);
+
+  // What you offer
+  const offers = document.createElement("div");
+  offers.className = "split-row";
+  const roles = document.createElement("div");
+  roles.className = "card";
+  roles.innerHTML = "<h2>Roles I will take</h2><p class=\"hint\">Hire lane. Titles and environments that fit.</p>";
+  roles.appendChild(offerField("hireRoles", "Fit roles", true));
+  offers.appendChild(roles);
+  const products = document.createElement("div");
+  products.className = "card";
+  products.innerHTML = "<h2>What I sell</h2><p class=\"hint\">Consultancy / systems. Name the offer in plain words.</p>";
+  products.appendChild(offerField("sellOffers", "Offers", true));
+  products.appendChild(offerField("pricing", "Pricing notes", false, "ranges, packages, or still open"));
+  offers.appendChild(products);
+  panel.appendChild(offers);
+
+  // Delivery + brand detail (still useful alongside lanes)
+  const mid = document.createElement("div");
+  mid.className = "split-row";
+  const del = document.createElement("div");
+  del.className = "card";
+  del.innerHTML = "<h2>Delivery systems</h2><p class=\"hint\">How work gets done once someone says yes. Can mirror Lane 4.</p>";
+  del.appendChild(offerField("delivery", "Systems / process", true));
+  mid.appendChild(del);
+  const brand = document.createElement("div");
+  brand.className = "card";
+  brand.innerHTML = "<h2>Brand &amp; presence</h2><p class=\"hint\">How people find and trust you. Can mirror Lane 3.</p>";
+  brand.appendChild(offerField("brand", "Site, LinkedIn, look, voice", true));
+  mid.appendChild(brand);
+  panel.appendChild(mid);
+
+  const learn = document.createElement("div");
+  learn.className = "card";
+  learn.innerHTML = "<h2>Work learning</h2><p class=\"hint\">Skill thread only. Formal courses live on the Classes page.</p>";
+  learn.appendChild(offerField("learning", "What I am studying / building skill in", true));
+  panel.appendChild(learn);
+
+  const check = document.createElement("div");
+  check.className = "card";
+  check.innerHTML = "<h2>Weekly check</h2>";
+  const cg = document.createElement("div");
+  cg.className = "grid-3";
+  ["check1", "check2", "check3"].forEach((k, i) => {
+    const lab = document.createElement("label");
+    lab.className = "field";
+    lab.innerHTML = "<span>Check " + (i + 1) + "</span>";
+    const ta = document.createElement("textarea");
+    ta.rows = 3;
+    ta.placeholder = "…";
+    ta.value = offerGet(k);
+    bindOfferField(ta, k);
+    lab.appendChild(ta);
+    cg.appendChild(lab);
+  });
+  check.appendChild(cg);
+  panel.appendChild(check);
+
+  const sig = document.createElement("div");
+  sig.className = "card";
+  sig.innerHTML = "<h2>Signals</h2>";
+  const sg = document.createElement("div");
+  sg.className = "grid-2";
+  const h = document.createElement("label");
+  h.className = "field";
+  h.innerHTML = "<span>Healthy looks like</span>";
+  const ht = document.createElement("textarea");
+  ht.className = "tall";
+  ht.value = offerGet("healthy");
+  bindOfferField(ht, "healthy");
+  h.appendChild(ht);
+  const b = document.createElement("label");
+  b.className = "field";
+  b.innerHTML = "<span>Broken looks like</span>";
+  const bt = document.createElement("textarea");
+  bt.className = "tall";
+  bt.value = offerGet("broken");
+  bindOfferField(bt, "broken");
+  b.appendChild(bt);
+  sg.appendChild(h);
+  sg.appendChild(b);
+  sig.appendChild(sg);
+  panel.appendChild(sig);
+
+  const note = document.createElement("p");
+  note.className = "note";
+  note.textContent = "Blank on purpose. Your words, not mine. Data stays on this Mac.";
+  panel.appendChild(note);
+}
+
+function textField(key, label, tall) {
+  const lab = document.createElement("label");
+  lab.className = "field";
+  const span = document.createElement("span");
+  span.textContent = label;
+  lab.appendChild(span);
+  const ta = document.createElement(tall ? "textarea" : "input");
+  if (!tall) ta.type = "text";
+  else { ta.className = "tall"; ta.rows = 4; }
+  ta.placeholder = "…";
+  ta.value = moneyGet(key);
+  bindMoneyField(ta, key);
+  lab.appendChild(ta);
+  return lab;
+}
+
+function genericGet(cat, key) {
+  return (data[cat] && data[cat][key]) || "";
+}
+function genericSet(cat, key, value) {
+  if (!data[cat]) data[cat] = {};
+  data[cat][key] = value;
+  save();
+}
+
+
+function classesGet(key) {
+  return (data.classes && data.classes[key] != null) ? data.classes[key] : "";
+}
+function classesSet(key, value) {
+  if (!data.classes) data.classes = { ...CLASSES_DEFAULTS };
+  data.classes[key] = value;
+  save();
+}
+function bindClassesField(el, key) {
+  el.addEventListener("input", () => classesSet(key, el.value));
+}
+function classesField(key, label, tall, placeholder) {
+  const lab = document.createElement("label");
+  lab.className = "field";
+  const span = document.createElement("span");
+  span.textContent = label;
+  lab.appendChild(span);
+  const ta = document.createElement(tall ? "textarea" : "input");
+  if (!tall) ta.type = "text";
+  else { ta.className = "tall"; ta.rows = 4; }
+  ta.placeholder = placeholder || "…";
+  ta.value = classesGet(key);
+  bindClassesField(ta, key);
+  lab.appendChild(ta);
+  return lab;
+}
+
+
+
+function uid() {
+  return "i" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+function guessFoodGroup(text) {
+  const t = String(text || "").toLowerCase();
+  if (!t.trim()) return "other";
+  const has = (words) => words.some((w) => t.includes(w));
+  if (has(["frozen", "ice cream", "popsicle"])) return "frozen";
+  if (has(["detergent", "bleach", "shampoo", "conditioner", "toothpaste", "deodorant", "toilet", "tissue", "paper towel", "trash", "garbage", "sponge", "ziplock", "foil", "cling", "napkin", "soap", "dish liquid", "cleaning", "pad", "tampon", "sanitary"])) return "household";
+  if (has(["banana", "plantain", "tomato", "lettuce", "cucumber", "pepper", "onion", "garlic", "ginger", "carrot", "cabbage", "spinach", "callaloo", "greens", "fruit", "apple", "orange", "lime", "lemon", "avocado", "pumpkin", "herbs", "cilantro", "parsley", "potato", "yam", "eddoe", "breadfruit", "mango", "papaya", "melon", "berr", "salad", "veg", "celery", "broccoli", "cauliflower", "zucchini", "squash", "corn on", "fresh herb"])) return "produce";
+  if (has(["chicken", "turkey", "beef", "pork", "lamb", "fish", "salmon", "tuna", "shrimp", "prawn", "crab", "egg", "mince", "sausage", "bacon", "ham", "steak", "meat", "fillet", "wing", "drumstick"])) return "protein";
+  if (has(["milk", "cheese", "yogurt", "yoghurt", "butter", "cream", "ghee", "cottage", "kefir", "oat milk", "almond milk", "soy milk", "lactose"])) return "dairy";
+  if (has(["bread", "bun", "bagel", "tortilla", "wrap", "pastry", "croissant", "roll"])) return "bakery";
+  if (has(["juice", "soda", "soft drink", "coconut water", "beer", "wine", "smoothie", "sparkling", "water bottle", "bottled water"])) return "drinks";
+  if (has(["coffee", "tea"]) && !has(["coffee bean", "tea bag", "instant coffee", "grounds"])) return "drinks";
+  if (has(["rice", "pasta", "oat", "flour", "sugar", "salt", "oil", "vinegar", "sauce", "ketchup", "mayo", "mustard", "spice", "seasoning", "bean", "lentil", "chickpea", "canned", "tin ", "peanut butter", "jam", "honey", "cereal", "cornmeal", "stock", "broth", "noodle", "coconut milk", "tea bag", "coffee bean", "instant coffee", "grounds", "baking", "yeast", "nut butter", "quinoa", "couscous", "tuna tin", "sardine"])) return "pantry";
+  if (has(["water"])) return "drinks";
+  return "other";
+}
+function linesToList(val) {
+  if (Array.isArray(val)) {
+    return val.map((item) => {
+      if (item && typeof item === "object") {
+        const group = FOOD_GROUP_IDS.includes(item.group) ? item.group : undefined;
+        return { id: item.id || uid(), text: String(item.text || ""), done: !!item.done, group };
+      }
+      return { id: uid(), text: String(item || ""), done: false };
+    }).filter((item) => item.text.trim());
+  }
+  if (typeof val === "string" && val.trim()) {
+    return val.split(/\n+/).map((line) => line.trim()).filter(Boolean).map((text) => ({
+      id: uid(), text, done: false
+    }));
+  }
+  return [];
+}
+function normalizeFoodList(list) {
+  return linesToList(list).map((item) => ({
+    ...item,
+    group: FOOD_GROUP_IDS.includes(item.group) ? item.group : guessFoodGroup(item.text)
+  }));
+}
+function bodyListGet(key) {
+  return normalizeFoodList(bodyGet(key));
+}
+function bodyListSet(key, list) {
+  bodySet(key, normalizeFoodList(list));
+}
+function groupSelect(selected, onChange) {
+  const sel = document.createElement("select");
+  sel.className = "item-list-group";
+  sel.title = "Group";
+  FOOD_GROUPS.forEach((g) => {
+    const opt = document.createElement("option");
+    opt.value = g.id;
+    opt.textContent = g.label;
+    if (g.id === selected) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener("change", () => onChange(sel.value));
+  return sel;
+}
+function renderItemList(card, key, opts) {
+  const wrap = document.createElement("div");
+  wrap.className = "item-list";
+
+  const board = document.createElement("div");
+  board.className = "item-list-board";
+
+  function redraw() {
+    const list = bodyListGet(key);
+    board.innerHTML = "";
+    if (!list.length) {
+      const empty = document.createElement("p");
+      empty.className = "item-list-empty";
+      empty.textContent = opts.emptyText || "No items yet.";
+      board.appendChild(empty);
+      return;
+    }
+    FOOD_GROUPS.forEach((g) => {
+      const rows = list.map((item, idx) => ({ item, idx })).filter((row) => row.item.group === g.id);
+      if (!rows.length) return;
+      const section = document.createElement("div");
+      section.className = "item-group";
+      const title = document.createElement("h3");
+      title.className = "item-group-title";
+      title.textContent = g.label;
+      section.appendChild(title);
+      const ul = document.createElement("ul");
+      ul.className = "item-list-ul";
+      rows.forEach(({ item, idx }) => {
+        const li = document.createElement("li");
+        li.className = "item-list-row" + (item.done ? " done" : "");
+
+        const check = document.createElement("input");
+        check.type = "checkbox";
+        check.checked = !!item.done;
+        check.title = "Got it";
+        check.addEventListener("change", () => {
+          const next = bodyListGet(key);
+          if (!next[idx]) return;
+          next[idx].done = check.checked;
+          bodyListSet(key, next);
+          redraw();
+        });
+
+        const text = document.createElement("input");
+        text.type = "text";
+        text.className = "item-list-text";
+        text.value = item.text;
+        text.placeholder = "Item…";
+        text.addEventListener("change", () => {
+          const next = bodyListGet(key);
+          if (!next[idx]) return;
+          next[idx].text = text.value;
+          bodyListSet(key, next.filter((row) => row.text.trim()));
+          redraw();
+        });
+        text.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            text.blur();
+            addInput.focus();
+          }
+        });
+
+        const sel = groupSelect(item.group || "other", (group) => {
+          const next = bodyListGet(key);
+          if (!next[idx]) return;
+          next[idx].group = group;
+          bodyListSet(key, next);
+          redraw();
+        });
+
+        const del = document.createElement("button");
+        del.type = "button";
+        del.className = "item-list-del";
+        del.setAttribute("aria-label", "Remove");
+        del.textContent = "×";
+        del.addEventListener("click", () => {
+          const next = bodyListGet(key).filter((_, i) => i !== idx);
+          bodyListSet(key, next);
+          redraw();
+        });
+
+        li.appendChild(check);
+        li.appendChild(text);
+        li.appendChild(sel);
+        li.appendChild(del);
+        ul.appendChild(li);
+      });
+      section.appendChild(ul);
+      board.appendChild(section);
+    });
+  }
+
+  const addRow = document.createElement("div");
+  addRow.className = "item-list-add";
+  const addGroup = groupSelect("other", () => {});
+  const autoOpt = document.createElement("option");
+  autoOpt.value = "auto";
+  autoOpt.textContent = "Auto group";
+  addGroup.insertBefore(autoOpt, addGroup.firstChild);
+  addGroup.value = "auto";
+  const addInput = document.createElement("input");
+  addInput.type = "text";
+  addInput.placeholder = opts.addPlaceholder || "Add item…";
+  const addBtn = document.createElement("button");
+  addBtn.type = "button";
+  addBtn.className = "btn";
+  addBtn.textContent = "Add";
+  function addItem() {
+    const text = addInput.value.trim();
+    if (!text) return;
+    const picked = addGroup.value;
+    const group = (picked === "auto" || !picked) ? guessFoodGroup(text) : picked;
+    const next = bodyListGet(key);
+    next.push({ id: uid(), text, done: false, group });
+    bodyListSet(key, next);
+    addInput.value = "";
+    redraw();
+    addInput.focus();
+  }
+  addBtn.addEventListener("click", addItem);
+  addInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addItem();
+    }
+  });
+  addRow.appendChild(addGroup);
+  addRow.appendChild(addInput);
+  addRow.appendChild(addBtn);
+
+  const actions = document.createElement("div");
+  actions.className = "item-list-actions";
+  if (opts.allowClearChecked) {
+    const clearDone = document.createElement("button");
+    clearDone.type = "button";
+    clearDone.className = "btn ghost";
+    clearDone.textContent = "Clear checked";
+    clearDone.addEventListener("click", () => {
+      const next = bodyListGet(key).filter((item) => !item.done);
+      bodyListSet(key, next);
+      redraw();
+    });
+    actions.appendChild(clearDone);
+  }
+  if (opts.allowClearAll) {
+    const clearAll = document.createElement("button");
+    clearAll.type = "button";
+    clearAll.className = "btn ghost";
+    clearAll.textContent = "Clear list";
+    clearAll.addEventListener("click", () => {
+      if (!bodyListGet(key).length) return;
+      if (!confirm(opts.clearConfirm || "Clear this list?")) return;
+      bodyListSet(key, []);
+      redraw();
+    });
+    actions.appendChild(clearAll);
+  }
+
+  wrap.appendChild(board);
+  wrap.appendChild(addRow);
+  if (actions.childNodes.length) wrap.appendChild(actions);
+  card.appendChild(wrap);
+  redraw();
+  return wrap;
+}
+
+
+function bodyFlatListGet(key) {
+  return linesToList(bodyGet(key)).map((item) => ({
+    id: item.id || uid(),
+    text: String(item.text || ""),
+    done: !!item.done
+  }));
+}
+function bodyFlatListSet(key, list) {
+  const cleaned = (list || []).map((item) => ({
+    id: item.id || uid(),
+    text: String(item.text || ""),
+    done: !!item.done
+  })).filter((item) => item.text.trim());
+  bodySet(key, cleaned);
+}
+function renderFlatItemList(card, key, opts) {
+  const wrap = document.createElement("div");
+  wrap.className = "item-list";
+  const board = document.createElement("div");
+  board.className = "item-list-board";
+
+  function redraw() {
+    const list = bodyFlatListGet(key);
+    board.innerHTML = "";
+    if (!list.length) {
+      const empty = document.createElement("p");
+      empty.className = "item-list-empty";
+      empty.textContent = opts.emptyText || "No items yet.";
+      board.appendChild(empty);
+      return;
+    }
+    const ul = document.createElement("ul");
+    ul.className = "item-list-ul";
+    list.forEach((item, idx) => {
+      const li = document.createElement("li");
+      li.className = "item-list-row flat" + (item.done ? " done" : "");
+      const check = document.createElement("input");
+      check.type = "checkbox";
+      check.checked = !!item.done;
+      check.title = "Taken / got it";
+      check.addEventListener("change", () => {
+        const next = bodyFlatListGet(key);
+        if (!next[idx]) return;
+        next[idx].done = check.checked;
+        bodyFlatListSet(key, next);
+        redraw();
+      });
+      const text = document.createElement("input");
+      text.type = "text";
+      text.className = "item-list-text";
+      text.value = item.text;
+      text.placeholder = "Item…";
+      text.addEventListener("change", () => {
+        const next = bodyFlatListGet(key);
+        if (!next[idx]) return;
+        next[idx].text = text.value;
+        bodyFlatListSet(key, next.filter((row) => row.text.trim()));
+        redraw();
+      });
+      text.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          text.blur();
+          addInput.focus();
+        }
+      });
+      const del = document.createElement("button");
+      del.type = "button";
+      del.className = "item-list-del";
+      del.setAttribute("aria-label", "Remove");
+      del.textContent = "×";
+      del.addEventListener("click", () => {
+        bodyFlatListSet(key, bodyFlatListGet(key).filter((_, i) => i !== idx));
+        redraw();
+      });
+      li.appendChild(check);
+      li.appendChild(text);
+      li.appendChild(del);
+      ul.appendChild(li);
+    });
+    board.appendChild(ul);
+  }
+
+  const addRow = document.createElement("div");
+  addRow.className = "item-list-add flat";
+  const addInput = document.createElement("input");
+  addInput.type = "text";
+  addInput.placeholder = opts.addPlaceholder || "Add item…";
+  const addBtn = document.createElement("button");
+  addBtn.type = "button";
+  addBtn.className = "btn";
+  addBtn.textContent = "Add";
+  function addItem() {
+    const text = addInput.value.trim();
+    if (!text) return;
+    const next = bodyFlatListGet(key);
+    next.push({ id: uid(), text, done: false });
+    bodyFlatListSet(key, next);
+    addInput.value = "";
+    redraw();
+    addInput.focus();
+  }
+  addBtn.addEventListener("click", addItem);
+  addInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addItem();
+    }
+  });
+  addRow.appendChild(addInput);
+  addRow.appendChild(addBtn);
+
+  const actions = document.createElement("div");
+  actions.className = "item-list-actions";
+  if (opts.allowClearChecked) {
+    const clearDone = document.createElement("button");
+    clearDone.type = "button";
+    clearDone.className = "btn ghost";
+    clearDone.textContent = "Clear checked";
+    clearDone.addEventListener("click", () => {
+      bodyFlatListSet(key, bodyFlatListGet(key).filter((item) => !item.done));
+      redraw();
+    });
+    actions.appendChild(clearDone);
+  }
+  if (opts.allowClearAll) {
+    const clearAll = document.createElement("button");
+    clearAll.type = "button";
+    clearAll.className = "btn ghost";
+    clearAll.textContent = "Clear list";
+    clearAll.addEventListener("click", () => {
+      if (!bodyFlatListGet(key).length) return;
+      if (!confirm(opts.clearConfirm || "Clear this list?")) return;
+      bodyFlatListSet(key, []);
+      redraw();
+    });
+    actions.appendChild(clearAll);
+  }
+
+  wrap.appendChild(board);
+  wrap.appendChild(addRow);
+  if (actions.childNodes.length) wrap.appendChild(actions);
+  card.appendChild(wrap);
+  redraw();
+  return wrap;
+}
+
+function bodyGet(key) {
+  return (data.body && data.body[key] != null) ? data.body[key] : "";
+}
+function bodySet(key, value) {
+  if (!data.body) data.body = { ...BODY_DEFAULTS };
+  data.body[key] = value;
+  save();
+}
+function bindBodyField(el, key) {
+  el.addEventListener("input", () => bodySet(key, el.value));
+}
+function bodyField(key, label, tall, placeholder) {
+  const lab = document.createElement("label");
+  lab.className = "field";
+  const span = document.createElement("span");
+  span.textContent = label;
+  lab.appendChild(span);
+  const ta = document.createElement(tall ? "textarea" : "input");
+  if (!tall) ta.type = "text";
+  else { ta.className = "tall"; ta.rows = 4; }
+  ta.placeholder = placeholder || "…";
+  ta.value = bodyGet(key);
+  bindBodyField(ta, key);
+  lab.appendChild(ta);
+  return lab;
+}
+
+function renderBody(panel) {
+  const hero = document.createElement("div");
+  hero.className = "hero";
+  hero.innerHTML = "<h1>Body &amp; Energy</h1><p>Food and movement for your body — not a generic wellness page. Staples monthly. Groceries weekly. Supplements and fiber foods on the desk. Workouts that match how you actually train.</p>";
+  panel.appendChild(hero);
+
+  // Body brief
+  const brief = document.createElement("div");
+  brief.className = "card body-brief";
+  brief.innerHTML = "<h2>Body brief</h2><p class=\"hint\">The filter. Food and workouts answer to this.</p>";
+  brief.appendChild(bodyField("brief", "Profile", true));
+  brief.appendChild(bodyField("limits", "Limits / no-gos", true, "pain, heat, what to skip on heavy days"));
+  panel.appendChild(brief);
+
+  // Groceries
+  const food = document.createElement("div");
+  food.className = "split-row";
+  const staples = document.createElement("div");
+  staples.className = "card body-staples";
+  staples.innerHTML = "<h2>Staples · monthly</h2><p class=\"hint\">Always-buy list, grouped by aisle. Rebuild about once a month. Change the group on any line to move it.</p>";
+  renderItemList(staples, "staples", {
+    addPlaceholder: "Add staple…",
+    emptyText: "No staples yet. Add the monthly always-buys.",
+    allowClearChecked: true,
+    allowClearAll: true,
+    clearConfirm: "Clear the whole staples list?"
+  });
+  food.appendChild(staples);
+  const weekly = document.createElement("div");
+  weekly.className = "card body-weekly";
+  weekly.innerHTML = "<h2>Groceries · this week</h2><p class=\"hint\">Weekly shop, grouped by aisle. Check off as you go. Change the group on any line to move it.</p>";
+  renderItemList(weekly, "weeklyGroceries", {
+    addPlaceholder: "Add grocery…",
+    emptyText: "No groceries this week yet.",
+    allowClearChecked: true,
+    allowClearAll: true,
+    clearConfirm: "Clear this week’s grocery list?"
+  });
+  food.appendChild(weekly);
+  panel.appendChild(food);
+
+  // Supplements + fiber
+  const stack = document.createElement("div");
+  stack.className = "split-row";
+  const supplements = document.createElement("div");
+  supplements.className = "card body-supplements";
+  supplements.innerHTML = "<h2>Supplements</h2><p class=\"hint\">Your stack. Check off when taken; clear checked when the day or week is done.</p>";
+  renderFlatItemList(supplements, "supplements", {
+    addPlaceholder: "Add supplement…",
+    emptyText: "No supplements listed yet. Add what you take.",
+    allowClearChecked: true,
+    allowClearAll: true,
+    clearConfirm: "Clear the supplements list?"
+  });
+  stack.appendChild(supplements);
+  const fiber = document.createElement("div");
+  fiber.className = "card body-fiber";
+  fiber.innerHTML = "<h2>Fiber foods</h2><p class=\"hint\">High-fiber picks drawn from Mayo Clinic / Harvard-style charts, tuned for Barbados shopping and a lactose-aware plate. Check when stocked or used. Food ideas only — not medical advice.</p>";
+  renderItemList(fiber, "fiberFoods", {
+    addPlaceholder: "Add fiber food…",
+    emptyText: "No fiber foods yet.",
+    allowClearChecked: true,
+    allowClearAll: true,
+    clearConfirm: "Clear the fiber foods list?"
+  });
+  stack.appendChild(fiber);
+  panel.appendChild(stack);
+
+  // Workouts
+  const train = document.createElement("div");
+  train.className = "card";
+  train.innerHTML = "<h2>Workouts for my body</h2><p class=\"hint\">Your mix: strength, pilates, yoga, cardio. Write what you actually do — or want on rotation.</p>";
+  train.appendChild(bodyField("workoutFocus", "Current focus", false, "e.g. deep core / posture / legs / calm nervous system"));
+
+  const mods = document.createElement("div");
+  mods.className = "workout-grid";
+  [
+    ["strength", "Strength", "strength", "lifts, bands, bodyweight — what and how often"],
+    ["pilates", "Pilates", "pilates", "mat / reformer notes, session length"],
+    ["yoga", "Yoga", "yoga", "style, when you use it"],
+    ["cardio", "Cardio", "cardio", "walk, heat-friendly options, duration"]
+  ].forEach(([key, title, tone, ph]) => {
+    const tile = document.createElement("div");
+    tile.className = "workout-tile " + tone;
+    tile.innerHTML = "<div class=\"lane-kicker\">Modality</div><div class=\"lane-title\">" + title + "</div>";
+    const ta = document.createElement("textarea");
+    ta.className = "tall";
+    ta.rows = 5;
+    ta.placeholder = ph;
+    ta.value = bodyGet(key);
+    bindBodyField(ta, key);
+    tile.appendChild(ta);
+    mods.appendChild(tile);
+  });
+  train.appendChild(mods);
+  train.appendChild(bodyField("drainedDay", "When I’m drained", true, "shortest honest session that still counts"));
+  panel.appendChild(train);
+
+  // Energy
+  const energy = document.createElement("div");
+  energy.className = "split-row";
+  const sleep = document.createElement("div");
+  sleep.className = "card";
+  sleep.innerHTML = "<h2>Sleep &amp; recovery</h2>";
+  sleep.appendChild(bodyField("sleep", "Sleep / recovery notes", true));
+  energy.appendChild(sleep);
+  const drains = document.createElement("div");
+  drains.className = "card";
+  drains.innerHTML = "<h2>What drains me</h2>";
+  drains.appendChild(bodyField("drains", "Drains", true, "food, heat, people, screens…"));
+  energy.appendChild(drains);
+  panel.appendChild(energy);
+
+  const check = document.createElement("div");
+  check.className = "card";
+  check.innerHTML = "<h2>Weekly check</h2>";
+  check.appendChild(bodyField("weeklyCheck", "This week", true, "food shop done? moved? energy 1–10?"));
+  panel.appendChild(check);
+
+  const sig = document.createElement("div");
+  sig.className = "card";
+  sig.innerHTML = "<h2>Signals</h2>";
+  const sg = document.createElement("div");
+  sg.className = "grid-2";
+  [["healthy", "Healthy looks like"], ["broken", "Broken looks like"]].forEach(([key, label]) => {
+    const lab = document.createElement("label");
+    lab.className = "field";
+    lab.innerHTML = "<span>" + label + "</span>";
+    const ta = document.createElement("textarea");
+    ta.className = "tall";
+    ta.value = bodyGet(key);
+    bindBodyField(ta, key);
+    lab.appendChild(ta);
+    sg.appendChild(lab);
+  });
+  sig.appendChild(sg);
+  panel.appendChild(sig);
+
+  const note = document.createElement("p");
+  note.className = "note";
+  note.textContent = "Not medical advice — your operating notes. Data stays on this Mac.";
+  panel.appendChild(note);
+}
+
+function renderClasses(panel) {
+  const hero = document.createElement("div");
+  hero.className = "hero";
+  hero.innerHTML = "<h1>Classes</h1><p>Your course roster. One page for what you are studying, what you finished, and what you dropped on purpose.</p>";
+  panel.appendChild(hero);
+
+  // Why + focus
+  const top = document.createElement("div");
+  top.className = "split-row";
+  const why = document.createElement("div");
+  why.className = "card";
+  why.innerHTML = "<h2>Why these classes</h2><p class=\"hint\">The point of the path — not the syllabus.</p>";
+  why.appendChild(classesField("why", "Purpose of this learning path", true));
+  top.appendChild(why);
+  const focus = document.createElement("div");
+  focus.className = "card classes-focus";
+  focus.innerHTML = "<h2>On the desk now</h2><p class=\"hint\">One class. One concrete study move.</p>";
+  focus.appendChild(classesField("focusClass", "Class in focus", false, "e.g. Systems thinking — OpenLearn"));
+  focus.appendChild(classesField("focusStep", "This week’s study move", true, "e.g. finish boundary / feedback sections + one note card"));
+  top.appendChild(focus);
+  panel.appendChild(top);
+
+  // Status board
+  const board = document.createElement("div");
+  board.className = "card";
+  board.innerHTML = "<h2>Roster</h2><p class=\"hint\">One class per line. Move the whole line when status changes. Dropped means stopped on purpose.</p>";
+  const cols = document.createElement("div");
+  cols.className = "grid-3 classes-board";
+  [
+    ["inProgress", "In progress", "Active path", "in-progress"],
+    ["completed", "Completed", "Finished — keep the wins", "completed"],
+    ["dropped", "Dropped", "Stopped on purpose", "dropped"]
+  ].forEach(([key, title, hint, tone]) => {
+    const col = document.createElement("div");
+    col.className = "class-col " + tone;
+    col.innerHTML = "<h3>" + title + "</h3><p class=\"hint\" style=\"margin-top:0\">" + hint + "</p>";
+    const ta = document.createElement("textarea");
+    ta.className = "tall classes-list";
+    ta.rows = 10;
+    ta.placeholder = "One class per line…";
+    ta.value = classesGet(key);
+    bindClassesField(ta, key);
+    col.appendChild(ta);
+    cols.appendChild(col);
+  });
+  board.appendChild(cols);
+  panel.appendChild(board);
+
+  // Path note + weekly
+  const mid = document.createElement("div");
+  mid.className = "split-row";
+  const path = document.createElement("div");
+  path.className = "card";
+  path.innerHTML = "<h2>Path notes</h2><p class=\"hint\">Links, kit location, order of study.</p>";
+  path.appendChild(classesField("pathNote", "Notes", true));
+  mid.appendChild(path);
+  const week = document.createElement("div");
+  week.className = "card";
+  week.innerHTML = "<h2>Weekly class check</h2><p class=\"hint\">Did study happen? What blocked it?</p>";
+  week.appendChild(classesField("weeklyCheck", "This week", true, "…"));
+  mid.appendChild(week);
+  panel.appendChild(mid);
+
+  const sig = document.createElement("div");
+  sig.className = "card";
+  sig.innerHTML = "<h2>Signals</h2>";
+  const sg = document.createElement("div");
+  sg.className = "grid-2";
+  const h = document.createElement("label");
+  h.className = "field";
+  h.innerHTML = "<span>Healthy study looks like</span>";
+  const ht = document.createElement("textarea");
+  ht.className = "tall";
+  ht.value = classesGet("healthy");
+  bindClassesField(ht, "healthy");
+  h.appendChild(ht);
+  const b = document.createElement("label");
+  b.className = "field";
+  b.innerHTML = "<span>Broken study looks like</span>";
+  const bt = document.createElement("textarea");
+  bt.className = "tall";
+  bt.value = classesGet("broken");
+  bindClassesField(bt, "broken");
+  b.appendChild(bt);
+  sg.appendChild(h);
+  sg.appendChild(b);
+  sig.appendChild(sg);
+  panel.appendChild(sig);
+
+  const note = document.createElement("p");
+  note.className = "note";
+  note.textContent = "Study Studio kit: Desktop / AGDS-Systems-Kit. Data for this page stays on this Mac.";
+  panel.appendChild(note);
+}
+
+
+function timeGet(key) {
+  return (data.time && data.time[key] != null) ? data.time[key] : "";
+}
+function timeSet(key, value) {
+  if (!data.time) data.time = { ...TIME_DEFAULTS };
+  data.time[key] = value;
+  save();
+}
+function timePlanetNote(id) {
+  const notes = (data.time && data.time.planetNotes) || {};
+  return notes[id] != null ? notes[id] : "";
+}
+function timeSetPlanetNote(id, value) {
+  if (!data.time) data.time = { ...TIME_DEFAULTS };
+  if (!data.time.planetNotes) data.time.planetNotes = {};
+  data.time.planetNotes[id] = value;
+  save();
+}
+function timeWeekNote(id) {
+  const notes = (data.time && data.time.weekNotes) || {};
+  return notes[id] != null ? notes[id] : "";
+}
+function timeSetWeekNote(id, value) {
+  if (!data.time) data.time = { ...TIME_DEFAULTS };
+  if (!data.time.weekNotes) data.time.weekNotes = {};
+  data.time.weekNotes[id] = value;
+  save();
+}
+function bindTimeField(el, key) {
+  el.addEventListener("input", () => timeSet(key, el.value));
+}
+function timeField(key, label, tall, placeholder) {
+  const lab = document.createElement("label");
+  lab.className = "field";
+  const span = document.createElement("span");
+  span.textContent = label;
+  lab.appendChild(span);
+  const ta = document.createElement(tall ? "textarea" : "input");
+  if (!tall) ta.type = "text";
+  else { ta.className = "tall"; ta.rows = 4; }
+  ta.placeholder = placeholder || "…";
+  ta.value = timeGet(key);
+  bindTimeField(ta, key);
+  lab.appendChild(ta);
+  return lab;
+}
+function weekdayIndex(d) {
+  // JS: 0=Sun … match WEEKDAY_RULERS
+  return d.getDay();
+}
+function renderTime(panel) {
+  const hero = document.createElement("div");
+  hero.className = "hero";
+  hero.innerHTML = "<h1>Time &amp; Rhythm</h1><p>Vedic day-chart desk: planet positions, dignity, classical nature, weekday rulers. Facts first. Your notes stay yours. Houses parked until birth time is confirmed.</p>";
+  panel.appendChild(hero);
+
+  const frame = document.createElement("div");
+  frame.className = "card time-frame";
+  frame.innerHTML = "<h2>Chart frame</h2><p class=\"frame-meta\">1 Jul 1977 · Georgetown, Guyana · Lahiri sidereal · day-chart (no houses in play). Lived evidence over generic rising-sign fluff.</p>";
+  frame.appendChild(timeField("frameNote", "Working notes on the chart", true, "birth-time hunt, corrections, what you refuse to romanticize…"));
+  panel.appendChild(frame);
+
+  const now = new Date();
+  const wd = WEEKDAY_RULERS[weekdayIndex(now)];
+  const todayCard = document.createElement("div");
+  todayCard.className = "card";
+  todayCard.innerHTML = "<h2>Today’s ruler</h2>";
+  const strip = document.createElement("div");
+  strip.className = "today-strip";
+  strip.innerHTML = "<div class=\"today-glyph\">" + wd.glyph + "</div><div><div class=\"kicker\">Weekday planet</div><div class=\"day-name\">" + wd.day + " · " + wd.planet + " (" + wd.sanskrit + ")</div><p class=\"hint\" style=\"margin:0\">Match today’s ruler to the planet card below. One lean, one watch.</p></div>";
+  todayCard.appendChild(strip);
+  todayCard.appendChild(timeField("todayNote", "Today’s move / watch", true, "one lean · one watch · one sentence"));
+  panel.appendChild(todayCard);
+
+  const planets = document.createElement("div");
+  planets.className = "card";
+  planets.innerHTML = "<h2>Planets</h2><p class=\"hint\">Placement facts and classical karaka nature only. Notes field is yours — nothing personal is pre-filled.</p>";
+  const board = document.createElement("div");
+  board.className = "planet-board";
+  NATAL_PLANETS.forEach((p) => {
+    const card = document.createElement("div");
+    card.className = "planet-card";
+    card.innerHTML = "<div class=\"pc-top\"><span class=\"pc-glyph\">" + p.glyph + "</span><span class=\"pc-name\">" + p.name + "</span><span class=\"pc-sanskrit\">" + p.sanskrit + "</span></div>"
+      + "<div class=\"pc-sign\">" + p.sign + "</div>"
+      + "<div class=\"pc-label\">Dignity</div><p class=\"pc-gift\">" + p.dignity + "</p>"
+      + "<div class=\"pc-label\">Classical nature</div><p class=\"pc-lesson\">" + p.nature + "</p>"
+      + "<div class=\"pc-label\">Chart fact</div><p class=\"pc-lesson\">" + p.fact + "</p>"
+      + "<div class=\"pc-label\">Your notes</div>";
+    const ta = document.createElement("textarea");
+    ta.placeholder = "Your notes on this planet — leave blank if none yet…";
+    ta.value = timePlanetNote(p.id);
+    ta.addEventListener("input", () => timeSetPlanetNote(p.id, ta.value));
+    card.appendChild(ta);
+    board.appendChild(card);
+  });
+  planets.appendChild(board);
+  panel.appendChild(planets);
+
+  const polarity = document.createElement("div");
+  polarity.className = "polarity-grid";
+  const strength = document.createElement("div");
+  strength.className = "card strength-panel";
+  strength.innerHTML = "<h2>Strength panel</h2><p class=\"hint\">Dignity and yoga facts from the day-chart only. Add your own notes below.</p><ul class=\"polarity-list\">" + TIME_STRENGTHS.map((s) => "<li>" + s + "</li>").join("") + "</ul>";
+  strength.appendChild(timeField("strengthNote", "Your strength notes", true, "…"));
+  polarity.appendChild(strength);
+  const soft = document.createElement("div");
+  soft.className = "card soft-panel";
+  soft.innerHTML = "<h2>Caution panel</h2><p class=\"hint\">Technical cautions from the chart math — not a personality read. Notes are yours.</p><ul class=\"polarity-list\">" + TIME_SOFT.map((s) => "<li>" + s + "</li>").join("") + "</ul>";
+  soft.appendChild(timeField("softNote", "Your caution notes", true, "…"));
+  polarity.appendChild(soft);
+  panel.appendChild(polarity);
+
+  const week = document.createElement("div");
+  week.className = "card";
+  week.innerHTML = "<h2>Week rhythm</h2><p class=\"hint\">Each day carries a planet. Scratch one focus line per day. Today is outlined.</p>";
+  const weekGrid = document.createElement("div");
+  weekGrid.className = "week-rhythm";
+  const todayIdx = weekdayIndex(now);
+  WEEKDAY_RULERS.forEach((d, i) => {
+    const cell = document.createElement("div");
+    cell.className = "week-day-card" + (i === todayIdx ? " is-today" : "");
+    cell.innerHTML = "<div class=\"wd-name\">" + d.day + "</div><div class=\"wd-planet\">" + d.glyph + " " + d.planet + "</div>";
+    const ta = document.createElement("textarea");
+    ta.placeholder = "Focus…";
+    ta.value = timeWeekNote(d.id);
+    ta.addEventListener("input", () => timeSetWeekNote(d.id, ta.value));
+    cell.appendChild(ta);
+    weekGrid.appendChild(cell);
+  });
+  week.appendChild(weekGrid);
+  panel.appendChild(week);
+
+  const check = document.createElement("div");
+  check.className = "card";
+  check.innerHTML = "<h2>Weekly check</h2>";
+  check.appendChild(timeField("weeklyCheck", "This week", true, "which planet led? where did soft spots win? what got finished?"));
+  panel.appendChild(check);
+
+  const signals = document.createElement("div");
+  signals.className = "split-row";
+  const healthy = document.createElement("div");
+  healthy.className = "card strength-panel";
+  healthy.innerHTML = "<h2>Healthy rhythm looks like</h2>";
+  healthy.appendChild(timeField("healthy", "Healthy", true, "…"));
+  signals.appendChild(healthy);
+  const broken = document.createElement("div");
+  broken.className = "card soft-panel";
+  broken.innerHTML = "<h2>Broken rhythm looks like</h2>";
+  broken.appendChild(timeField("broken", "Broken", true, "…"));
+  signals.appendChild(broken);
+  panel.appendChild(signals);
+
+  const foot = document.createElement("p");
+  foot.className = "note";
+  foot.textContent = "Reflective chart tool — not medical, legal, or financial advice, and not fate. Houses stay parked until birth time is confirmed.";
+  panel.appendChild(foot);
+}
+
+
+function intentionGet(key) {
+  return (data.intention && data.intention[key] != null) ? data.intention[key] : "";
+}
+function intentionSet(key, value) {
+  if (!data.intention) data.intention = { ...INTENTION_DEFAULTS };
+  data.intention[key] = value;
+  save();
+}
+function bindIntentionField(el, key) {
+  el.addEventListener("input", () => intentionSet(key, el.value));
+}
+function intentionField(key, label, tall, placeholder) {
+  const lab = document.createElement("label");
+  lab.className = "field";
+  const span = document.createElement("span");
+  span.textContent = label;
+  lab.appendChild(span);
+  const ta = document.createElement(tall ? "textarea" : "input");
+  if (!tall) ta.type = "text";
+  else { ta.className = "tall"; ta.rows = 3; }
+  ta.placeholder = placeholder || "…";
+  ta.value = intentionGet(key);
+  bindIntentionField(ta, key);
+  lab.appendChild(ta);
+  return lab;
+}
+
+function renderIntention(panel) {
+  const hero = document.createElement("div");
+  hero.className = "hero";
+  hero.innerHTML = "<h1>Intention</h1><p>Design your life intentionally. A quiet desk for the cycle: what you want, what you do, the life you live toward, and why.</p>";
+  panel.appendChild(hero);
+
+  const quote = document.createElement("p");
+  quote.className = "intention-quote";
+  quote.textContent = "When you understand your why, everything changes.";
+  panel.appendChild(quote);
+
+  const bridge = document.createElement("p");
+  bridge.className = "horizons-bridge";
+  bridge.textContent = "Horizons set the altitude. The cycle runs the week.";
+  panel.appendChild(bridge);
+
+  const horizonsCard = document.createElement("div");
+  horizonsCard.className = "card";
+  horizonsCard.innerHTML = "<h2>Three Timelines</h2>";
+
+  const tlGrid = document.createElement("div");
+  tlGrid.className = "timelines-grid";
+
+  const horizons = [
+    {
+      key: "horizon90",
+      kicker: "90 days",
+      title: "Be visible",
+      sub: "Proof of work and contribution",
+      prompt: "What am I doing in the next 90 days that makes me more visible to others?",
+      chips: null
+    },
+    {
+      key: "horizon18",
+      kicker: "12–18 months",
+      title: "Be valuable",
+      sub: "Compounding engine",
+      prompt: "What will I build in the next year that stays valuable for years?",
+      chips: "skills · systems · products · relationships · reputation"
+    },
+    {
+      key: "horizon5",
+      kicker: "5 years",
+      title: "Be a visionary",
+      sub: "Long bets / marathon of transformation",
+      prompt: "What are my long-term bets (skills, career arc, entrepreneurship, identity)?",
+      chips: null
+    }
+  ];
+
+  horizons.forEach((h) => {
+    const tile = document.createElement("div");
+    tile.className = "timeline-card";
+    const k = document.createElement("div");
+    k.className = "tl-kicker";
+    k.textContent = h.kicker;
+    const t = document.createElement("div");
+    t.className = "tl-title";
+    t.textContent = h.title;
+    const sub = document.createElement("div");
+    sub.className = "tl-sub";
+    sub.textContent = h.sub;
+    const prompt = document.createElement("div");
+    prompt.className = "tl-prompt";
+    prompt.textContent = h.prompt;
+    tile.appendChild(k);
+    tile.appendChild(t);
+    tile.appendChild(sub);
+    tile.appendChild(prompt);
+    if (h.chips) {
+      const chips = document.createElement("div");
+      chips.className = "tl-chips";
+      chips.textContent = h.chips;
+      tile.appendChild(chips);
+    }
+    tile.appendChild(intentionField(h.key, "Notes", true, "…"));
+    tlGrid.appendChild(tile);
+  });
+
+  horizonsCard.appendChild(tlGrid);
+  panel.appendChild(horizonsCard);
+
+  const flow = document.createElement("p");
+  flow.className = "cycle-flow";
+  flow.textContent = "Cycle (clockwise): Intention → Action → Goal → Awareness → Intention";
+  panel.appendChild(flow);
+
+  const cycleCard = document.createElement("div");
+  cycleCard.className = "card";
+  cycleCard.innerHTML = "<h2>The cycle</h2>";
+
+  const grid = document.createElement("div");
+  grid.className = "intention-cycle";
+
+  // Clockwise 2x2: Intention | Action / Awareness | Goal
+  const stages = [
+    {
+      key: "intention",
+      kicker: "1 · Intention",
+      title: "Intention",
+      want: "What you want",
+      line: "Clarity leads to better choices.",
+      label: "What I want this season / this week",
+      placeholder: "…"
+    },
+    {
+      key: "action",
+      kicker: "2 · Action",
+      title: "Action",
+      want: "Doing what you want",
+      line: "Small steps create big shifts.",
+      label: "Small steps I am taking",
+      placeholder: "…"
+    },
+    {
+      key: "awareness",
+      kicker: "4 · Awareness",
+      title: "Awareness",
+      want: "Why you do it",
+      line: "Reflection keeps you aligned.",
+      label: "Why this season",
+      placeholder: "…"
+    },
+    {
+      key: "goal",
+      kicker: "3 · Goal",
+      title: "Goal",
+      want: "Living the life you want to live",
+      line: "A clearer you creates a brighter tomorrow.",
+      label: "The life I am living toward (felt outcome)",
+      placeholder: "…"
+    }
+  ];
+
+  stages.forEach((s) => {
+    const tile = document.createElement("div");
+    tile.className = "cycle-stage";
+    const k = document.createElement("div");
+    k.className = "stage-kicker";
+    k.textContent = s.kicker;
+    const t = document.createElement("div");
+    t.className = "stage-title";
+    t.textContent = s.title;
+    const w = document.createElement("div");
+    w.className = "stage-want";
+    w.textContent = s.want;
+    const line = document.createElement("div");
+    line.className = "stage-line";
+    line.textContent = '"' + s.line + '"';
+    tile.appendChild(k);
+    tile.appendChild(t);
+    tile.appendChild(w);
+    tile.appendChild(line);
+    tile.appendChild(intentionField(s.key, s.label, true, s.placeholder));
+    grid.appendChild(tile);
+  });
+
+  cycleCard.appendChild(grid);
+
+  const note = document.createElement("p");
+  note.className = "cycle-note";
+  note.textContent = "Intentional living is asking better questions, taking aligned action, and letting each step inform the next.";
+  cycleCard.appendChild(note);
+  panel.appendChild(cycleCard);
+
+  const review = document.createElement("div");
+  review.className = "card";
+  review.innerHTML = "<h2>Season and weekly loop</h2><p class=\"hint\">Name the season if it helps. Then notice what stayed on cycle and what drifted.</p>";
+  review.appendChild(intentionField("seasonNote", "Season (optional one-liner)", false, "e.g. late September reset"));
+  review.appendChild(intentionField("weeklyCheck", "What looped this week", true, "…"));
+  const split = document.createElement("div");
+  split.className = "grid-2";
+  const a = document.createElement("div");
+  a.appendChild(intentionField("aligned", "What stayed on cycle", true, "…"));
+  const o = document.createElement("div");
+  o.appendChild(intentionField("offCycle", "What drifted", true, "…"));
+  split.appendChild(a);
+  split.appendChild(o);
+  review.appendChild(split);
+  panel.appendChild(review);
+
+  const foot = document.createElement("p");
+  foot.className = "note";
+  foot.textContent = "Fields stay blank until you fill them. Data for this page stays on this Mac.";
+  panel.appendChild(foot);
+}
+
+function renderGeneric(panel, catId) {
+  const conf = GENERIC[catId];
+  const hero = document.createElement("div");
+  hero.className = "hero";
+  hero.innerHTML = "<h1>" + conf.title + "</h1><p>" + conf.blurb + " <span class=\"soon\">Own layout next.</span></p>";
+  panel.appendChild(hero);
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = "<h2>Notes</h2>";
+  conf.fields.forEach(([key, label, tall]) => {
+    const lab = document.createElement("label");
+    lab.className = "field";
+    lab.innerHTML = "<span>" + label + "</span>";
+    const ta = document.createElement("textarea");
+    if (tall) ta.className = "tall";
+    ta.rows = tall ? 4 : 2;
+    ta.placeholder = "…";
+    ta.value = genericGet(catId, key);
+    ta.addEventListener("input", () => genericSet(catId, key, ta.value));
+    lab.appendChild(ta);
+    card.appendChild(lab);
+  });
+  panel.appendChild(card);
+}
+
+function renderNav() {
+  const nav = document.getElementById("nav");
+  nav.innerHTML = "";
+  NAV.forEach((item) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = item.title;
+    b.className = item.id === active ? "active" : "";
+    b.addEventListener("click", () => {
+      active = item.id;
+      render();
+      save();
+    });
+    nav.appendChild(b);
+  });
+}
+
+function renderMain() {
+  const main = document.getElementById("main");
+  main.innerHTML = "";
+  NAV.forEach((item) => {
+    const panel = document.createElement("section");
+    panel.className = "panel" + (item.id === active ? " active" : "");
+    if (item.id === "intention") renderIntention(panel);
+    else if (item.id === "money") renderMoney(panel);
+    else if (item.id === "offer") renderOffer(panel);
+    else if (item.id === "classes") renderClasses(panel);
+    else if (item.id === "body") renderBody(panel);
+    else if (item.id === "time") renderTime(panel);
+    else renderGeneric(panel, item.id);
+    main.appendChild(panel);
+  });
+}
+
+function render() {
+  const fallback = document.getElementById("jsFallback");
+  if (fallback) fallback.remove();
+
+  renderNav();
+  renderMain();
+}
+
+function exportText() {
+  let out = "ARLETTE OS\n" + "=".repeat(40) + "\n\n";
+  out += "INTENTION\n---------\n";
+  [
+    ["seasonNote", "Season"],
+    ["horizon90", "90 days · Be visible"],
+    ["horizon18", "12–18 months · Be valuable"],
+    ["horizon5", "5 years · Be a visionary"],
+    ["awareness", "Awareness (why)"],
+    ["intention", "Intention (what I want)"],
+    ["action", "Action (small steps)"],
+    ["goal", "Goal (life toward)"],
+    ["weeklyCheck", "Weekly check"],
+    ["aligned", "Aligned / on cycle"],
+    ["offCycle", "Off cycle / drifted"]
+  ].forEach(([k, lab]) => {
+    out += lab + ":\n" + (String(intentionGet(k) || "").trim() || "(empty)") + "\n\n";
+  });
+  out += "\nMONEY\n-----\n";
+  out += "Bank / account: " + moneyGet("bank") + "\n";
+  out += "Trading: " + moneyGet("trading") + "\n";
+  out += "Cash on hand: " + moneyGet("cash") + "\n";
+  out += "Total: " + formatAmt(moneyTotal()) + "\n\n";
+  [
+    ["bufferTarget", "Buffer target"],
+    ["bufferNote", "Buffer notes"],
+    ["periodIn", "Money in"],
+    ["periodOut", "Money out"],
+    ["comingDue", "Coming due"],
+    ["streams", "Streams"],
+    ["tradingRules", "Trading rules"],
+    ["toolNotes", "Tool notes"],
+    ["check1", "Check 1"],
+    ["check2", "Check 2"],
+    ["check3", "Check 3"],
+    ["healthy", "Healthy"],
+    ["broken", "Broken"],
+    ["updatedNote", "Updated note"]
+  ].forEach(([k, lab]) => {
+    out += lab + ":\n" + (moneyGet(k).trim() || "(empty)") + "\n\n";
+  });
+  out += "\nOFFER & WORK\n------------\n";
+  [1,2,3,4].forEach((n) => {
+    const p = "l" + n;
+    out += "LANE " + n + " · " + (offerGet(p + "Name") || "") + "\n";
+    out += "Goal:\n" + (offerGet(p + "Goal").trim() || "(empty)") + "\n";
+    out += "Status:\n" + (offerGet(p + "Status").trim() || "(empty)") + "\n";
+    for (let s = 1; s <= 5; s++) {
+      out += "Step " + s + ":\n" + (offerGet(p + "Step" + s).trim() || "(empty)") + "\n";
+    }
+    out += "Next:\n" + (offerGet(p + "Next").trim() || "(empty)") + "\n\n";
+  });
+  [
+    ["focusNow", "Focus this week"],
+    ["warm", "Pipeline warm"],
+    ["talking", "Pipeline talking"],
+    ["closed", "Pipeline closed"],
+    ["hireRoles", "Roles I will take"],
+    ["sellOffers", "What I sell"],
+    ["pricing", "Pricing"],
+    ["delivery", "Delivery"],
+    ["brand", "Brand"],
+    ["learning", "Work learning"],
+    ["check1", "Check 1"],
+    ["check2", "Check 2"],
+    ["check3", "Check 3"],
+    ["healthy", "Healthy"],
+    ["broken", "Broken"]
+  ].forEach(([k, lab]) => {
+    out += lab + ":\n" + (offerGet(k).trim() || "(empty)") + "\n\n";
+  });
+  out += "\nBODY & ENERGY\n-------------\n";
+  [
+    ["brief", "Body brief"],
+    ["limits", "Limits"],
+    ["workoutFocus", "Workout focus"],
+    ["strength", "Strength"],
+    ["pilates", "Pilates"],
+    ["yoga", "Yoga"],
+    ["cardio", "Cardio"],
+    ["drainedDay", "Drained day"],
+    ["sleep", "Sleep"],
+    ["drains", "Drains"],
+    ["weeklyCheck", "Weekly check"],
+    ["healthy", "Healthy"],
+    ["broken", "Broken"]
+  ].forEach(([k, lab]) => {
+    out += lab + ":\n" + (String(bodyGet(k) || "").trim() || "(empty)") + "\n\n";
+  });
+  function formatFlatList(list) {
+    const rows = linesToList(list);
+    if (!rows.length) return "(empty)";
+    return rows.map((row) => (row.done ? "[x] " : "[ ] ") + row.text).join("\n");
+  }
+  function formatList(list) {
+    const rows = normalizeFoodList(list);
+    if (!rows.length) return "(empty)";
+    const parts = [];
+    FOOD_GROUPS.forEach((g) => {
+      const inGroup = rows.filter((row) => row.group === g.id);
+      if (!inGroup.length) return;
+      parts.push(g.label + ":");
+      inGroup.forEach((row) => {
+        parts.push((row.done ? "[x] " : "[ ] ") + row.text);
+      });
+    });
+    return parts.join("\n") || "(empty)";
+  }
+  out += "Staples monthly:\n" + formatList(bodyGet("staples")) + "\n\n";
+  out += "Weekly groceries:\n" + formatList(bodyGet("weeklyGroceries")) + "\n\n";
+  out += "Supplements:\n" + formatFlatList(bodyGet("supplements")) + "\n\n";
+  out += "Fiber foods:\n" + formatList(bodyGet("fiberFoods")) + "\n\n";
+  out += "\nCLASSES\n-------\n";
+  [
+    ["why", "Why these classes"],
+    ["focusClass", "Class in focus"],
+    ["focusStep", "Study move"],
+    ["inProgress", "In progress"],
+    ["completed", "Completed"],
+    ["dropped", "Dropped"],
+    ["pathNote", "Path notes"],
+    ["weeklyCheck", "Weekly check"],
+    ["healthy", "Healthy study"],
+    ["broken", "Broken study"]
+  ].forEach(([k, lab]) => {
+    out += lab + ":\n" + (classesGet(k).trim() || "(empty)") + "\n\n";
+  });
+  out += "\nTIME & RHYTHM\n--------------\n";
+  out += "Frame:\n" + (String(timeGet("frameNote") || "").trim() || "(empty)") + "\n\n";
+  out += "Today:\n" + (String(timeGet("todayNote") || "").trim() || "(empty)") + "\n\n";
+  NATAL_PLANETS.forEach((p) => {
+    out += p.name + " (" + p.sign + ")\n  Dignity: " + p.dignity + "\n  Nature: " + p.nature + "\n  Fact: " + p.fact + "\n  Notes: " + (timePlanetNote(p.id).trim() || "(empty)") + "\n\n";
+  });
+  out += "Strength notes:\n" + (String(timeGet("strengthNote") || "").trim() || "(empty)") + "\n\n";
+  out += "Soft-spot notes:\n" + (String(timeGet("softNote") || "").trim() || "(empty)") + "\n\n";
+  WEEKDAY_RULERS.forEach((d) => {
+    out += d.day + " · " + d.planet + ":\n" + (timeWeekNote(d.id).trim() || "(empty)") + "\n\n";
+  });
+  out += "Weekly check:\n" + (String(timeGet("weeklyCheck") || "").trim() || "(empty)") + "\n\n";
+  out += "Healthy rhythm:\n" + (String(timeGet("healthy") || "").trim() || "(empty)") + "\n\n";
+  out += "Broken rhythm:\n" + (String(timeGet("broken") || "").trim() || "(empty)") + "\n\n";
+  Object.keys(GENERIC).forEach((catId) => {
+    out += "\n" + GENERIC[catId].title.toUpperCase() + "\n";
+    GENERIC[catId].fields.forEach(([key, label]) => {
+      out += label + ":\n" + (genericGet(catId, key).trim() || "(empty)") + "\n\n";
+    });
+  });
+  const blob = new Blob([out], { type: "text/plain;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "arlette-os-export.txt";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function downloadBlob(filename, content, mime) {
+  const blob = new Blob([content], { type: mime || "text/plain;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(a.href);
+}
+
+function exportJSONBackup() {
+  const stamp = new Date().toISOString().slice(0, 16).replace("T", "_").replace(":", "-");
+  const payload = {
+    exportedAt: new Date().toISOString(),
+    active: localStorage.getItem("arlette-os-active"),
+    storageKey: STORAGE_KEY,
+    data: JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}")
+  };
+  downloadBlob("arlette-os-data_" + stamp + ".json", JSON.stringify(payload, null, 2), "application/json;charset=utf-8");
+  return stamp;
+}
+
+function runAutoBackupIfRequested() {
+  const want = location.hash === "#backup" || /(?:^|[?&])backup=1(?:&|$)/.test(location.search);
+  if (!want) return;
+  setTimeout(() => {
+    try {
+      const stamp = exportJSONBackup();
+      // reuse export UI text with dated name
+      const orig = document.createElement("a").download;
+      const oldExport = exportText;
+      // temporarily wrap download name inside exportText by monkeypatching createElement? simpler: call export then rename is hard.
+      exportText();
+      // second json already dated; text keeps default name — rename after via agent
+    } catch (e) {
+      console.error(e);
+    }
+    try {
+      history.replaceState(null, "", location.pathname);
+    } catch (e2) {}
+  }, 500);
+}
+
+document.getElementById("btnExport").addEventListener("click", exportText);
+document.getElementById("btnClear").addEventListener("click", () => {
+  if (!confirm("Clear every field in Arlette OS? This cannot be undone.")) return;
+  data = { intention: { ...INTENTION_DEFAULTS }, money: { ...MONEY_DEFAULTS }, offer: { ...OFFER_DEFAULTS }, classes: { ...CLASSES_DEFAULTS }, body: { ...BODY_DEFAULTS }, time: { ...TIME_DEFAULTS } };
+  save();
+  render();
+});
+
+render();
+runAutoBackupIfRequested();
+</script>
+</body>
+</html>
