@@ -734,6 +734,69 @@ body.is-printing #printWeekSheet {
 }
 .grat-history-item strong { color: var(--gold-pale); }
 
+
+.day-picker { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 14px; }
+.day-picker button {
+  background: rgba(15,10,30,0.45);
+  border: 1px solid rgba(212,168,75,0.25);
+  color: var(--muted);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+.day-picker button:hover { color: var(--gold-pale); border-color: var(--card-border); }
+.day-picker button.active {
+  background: var(--indigo-mid);
+  color: var(--gold);
+  border-color: var(--gold);
+}
+.guide-open { color: var(--text-dim); font-size: 0.92rem; margin-bottom: 12px; line-height: 1.55; }
+.guide-section-title {
+  font-size: 0.95rem;
+  color: var(--gold);
+  margin: 14px 0 6px;
+  letter-spacing: 0.03em;
+}
+.guide-rhythm { list-style: none; margin-left: 0 !important; }
+.guide-rhythm li {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(168,155,196,0.12);
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+.guide-rhythm li:last-child { border-bottom: none; }
+.guide-rhythm strong { color: var(--gold-soft); }
+.guide-short {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--gold-pale);
+  margin-top: 12px;
+  font-size: 0.95rem;
+}
+.day-did {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: rgba(212,168,75,0.08);
+  border-radius: 10px;
+  border: 1px dashed rgba(212,168,75,0.4);
+}
+.day-did h3 { margin-top: 0; }
+.day-card-compact {
+  background: rgba(15,10,30,0.35);
+  border-left: 3px solid var(--gold);
+  padding: 10px 12px;
+  margin: 10px 0 4px;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+.day-card-compact div { margin-bottom: 3px; }
+.day-card-compact strong { color: var(--gold-soft); }
+.week-day.browse-hit { cursor: pointer; }
+.week-day.browse-hit:hover { border-color: var(--gold); }
+
 </style>
 </head>
 <body>
@@ -790,20 +853,20 @@ body.is-printing #printWeekSheet {
     <div class="card" id="todayCard">
       <div class="eyebrow" id="todayDateLabel">Today</div>
       <h2 id="todayVaraTitle">Daily Life Guide</h2>
-      <p id="todayInsight"><strong style="color:var(--gold-soft)">Today’s insight:</strong> Open this file in Safari or Chrome so the guide can match today’s weekday planet to your natal chart. Scroll below for Who is Arlette, Life purpose, and the Approval lab — those sections are always readable.</p>
-      <h3>Best practices</h3>
-      <ul class="check-list" id="todayPractices">
-        <li>Open in Safari (not Files preview) for the live daily checklist.</li>
-        <li>Read “Who is Arlette” once today.</li>
-        <li>Visit Approval lab if praise-seeking or people-pleasing shows up.</li>
-      </ul>
-      <h3>Watch-fors</h3>
-      <ul id="todayWatch">
-        <li>Files preview can look blank even when the app is fine.</li>
-        <li>Chat previews also block JavaScript.</li>
-      </ul>
-      <h3>Daily prompt</h3>
-      <div class="prompt-box" id="todayPrompt">What would “enough” feel like in my body today, without earning it?</div>
+      <div class="day-picker" id="dayPicker" aria-label="Browse weekday guides"></div>
+      <p class="guide-open" id="todayInsight">Open this file in Safari or Chrome so the guide can match today’s weekday planet to your natal chart.</p>
+      <div class="day-card-compact" id="todayDayCard"></div>
+      <h3 class="guide-section-title">What your chart says</h3>
+      <ul id="todayChartSays"></ul>
+      <h3 class="guide-section-title">A day rhythm</h3>
+      <ul class="guide-rhythm" id="todayPractices"></ul>
+      <h3 class="guide-section-title">What pulls you off</h3>
+      <ul id="todayWatch"></ul>
+      <p class="guide-short" id="todayPrompt"></p>
+      <div class="day-did" id="todayDidWrap">
+        <h3>Today I did</h3>
+        <ul class="check-list" id="todayDidList"></ul>
+      </div>
     </div>
     <div class="sky-note" id="skyNote"><strong>Sky note:</strong> Live sky calculation needs Safari/Chrome. Your natal Saturn in Cancer is a standing theme of belonging without self-erasure.</div>
   </section>
@@ -911,9 +974,15 @@ body.is-printing #printWeekSheet {
   <!-- 6. WEEK AT A GLANCE -->
   <section class="panel" id="panel-week" data-section="week">
     <div class="card">
-      <div class="eyebrow">Seven days</div>
+      <div class="eyebrow">Seven days + nodes</div>
       <h2>Week at a glance</h2>
+      <p class="approx">Tap a day to open its full natal guide on Today. Compact day-card lines match morning chat pings.</p>
       <div class="week-grid" id="weekGrid"></div>
+    </div>
+    <div class="card" id="nodesCard">
+      <div class="eyebrow">No weekday · axis</div>
+      <h2>Rahu &amp; Ketu</h2>
+      <div id="nodesGuideBody"></div>
     </div>
   </section>
 
@@ -1302,7 +1371,7 @@ body.is-printing #printWeekSheet {
     </div>
   </section>
 
-  <footer class="app-foot">Arlette Life Guide · v1.5.0</footer>
+  <footer class="app-foot">Arlette Life Guide · v1.6.0 · natal day guides</footer>
 </div>
 
 <script>
@@ -1369,109 +1438,263 @@ var GRAHA_SYM = {
   Jupiter: '♃', Saturn: '♄', Rahu: '☊', Ketu: '☋'
 };
 
-var DAILY = {
+var PLANET_DAY_GUIDES = {
   Sun: {
-    insight: 'Sunday carries Ravi — your natal Sun in Mithuna. Today the sky asks your dual mind to shine with clarity, not scatter. Let one story, one offer, or one finished piece get the light. Your Gemini Sun thrives when visibility meets completion.',
-    practices: [
-      'Finish one small creative or sales piece before sharing it.',
-      'Speak one true sentence about your craft without soft-pedaling.',
-      'Sit in sunlight or open air for ten quiet minutes — body as altar.'
+    day: 'Sunday',
+    planet: 'Sun',
+    sanskrit: 'Ravi',
+    opening: 'You align with Sunday by giving the Sun what Gemini needs, which is clear light through words and exchange, finished enough to be seen. A Gemini Sun does not shine by standing still on a stage. It shines when one idea becomes one true sentence, one conversation, or one completed piece that can meet the world.',
+    chart: [
+      'Gemini, ruled by Mercury. Your Sun works through Mercury, and Mercury sits right beside it in Gemini in its own sign. So your vitality shows up as curiosity, speech, and mental agility. The catch is proximity: Mercury is about 2° from the Sun, so Budha-Aditya (Sun–Mercury yoga) is present and Mercury is combust. Clarity comes when thought serves the heart of the message, not when the mind races for applause.',
+      'Ardra, the storm that clears. Rahu rules this nakshatra. Your Sun carries a capacity to tell the truth after weather passes — to name what is real without drama. Soft rain after thunder is the tone, not endless storm.',
+      'The Sun aspects your Moon in Sagittarius (7th aspect). Sunday light lands on the emotional center. When the Sun is clean, the Moon feels oriented rather than restless.',
+      'Mercury, also in Gemini, shares this day-field. What you think and what you show are woven together; unfinished performance drains the Sun faster than honest silence.'
     ],
-    watch: [
-      'Performing for praise instead of offering finished work.',
-      'Splitting attention across too many bright ideas.'
+    rhythm: [
+      { label: 'Morning', text: 'Wear or keep something in warm gold, saffron, or copper tones near you. Sit with a Surya mantra such as Om Suryaya Namah, 9, 27, or 108 times, ideally facing morning light or an open window. Eat something fresh and simple — fruit, warm grains, or anything that feels bright rather than heavy.' },
+      { label: 'Midday', text: 'Leave the house for light and people: a short walk in the sun, a conversation that matters, or a visit to a place where ideas move (a library, café, bookstore, or community space). Speak one finished thought out loud to someone — not a draft, a completed sentence.' },
+      { label: 'Afternoon', text: 'Offer something luminous. Traditionally Sundays favor the colour red-gold and offerings that honor life-force: water poured with gratitude, a small donation, or helping someone see a clearer path. Write or send one clear message, then stop revising.' },
+      { label: 'Evening', text: 'Sit where you can see the day’s last light. Name one thing you completed and let it be enough. Soften the screen glow; let the body know the Sun has set.' }
     ],
-    prompt: 'What one thing am I ready to complete and let be seen — without asking for applause first?'
+    off: [
+      'Splitting into too many bright ideas so none get finished light.',
+      'Performing for praise instead of offering something complete.',
+      'Hiding after the Ardra storm instead of speaking the calm truth.'
+    ],
+    closing: 'In short, a Sun-in-Gemini Sunday is clear, conversational, and complete. You shine by finishing one true thing and letting it be seen.',
+    did: { body: 'Walked in sunlight or stretched facing a window', out: 'Had a real conversation or visited a place where ideas meet people', practice: 'Gold/saffron + Om Suryaya Namah + one finished sentence shared' }
   },
   Moon: {
-    insight: 'Monday carries Soma — speaking to your approximate Moon in Dhanu. Your heart needs horizon and meaning. Soften the crab shell of Saturn–Cancer by feeding the seeker: a walk, a prayer, a larger why for the week.',
-    practices: [
-      'Name today’s larger why in one sentence.',
-      'Do one act of care for yourself that is not about earning belonging.',
-      'Read or listen to something that stretches your horizon.'
+    day: 'Monday',
+    planet: 'Moon',
+    sanskrit: 'Soma',
+    opening: 'You align with Monday by giving the Moon what Sagittarius needs, which is feeling with a horizon. A Sagittarius Moon does not settle by shrinking the week. It settles when emotion has meaning, movement, and a larger why — water that knows which way the river runs.',
+    chart: [
+      'Sagittarius, ruled by Jupiter. Your Moon works through Guru, and Jupiter sits in Taurus. So the heart softens when wisdom is tangible: real learning, real faith, real generosity — not abstract pep talk. Thursday’s planet is the Moon’s landlord; feed Jupiter and Monday eases.',
+      'Purva Ashadha, the invincible star. Venus rules this nakshatra. Your emotional weather improves through beauty, refreshment, and conviction that feels clean rather than forced. The symbol carries early victory — the sense that the heart can renew itself when it is watered.',
+      'The Moon opposes the Sun and Mercury in Gemini (7th aspect). Feeling and mind face each other across the chart. Monday asks the heart to lead without silencing the mind, and the mind to listen without talking the feeling away.',
+      'Jupiter also rules Ketu’s sign (Pisces), so the Moon’s dispositor links feeling to release and devotion. Quiet faith steadies the seeker Moon more than restless searching.'
     ],
-    watch: [
-      'Feeling caged and snapping at those closest.',
-      'Numbing restlessness instead of giving it a destination.'
+    rhythm: [
+      { label: 'Morning', text: 'Wear white, silver, or soft cream, or keep a pale cloth near you. Chant Om Chandraya Namah 9, 27, or 108 times. Eat something cooling and kind — milk or a milk alternative if it suits you, rice, soft fruit, or a gentle breakfast taken without rushing.' },
+      { label: 'Midday', text: 'Give the Moon sky and distance: a longer walk with a view, time near water if you can, or a visit to a park, temple, or open road where the horizon shows. Learn one thing that stretches meaning — a page of philosophy, a travel story, a teaching that widens the week.' },
+      { label: 'Afternoon', text: 'Offer care without earning. Traditionally Mondays favor white foods, milk, or rice given with a soft heart. Check on someone, water a plant, or make a small offering in gratitude. Let kindness be free of a bargain.' },
+      { label: 'Evening', text: 'Dim the lights early. Journal one sentence: what did my heart need today, and did it get a horizon? Rest without solving everything. The Moon renews in cycles, not in one argument.' }
     ],
-    prompt: 'Where does my heart feel small — and what horizon would restore it?'
+    off: [
+      'Caging the week so small that the Sagittarius heart paces.',
+      'Numbing restlessness instead of giving feeling a destination.',
+      'Letting Gemini mind-talk override what the body already knows.'
+    ],
+    closing: 'In short, a Moon-in-Sagittarius Monday is wide, kind, and meaningful. You settle by giving the heart a horizon and a gentle rhythm.',
+    did: { body: 'Took a longer walk with a view or stretched near open air', out: 'Park, water, temple, or somewhere with sky', practice: 'White/silver + Om Chandraya Namah + one act of free kindness' }
   },
   Mars: {
-    insight: 'Tuesday carries Mangala — your Mars in Mesha. Fire is clean today: start, decide, cut through fog. Pair the spark with Taurus patience so you do not abandon the middle of the work.',
-    practices: [
-      'Start the hard thing in the first hour you are free.',
-      'Set a timer for focused craft — then stop cleanly.',
-      'Move your body enough to burn excess heat (walk, stretch, sea air).'
+    day: 'Tuesday',
+    planet: 'Mars',
+    sanskrit: 'Mangala',
+    opening: 'You align with Tuesday by giving Mars what Aries needs, which is clean heat with a beginning and a boundary. Mars in its own sign starts well. The work is to start once, move the body, and respect the middle after the first spark — courage without scatter-fire.',
+    chart: [
+      'Aries, own sign. Mars here is dignified: initiative, courage, and decisive action come naturally. You do not need to invent drive; you need to aim it.',
+      'Bharani, the star of bearing and thresholds. Venus rules Bharani, so your Mars works best when force serves something of value — life, beauty, a vow kept — not heat for its own sake. The yoni symbol asks: what are you willing to carry through to the other side?',
+      'Mars aspects Saturn in Cancer (4th aspect), and Saturn aspects Mars in return (10th from Cancer). Courage and duty look at each other. Tuesday goes well when you start the hard thing and also honour the slow structure that keeps it from burning out.',
+      'Mars also aspects Libra and Scorpio (7th and 8th). Relationship balance and deep change feel the heat of this Mars; use it to cut fog, not to cut bonds carelessly.',
+      'Mars rules Mrigashira (your Jupiter’s nakshatra) and Chitra (Rahu’s). Your growth-seeking and Rahu’s craft hunger both answer to Mars — movement and precise effort feed more of the chart than restless pushing.'
     ],
-    watch: [
-      'Impatience with anyone slower than your spark.',
-      'Starting three fires and tending none.'
+    rhythm: [
+      { label: 'Morning', text: 'Wear red, coral, or a warm earth tone, or keep a red thread or cloth nearby. Chant Om Mangalaya Namah 9, 27, or 108 times. Eat something grounding and simple — lentils, warm grains, or a meal with a little spice that wakes the body without agitating it.' },
+      { label: 'Midday', text: 'Move hard enough to clear heat: a brisk walk, stairs, a short run, swimming, or decisive physical work outdoors. Then start one difficult task in the first free hour — one, not three. That is own-sign Mars with a target.' },
+      { label: 'Afternoon', text: 'Offer strength usefully. Traditionally Tuesdays favor red lentils, sesame, or helping with a physical task for someone else. Finish a repair, clear a path, or give time to a practical need. Heat that serves is Mars at its best.' },
+      { label: 'Evening', text: 'Cool the system on purpose: stretch, slow breathing, a shower, or an early stop to conflict. Write what you began and what you will respect tomorrow in the middle of the work. Let the fire bank, not rage overnight.' }
     ],
-    prompt: 'What am I ready to begin — and what slow step will I respect after the first spark?'
+    off: [
+      'Starting three fires and tending none.',
+      'Impatience with anyone or anything slower than your spark.',
+      'Using heat to escape duty instead of to meet it (the Mars–Saturn conversation).'
+    ],
+    closing: 'In short, a Mars-in-Aries Tuesday is brave, bodily, and single-pointed. You begin cleanly, move the heat, and stay for the middle.',
+    did: { body: 'Brisk walk, stairs, swim, or hard outdoor effort', out: 'Left the house to move; did one physical errand or repair', practice: 'Red/coral + Om Mangalaya Namah + started one hard thing' }
   },
   Mercury: {
-    insight: 'Wednesday carries Budha — your Mercury sits with the Sun in Mithuna. Words, sales, hostessing, and teaching are favored. Watch the urge to float unfinished drafts for validation; let cleverness serve usefulness.',
-    practices: [
-      'Write or pitch one clear message — then leave it alone.',
-      'Listen twice as long as you explain today.',
-      'Organize one small corner of craft inventory or inbox.'
+    day: 'Wednesday',
+    planet: 'Mercury',
+    sanskrit: 'Budha',
+    opening: 'You align with Wednesday by giving Mercury what Gemini needs, which is cleverness in service of usefulness. Mercury in its own sign is skilled at words, links, and learning. Because it sits so close to the Sun, the mind burns brightest when it carries a clear message — not when it performs every unfinished draft for a hit of attention.',
+    chart: [
+      'Gemini, own sign. Mercury here is strong in skill: speech, writing, teaching, trade of ideas, and agile explanation. Your intelligence likes exchange and variety, with a thread that holds.',
+      'Ardra pada 4, ruled by Rahu. The storm-and-clear theme deepens: your Mercury can name disruption and then translate it into something others can use. Precision after intensity is the gift.',
+      'Combust and in Budha-Aditya yoga with the Sun (~2°). Thought and identity blaze together. Wednesday works when the mind serves one solar point — one thesis, one useful explanation — rather than scattering into witty fragments.',
+      'Mercury aspects the Moon in Sagittarius (7th). Words land on feeling. Kind, clear speech settles the Moon; clever talk that talks past the heart agitates it.',
+      'Mercury rules your Sun’s sign, Saturn’s nakshatra (Ashlesha), and Ketu’s nakshatra (Revati). How you think and speak touches vitality, emotional coils, and the capacity to release. Clean language is medicine for more than Wednesday.'
     ],
-    watch: [
-      'Oversharing WIP for dopamine or praise.',
-      'Talking past the point of connection.'
+    rhythm: [
+      { label: 'Morning', text: 'Wear green, or keep something leafy or emerald-toned near you. Chant Om Budhaya Namah 9, 27, or 108 times. Eat light and fresh — greens, fruit, or a simple meal that keeps the head clear rather than fogged.' },
+      { label: 'Midday', text: 'Learn and link in the world: a class, a library visit, a market conversation, a short course video watched in a café, or a walk where you notice and name what you see. Write one clear paragraph or message, then leave it alone. That is combust Mercury choosing completion over performance.' },
+      { label: 'Afternoon', text: 'Offer intelligence. Traditionally Wednesdays favor green foods, books, or helping someone understand. Teach a small thing, edit a friend’s note, organize a shared list, or give a useful tip without over-explaining.' },
+      { label: 'Evening', text: 'Quiet the channels. Put the phone face down for a stretch. Read something that sharpens rather than scrolls. Note one idea worth keeping and one you can release. Let Ashlesha’s coil loosen by not chewing the same thought all night.' }
     ],
-    prompt: 'What do I need to say clearly — and what am I saying only to be admired?'
+    off: [
+      'Oversharing unfinished work for dopamine or praise.',
+      'Talking past the point of connection.',
+      'Clever scatter that never becomes one useful sentence.'
+    ],
+    closing: 'In short, a Mercury-in-Gemini Wednesday is quick, green, and useful. You think best when curiosity finishes one clear exchange.',
+    did: { body: 'Walked while naming what I saw, or light stretch between errands', out: 'Library, café, class, market talk, or learning in public', practice: 'Green + Om Budhaya Namah + one finished message' }
   },
   Jupiter: {
-    insight: 'Thursday carries Guru — your Jupiter in Vrishabha beside Venus. Expansion wants substance: beauty, craft, values with weight. Teach or host from what you have lived, not from borrowed shine. Wisdom becomes matter.',
-    practices: [
-      'Invest time in one tangible improvement to your craft or space.',
-      'Share one piece of hard-won wisdom without overselling it.',
-      'Choose quality over a quick win in a money or making decision.'
+    day: 'Thursday',
+    planet: 'Jupiter',
+    sanskrit: 'Guru',
+    opening: 'You align with Thursday by giving Jupiter what Taurus needs, which is growth you can feel in your body and senses, done slowly and steadily. Guru in Taurus doesn’t learn in the abstract. It learns by tasting, touching, walking, and building something that lasts.',
+    chart: [
+      'Taurus, ruled by Venus. Your Jupiter works through Venus, and your Venus is strong in its own sign. So your wisdom arrives through beauty, comfort, food, nature, and things that have real value. In Jyotish, Jupiter and Venus are rival teachers (one of spirit, one of pleasure). Your task is to make pleasure sacred, not to choose between them.',
+      'Mrigashira, the searching deer. Your Jupiter sits in the nakshatra of curiosity and seeking. Mars rules it, so your growth needs movement and exploration, not only stillness.',
+      'Jupiter rules your Moon. Your Moon is in Sagittarius, a Jupiter sign, so Thursday touches your emotional center directly. When Jupiter is fed, the Moon settles.',
+      'Jupiter’s aspect falls on Rahu in Virgo. Jupiter’s wisdom is meant to steady Rahu’s restless hunger, so practical, useful learning calms the mind more than chasing the next new thing.'
     ],
-    watch: [
-      'Big talk without a material next step.',
-      'Over-promising from enthusiasm.'
+    rhythm: [
+      { label: 'Morning', text: 'Wear yellow or gold, or keep something yellow near you. Take a few minutes of quiet with a Guru mantra, such as Om Brihaspataye Namah, repeated 9, 27, or 108 times. Eat something simple and sattvic, like a banana, chickpeas, or anything with turmeric.' },
+      { label: 'Midday', text: 'Learn one thing through your body and senses: a walk somewhere new, a visit to a garden or market, a hands-on lesson, or a book read outdoors. That’s the Mrigashira deer exploring, grounded by Taurus.' },
+      { label: 'Afternoon', text: 'Give something of value. Taurus Jupiter grows by offering, not grasping. You could share a skill, give food, or thank a teacher. Traditionally, yellow foods, sweets, or turmeric are offered on Thursdays.' },
+      { label: 'Evening', text: 'Enjoy one slow pleasure on purpose, such as a good meal, music, or a bath, and let it be something you’re grateful for rather than something you escape into. Then write one line about what grew in you today.' }
     ],
-    prompt: 'How can today’s wisdom become something I can touch or give?'
+    off: [
+      'Overdoing comfort. Taurus Jupiter can confuse fullness with growth.',
+      'Scattered seeking, where the deer runs without landing.',
+      'Stubbornness about what you already believe. Jupiter needs a teacher, a book, or a new road.'
+    ],
+    closing: 'In short, a Jupiter-in-Taurus Thursday is slow, sensory, generous, and curious. You’re growing something real, the way a tree grows.',
+    did: { body: 'Walked somewhere new or stretched outdoors', out: 'Garden, market, or a short lesson in person', practice: 'Yellow/gold + Om Brihaspataye Namah + one generous offer' }
   },
   Venus: {
-    insight: 'Friday carries Shukra — your Venus is strong in own-sign Vrishabha. Beauty, pleasure, relationship, and craft are in dignity. Receive appreciation without making it proof of worth. Make something lovely and useful.',
-    practices: [
-      'Tend one beautiful, useful thing (object, meal, display, garment).',
-      'Receive a compliment with a simple thank-you — no deflection.',
-      'Spend a little on quality that aligns with your values, or repair what you have.'
+    day: 'Friday',
+    planet: 'Venus',
+    sanskrit: 'Shukra',
+    opening: 'You align with Friday by giving Venus what Taurus needs, which is beauty you can touch and pleasure that has weight. Venus in its own sign does not apologize for liking harmony, texture, music, and good company. The art is to enjoy without making enjoyment a proof of worth — taste as devotion, not as audition.',
+    chart: [
+      'Taurus, own sign. Venus here is in dignity: values, aesthetics, comfort, and loyal affection have a natural seat. You know quality in the body before you argue it in the mind.',
+      'Krittika, the cutting star. The Sun rules Krittika. Your Venus carries a refining flame — beauty that edits, not only softens. What you love can also be trimmed to truth. Warmth and discrimination share the same seat.',
+      'Venus shares Taurus with Jupiter (same sign; Jupiter later in the sign). Pleasure (Venus) and wisdom (Jupiter) occupy one field. As rival teachers, they ask you to make delight sacred rather than split spirit against the senses.',
+      'Venus aspects Scorpio (7th). Depth and intensity feel your Venusian tone; intimacy wants honesty and beauty together, not charm that avoids the real.',
+      'Venus rules Jupiter’s sign and the Moon’s nakshatra (Purva Ashadha), and also Mars’s Bharani. How you value and beautify feeds growth, emotional weather, and how courage is carried. Friday ripples through more of the chart than romance alone.'
     ],
-    watch: [
-      'Equating beauty-praise with safety or love.',
-      'People-pleasing through aesthetics while ignoring your own taste.'
+    rhythm: [
+      { label: 'Morning', text: 'Wear white, soft pastel, or something that feels lovely against the skin. Chant Om Shukraya Namah 9, 27, or 108 times. Eat something beautiful and nourishing — fresh fruit, a careful breakfast, or a meal you plate as if it matters (because it does).' },
+      { label: 'Midday', text: 'Go toward art, nature, or pleasant company: a gallery, florist, garden, music shop, good bakery, or a slow walk where colour and scent lead. Create or arrange one beautiful useful thing — a playlist, a table, a repaired object, a short piece of writing or song — not only decoration.' },
+      { label: 'Afternoon', text: 'Offer sweetness. Traditionally Fridays favor white flowers, sweets, dairy if it suits you, or acts of harmony. Give a sincere compliment, share food, or mend a small social thread. Receive a kindness with a simple thank-you and no deflection.' },
+      { label: 'Evening', text: 'One deliberate pleasure: music, a bath with care, a lovely meal, fragrance, or quiet with someone safe. Let it be gratitude, not escape. End with one line: what felt enough today?' }
     ],
-    prompt: 'Where can I create or enjoy beauty without needing it to earn belonging?'
+    off: [
+      'Equating beauty-praise with safety or worth.',
+      'People-pleasing through aesthetics while ignoring your own taste.',
+      'Grasping at luxury to fill a hollow instead of enjoying what is already here.'
+    ],
+    closing: 'In short, a Venus-in-Taurus Friday is warm, sensory, and honest. You thrive when beauty is real, shared, and enough.',
+    did: { body: 'Slow sensory walk; danced or stretched to music', out: 'Garden, gallery, florist, bakery, or pleasant company in public', practice: 'Soft colours + Om Shukraya Namah + one beautiful useful act' }
   },
   Saturn: {
-    insight: 'Saturday carries Shani — speaking directly to your Saturn in Karka. Structure, boundaries, and honest belonging are the work. Notice where caretaking becomes self-erasure. Build a shell that protects without isolating.',
-    practices: [
-      'Say one kind no — or one clear yes that is truly yours.',
-      'Do a small duty fully (body, home, craft maintenance).',
-      'Check: am I giving to be loved, or giving from fullness?'
+    day: 'Saturday',
+    planet: 'Saturn',
+    sanskrit: 'Shani',
+    opening: 'You align with Saturday by giving Saturn what Cancer needs, which is durable care without self-erasure. Saturn in the Moon’s sign is not the most comfortable seat — duty sits in emotional water — but it can become deep loyalty and honest structure once belonging feels real. Saturday builds the shell that protects without isolating.',
+    chart: [
+      'Cancer, ruled by the Moon. Saturn works through lunar needs: safety, continuity, and emotional weather. Saturn here can feel heavy in feeling-space; the remedy is rhythm and clear boundaries, not harder armor.',
+      'Ashlesha, the coiled one. Mercury rules Ashlesha. Your Saturn learns through precise awareness of emotional patterns — the embrace that nourishes versus the coil that constricts. Discernment is part of duty.',
+      'Saturn aspects Rahu in Virgo (3rd), Capricorn (7th), and Mars in Aries (10th). Structure speaks to restless hunger, to long goals, and to courage. Saturday steadies Rahu when you do one practical duty fully; it respects Mars when initiative serves a lasting plan.',
+      'Mars aspects Saturn in return — mutual aspect. Heat and time must negotiate. Rushing breaks the vessel; freezing wastes the fire. Steady effort is the agreement.',
+      'Natural tension: Saturn is not at ease in the Moon’s sign. Treat Saturday as practice in belonging without disappearing — structure as kindness to future-you.'
     ],
-    watch: [
+    rhythm: [
+      { label: 'Morning', text: 'Wear dark blue, black, or deep grey, or keep something simple and sturdy near you. Chant Om Shanaye Namah 9, 27, or 108 times. Eat simply and on time — warm, grounding food; fewer stimulants. Saturn likes regularity more than intensity.' },
+      { label: 'Midday', text: 'Do one duty in the world: an errand that maintains life, a visit that keeps a promise, community service, sorting paperwork at a desk outside the house, or helping with a practical task for someone. Move the body slowly and thoroughly — a measured walk, joint care, or steady chores that count as exercise.' },
+      { label: 'Afternoon', text: 'Offer time or labour. Traditionally Saturdays favor dark sesame, black foods, or service to elders and those who carry heavy loads. Give without performing goodness. Say one kind no, or one clear yes that is truly yours.' },
+      { label: 'Evening', text: 'Tidy one corner. Review the week without cruelty. Oil the body or stretch slowly. Write what you kept and what you will stop earning approval for. Rest is part of Saturn’s structure, not a reward you must justify.' }
+    ],
+    off: [
       'Approval-seeking disguised as helpfulness.',
-      'Emotional armor that blocks the closeness you want.'
+      'Emotional armor that blocks the closeness you want.',
+      'Skipping small duties, then drowning in the backlog.'
     ],
-    prompt: 'Where am I earning belonging — and what would secure care look like instead?'
+    closing: 'In short, a Saturn-in-Cancer Saturday is steady, honest, and protective. You belong by keeping your word to yourself and offering care that does not erase you.',
+    did: { body: 'Measured walk or slow thorough chores as movement', out: 'Errands, service, or kept a promise in person', practice: 'Dark blue/black + Om Shanaye Namah + one full duty + one kind boundary' }
   }
 };
 
-var WEEK_LINES = {
-  Sun: { best: 'Finish one visible piece.', lean: 'Clarity & voice', soft: 'Scatter / performance' },
-  Moon: { best: 'Feed meaning & rest.', lean: 'Horizon & heart', soft: 'Cage restlessness' },
-  Mars: { best: 'Start, then stay a beat.', lean: 'Clean initiative', soft: 'Impatience' },
-  Mercury: { best: 'Speak & organize clearly.', lean: 'Story / sales skill', soft: 'WIP validation' },
-  Jupiter: { best: 'Expand through substance.', lean: 'Craft wisdom', soft: 'Big talk only' },
-  Venus: { best: 'Make & receive beauty.', lean: 'Own-sign grace', soft: 'Worth = praise' },
-  Saturn: { best: 'Boundary with care.', lean: 'Loyal structure', soft: 'People-pleasing' }
+var NODES_GUIDE = {
+  opening: 'Rahu and Ketu do not rule a weekday the way the seven grahas do. They mark an axis of appetite and release. Traditionally Rahu’s restless hours are sometimes linked with Saturday and Rahu-kaal clock periods — useful as timing awareness, not as fear. Work with them as chart facts, lightly and steadily.',
+  chart: [
+    'Rahu in Virgo ~26°45′, Chitra pada 2. Mercury’s sign, Mars’s nakshatra. The hunger is for craft, detail, usefulness, and precise beauty — Chitra’s shining architect. Jupiter aspects Rahu from Taurus (5th), and Saturn aspects Rahu from Cancer (3rd). Wisdom and structure are meant to steady the appetite: useful learning and real duty calm Rahu more than the next novelty.',
+    'Ketu in Pisces ~26°45′, Revati pada 4. Jupiter’s sign, Mercury’s nakshatra. The release point is soft, oceanic, and complete — Revati’s shepherding toward the end of a cycle. Jupiter rules this sign; devotion and gentle closure serve Ketu better than dramatic withdrawal.',
+    'The axis asks: refine and be useful (Rahu–Virgo–Chitra) without forgetting how to let go and trust (Ketu–Pisces–Revati). Mars rules Chitra; Mercury rules Revati — effort and clear mind both participate.'
+  ],
+  practice: [
+    'When hunger spikes (Rahu): do one small useful task with care — sort, edit, measure, finish a detail — then stop. Prefer practical skill over chasing a new identity.',
+    'When detachment spikes (Ketu): keep one gentle devotion or kindness, and keep one ordinary duty. Release comparison; do not release the whole day.',
+    'Optional timing note: if you track Rahu-kaal, treat it as a pause for new starts, not as a threat. Use it to finish, tidy, or rest the appetite.'
+  ],
+  off: [
+    'Perfectionism that stalls service (Rahu–Virgo shadow).',
+    'Escaping into vagueness or aloofness when feeling asks for presence (Ketu shadow).',
+    'Feeding hunger with more input instead of one useful completion.'
+  ],
+  closing: 'In short, Rahu in Virgo wants precise usefulness; Ketu in Pisces wants soft completion. Steady the axis with craft and release, not with fear.'
 };
+
+var DAY_CARDS = {
+  Sun: {
+    principle: 'one clear finished light',
+    body: 'walk in real sunlight or stretch facing a window',
+    out: 'conversation, library, café, or any place ideas meet people',
+    practice: 'gold/saffron + Om Suryaya Namah + one finished sentence shared',
+    watch: 'scatter; performing unfinished work for praise'
+  },
+  Moon: {
+    principle: 'feeling with a horizon',
+    body: 'longer walk with a view, or gentle stretch near open air',
+    out: 'park, water, temple, or any place with sky',
+    practice: 'white/silver + Om Chandraya Namah + one act of free kindness',
+    watch: 'small-cage restlessness; numbing instead of meaning'
+  },
+  Mars: {
+    principle: 'one clean start, then stay',
+    body: 'brisk walk, stairs, swim, or hard outdoor effort',
+    out: 'leave the house to move; do one physical errand or repair in the world',
+    practice: 'red/coral + Om Mangalaya Namah + start one hard thing',
+    watch: 'three fires; impatience; heat that skips duty'
+  },
+  Mercury: {
+    principle: 'cleverness that serves',
+    body: 'walk while naming what you see, or light stretch between errands',
+    out: 'library, café, class, market talk, or any learning in public',
+    practice: 'green + Om Budhaya Namah + one finished message',
+    watch: 'WIP for praise; talking past connection'
+  },
+  Jupiter: {
+    principle: 'grow through the senses, slowly',
+    body: 'walk somewhere new or stretch outdoors',
+    out: 'garden, market, or a short lesson in person',
+    practice: 'yellow/gold + Om Brihaspataye Namah + one generous offer',
+    watch: 'comfort mistaken for growth; seeking without landing'
+  },
+  Venus: {
+    principle: 'beauty with weight, enjoyed as enough',
+    body: 'slow sensory walk; dance or stretch to music',
+    out: 'garden, gallery, florist, bakery, or pleasant company in public',
+    practice: 'soft colours + Om Shukraya Namah + one beautiful useful act',
+    watch: 'worth = praise; pleasing past your own taste'
+  },
+  Saturn: {
+    principle: 'durable care without self-erasure',
+    body: 'measured walk or slow thorough chores as movement',
+    out: 'errands, service, keep a promise in person',
+    practice: 'dark blue/black + Om Shanaye Namah + one full duty + one kind boundary',
+    watch: 'people-pleasing; armor that isolates; skipped small duties'
+  }
+};
+
+/* Back-compat aliases used by older render paths */
+var DAILY = PLANET_DAY_GUIDES;
+var WEEK_LINES = DAY_CARDS;
 
 var LAB_QS = [
   { id: 'q1', text: 'Today, did I say yes when I meant no — to keep someone comfortable?' },
@@ -1586,7 +1809,8 @@ function defaultState() {
     business: { projects: [], seededCrm: false },
     editingId: null,
     matter: {},
-    gate: {}
+    gate: {},
+    dayDid: {}
   };
 }
 
@@ -1612,6 +1836,7 @@ function normalizeState(parsed) {
   if (!parsed.displayName) { parsed.displayName = 'Arlette'; }
   if (!parsed.matter) { parsed.matter = {}; }
   if (!parsed.gate) { parsed.gate = {}; }
+  if (!parsed.dayDid) { parsed.dayDid = {}; }
   return parsed;
 }
 
@@ -1703,6 +1928,41 @@ function runPrintSheet(buildFn) {
       sheet.setAttribute('aria-hidden', 'true');
     }, 600);
   }, 50);
+}
+
+
+var GUIDE_TZ = 'America/Barbados';
+var selectedGuidePlanet = null; /* null = today's weekday */
+
+function barbadosNow() {
+  try {
+    var parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: GUIDE_TZ,
+      weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+    }).formatToParts(new Date());
+    var map = {};
+    for (var i = 0; i < parts.length; i++) { map[parts[i].type] = parts[i].value; }
+    var wd = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+    return {
+      dow: wd[map.weekday] != null ? wd[map.weekday] : new Date().getDay(),
+      y: Number(map.year),
+      m: Number(map.month),
+      d: Number(map.day)
+    };
+  } catch (e) {
+    var n = new Date();
+    return { dow: n.getDay(), y: n.getFullYear(), m: n.getMonth() + 1, d: n.getDate() };
+  }
+}
+
+function barbadosDateKey() {
+  var b = barbadosNow();
+  return b.y + '-' + String(b.m).padStart(2, '0') + '-' + String(b.d).padStart(2, '0');
+}
+
+function todayVara() {
+  return VARA[barbadosNow().dow];
 }
 
 var state = loadState();
@@ -2118,15 +2378,62 @@ function showSection(id) {
   }
 }
 
+function renderDayPicker(activePlanet) {
+  var el = document.getElementById('dayPicker');
+  var i, v, btn, html = '';
+  if (!el) { return; }
+  for (i = 0; i < VARA.length; i++) {
+    v = VARA[i];
+    html += '<button type="button" data-planet="' + v.planet + '"' +
+      (v.planet === activePlanet ? ' class="active"' : '') + '>' +
+      v.name.slice(0, 3) + '</button>';
+  }
+  html += '<button type="button" data-planet="Nodes"' +
+    (activePlanet === 'Nodes' ? ' class="active"' : '') + '>Rahu/Ketu</button>';
+  el.innerHTML = html;
+  el.onclick = function (ev) {
+    var t = ev.target;
+    var p;
+    if (!t || !t.getAttribute) { return; }
+    p = t.getAttribute('data-planet');
+    if (!p) { return; }
+    selectedGuidePlanet = p;
+    renderToday();
+    if (p === 'Nodes') {
+      showSection('week');
+      var nodes = document.getElementById('nodesCard');
+      if (nodes && nodes.scrollIntoView) { nodes.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    }
+  };
+}
+
+function renderNodesGuide() {
+  var el = document.getElementById('nodesGuideBody');
+  var g = NODES_GUIDE;
+  var html = '';
+  var i;
+  if (!el || !g) { return; }
+  html += '<p class="guide-open">' + g.opening + '</p>';
+  html += '<h3 class="guide-section-title">What your chart says about this axis</h3><ul>';
+  for (i = 0; i < g.chart.length; i++) { html += '<li>' + g.chart[i] + '</li>'; }
+  html += '</ul><h3 class="guide-section-title">A simple axis practice</h3><ul class="guide-rhythm">';
+  for (i = 0; i < g.practice.length; i++) { html += '<li>' + g.practice[i] + '</li>'; }
+  html += '</ul><h3 class="guide-section-title">What pulls the axis off balance</h3><ul>';
+  for (i = 0; i < g.off.length; i++) { html += '<li>' + g.off[i] + '</li>'; }
+  html += '</ul><p class="guide-short">' + g.closing + '</p>';
+  el.innerHTML = html;
+}
+
 function renderToday() {
   var now = new Date();
-  var day = VARA[now.getDay()];
-  var pack = DAILY[day.planet];
-  var key = dateKey(now);
-  var practiceState = state.practices[key] || {};
-  var i;
-  var html;
-  var checked;
+  var day = todayVara();
+  var planet = selectedGuidePlanet || day.planet;
+  var viewingNodes = planet === 'Nodes';
+  var pack = viewingNodes ? null : PLANET_DAY_GUIDES[planet];
+  var card = viewingNodes ? null : DAY_CARDS[planet];
+  var key = barbadosDateKey();
+  var didState = (state.dayDid && state.dayDid[key] && state.dayDid[key][planet]) || {};
+  var i, html, checked, r, isTodayPlanet;
 
   document.getElementById('seasonSlot').innerHTML = buildSeasonCard(now);
   document.getElementById('lightsSlot').innerHTML = buildNatalLights(now);
@@ -2134,36 +2441,81 @@ function renderToday() {
   document.getElementById('matterSlot').innerHTML = buildMatterMeter(now);
   bindMatterAndGate(key);
 
-  document.getElementById('todayDateLabel').textContent = formatNiceDate(now);
-  document.getElementById('todayVaraTitle').textContent =
-    day.name + ' · ' + day.planet + ' (vāra ' + day.sanskrit + ')';
-  document.getElementById('todayInsight').innerHTML =
-    '<strong style="color:var(--gold-soft)">Today’s insight:</strong> ' + pack.insight;
+  isTodayPlanet = !viewingNodes && planet === day.planet;
+  document.getElementById('todayDateLabel').textContent = isTodayPlanet
+    ? (formatNiceDate(now) + ' · Barbados')
+    : ('Browsing · ' + (pack ? pack.day : 'Rahu/Ketu'));
+  document.getElementById('todayVaraTitle').textContent = viewingNodes
+    ? 'Rahu & Ketu · axis'
+    : (pack.day + ' · ' + pack.planet + ' (vāra ' + pack.sanskrit + ')');
+
+  renderDayPicker(planet);
+  renderNodesGuide();
+
+  if (viewingNodes) {
+    document.getElementById('todayInsight').textContent = NODES_GUIDE.opening;
+    document.getElementById('todayDayCard').innerHTML =
+      '<div><strong>Note:</strong> No weekday ruler — browse the Week tab for the full axis guide.</div>';
+    html = '';
+    for (i = 0; i < NODES_GUIDE.chart.length; i++) { html += '<li>' + NODES_GUIDE.chart[i] + '</li>'; }
+    document.getElementById('todayChartSays').innerHTML = html;
+    html = '';
+    for (i = 0; i < NODES_GUIDE.practice.length; i++) {
+      html += '<li>' + NODES_GUIDE.practice[i] + '</li>';
+    }
+    document.getElementById('todayPractices').innerHTML = html;
+    html = '';
+    for (i = 0; i < NODES_GUIDE.off.length; i++) { html += '<li>' + NODES_GUIDE.off[i] + '</li>'; }
+    document.getElementById('todayWatch').innerHTML = html;
+    document.getElementById('todayPrompt').textContent = NODES_GUIDE.closing;
+    document.getElementById('todayDidWrap').style.display = 'none';
+    document.getElementById('skyNote').innerHTML = buildSkyNote(now).html;
+    return;
+  }
+
+  document.getElementById('todayDidWrap').style.display = '';
+  document.getElementById('todayInsight').textContent = pack.opening;
+  document.getElementById('todayDayCard').innerHTML =
+    '<div><strong>Principle:</strong> ' + card.principle + '</div>' +
+    '<div><strong>Body:</strong> ' + card.body + '</div>' +
+    '<div><strong>Out:</strong> ' + card.out + '</div>' +
+    '<div><strong>Practice:</strong> ' + card.practice + '</div>' +
+    '<div><strong>Watch-for:</strong> ' + card.watch + '</div>';
 
   html = '';
-  for (i = 0; i < pack.practices.length; i++) {
-    checked = practiceState['p' + i] ? ' checked' : '';
-    html += '<li><input type="checkbox" data-pi="' + i + '"' + checked + '>' +
-      '<span>' + pack.practices[i] + '</span></li>';
+  for (i = 0; i < pack.chart.length; i++) { html += '<li>' + pack.chart[i] + '</li>'; }
+  document.getElementById('todayChartSays').innerHTML = html;
+
+  html = '';
+  for (i = 0; i < pack.rhythm.length; i++) {
+    r = pack.rhythm[i];
+    html += '<li><strong>' + r.label + '.</strong> ' + r.text + '</li>';
   }
   document.getElementById('todayPractices').innerHTML = html;
-  document.getElementById('todayPractices').onchange = function (ev) {
-    var t = ev.target;
-    var pi;
-    if (t && t.getAttribute('data-pi') !== null) {
-      pi = t.getAttribute('data-pi');
-      if (!state.practices[key]) { state.practices[key] = {}; }
-      state.practices[key]['p' + pi] = t.checked;
-      saveState();
-    }
-  };
 
   html = '';
-  for (i = 0; i < pack.watch.length; i++) {
-    html += '<li>' + pack.watch[i] + '</li>';
-  }
+  for (i = 0; i < pack.off.length; i++) { html += '<li>' + pack.off[i] + '</li>'; }
   document.getElementById('todayWatch').innerHTML = html;
-  document.getElementById('todayPrompt').textContent = pack.prompt;
+  document.getElementById('todayPrompt').textContent = pack.closing;
+
+  html = '';
+  [['body', pack.did.body], ['out', pack.did.out], ['practice', pack.did.practice]].forEach(function (pair) {
+    checked = didState[pair[0]] ? ' checked' : '';
+    html += '<li><input type="checkbox" data-did="' + pair[0] + '"' + checked + '>' +
+      '<span>' + pair[1] + '</span></li>';
+  });
+  document.getElementById('todayDidList').innerHTML = html;
+  document.getElementById('todayDidList').onchange = function (ev) {
+    var t = ev.target;
+    var didKey;
+    if (!t || !t.getAttribute || t.getAttribute('data-did') === null) { return; }
+    didKey = t.getAttribute('data-did');
+    if (!state.dayDid) { state.dayDid = {}; }
+    if (!state.dayDid[key]) { state.dayDid[key] = {}; }
+    if (!state.dayDid[key][planet]) { state.dayDid[key][planet] = {}; }
+    state.dayDid[key][planet][didKey] = t.checked;
+    saveState();
+  };
 
   document.getElementById('skyNote').innerHTML = buildSkyNote(now).html;
 }
@@ -2306,28 +2658,36 @@ function escapeHtml(s) {
 
 function renderWeek() {
   var now = new Date();
-  var start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  var dow = start.getDay();
-  start.setDate(start.getDate() - dow);
+  var todayDow = barbadosNow().dow;
   var html = '';
-  var i;
-  var d;
-  var v;
-  var line;
-  var isToday;
-  for (i = 0; i < 7; i++) {
-    d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
-    v = VARA[d.getDay()];
-    line = WEEK_LINES[v.planet];
-    isToday = dateKey(d) === dateKey(now);
-    html += '<div class="week-day' + (isToday ? ' wd-today' : '') + '">' +
+  var i, v, card, isToday;
+  for (i = 0; i < VARA.length; i++) {
+    v = VARA[i];
+    card = DAY_CARDS[v.planet];
+    isToday = i === todayDow;
+    html += '<div class="week-day browse-hit' + (isToday ? ' wd-today' : '') + '" data-jump="' + v.planet + '">' +
       '<div><div class="wd-name">' + v.name.slice(0, 3) + (isToday ? ' · today' : '') + '</div>' +
       '<div class="wd-planet">' + v.planet + '</div></div>' +
-      '<div><strong style="color:var(--gold-pale)">' + line.best + '</strong><br>' +
-      '<span style="color:var(--ok)">Lean: ' + line.lean + '</span> · ' +
-      '<span style="color:var(--warn)">Watch: ' + line.soft + '</span></div></div>';
+      '<div><strong style="color:var(--gold-pale)">' + card.principle + '</strong><br>' +
+      '<span style="color:var(--ok)">Body: ' + card.body + '</span><br>' +
+      '<span style="color:var(--text-dim)">Out: ' + card.out + '</span><br>' +
+      '<span style="color:var(--gold-soft)">Practice: ' + card.practice + '</span><br>' +
+      '<span style="color:var(--warn)">Watch: ' + card.watch + '</span></div></div>';
   }
   document.getElementById('weekGrid').innerHTML = html;
+  document.getElementById('weekGrid').onclick = function (ev) {
+    var t = ev.target;
+    var jump = null;
+    while (t && t !== this) {
+      if (t.getAttribute && t.getAttribute('data-jump')) { jump = t.getAttribute('data-jump'); break; }
+      t = t.parentNode;
+    }
+    if (!jump) { return; }
+    selectedGuidePlanet = jump;
+    showSection('today');
+    renderToday();
+  };
+  renderNodesGuide();
 }
 
 
@@ -3741,16 +4101,13 @@ function dayAlertPermission() {
 }
 
 function todayAlertBody() {
-  var d = new Date();
-  var v = VARA[d.getDay()];
-  var herm = (typeof HERM_DAY !== 'undefined' && HERM_DAY[d.getDay()]) ? HERM_DAY[d.getDay()] : null;
-  var line = v.name + ' · ' + v.planet + ' day';
-  if (herm) {
-    line += ' · ' + herm.principle + '. ' + herm.line;
-  } else {
-    line += '. Open Life Guide for today’s practices.';
+  var v = todayVara();
+  var card = DAY_CARDS[v.planet];
+  var line = v.name + ' · ' + v.planet + ': ' + (card ? card.principle : 'Open Life Guide');
+  if (card) {
+    line += '. Body: ' + card.body + '. Out: ' + card.out + '. Practice: ' + card.practice + '. Watch: ' + card.watch + '.';
   }
-  if (line.length > 180) { line = line.slice(0, 177) + '…'; }
+  if (line.length > 220) { line = line.slice(0, 217) + '…'; }
   return line;
 }
 
@@ -3772,7 +4129,7 @@ function showDayNotification(force) {
     return;
   }
   try {
-    new Notification('Arlette · ' + VARA[new Date().getDay()].planet + ' day', {
+    new Notification('Arlette · ' + todayVara().planet + ' day', {
       body: todayAlertBody(),
       tag: 'arlette-day-' + today
     });
