@@ -132,6 +132,7 @@
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem 1rem; }
   .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem; }
   .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.85rem; }
+  .grid-money-flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem; margin-top: 0.85rem; }
   footer.note, .note { margin-top: 1.25rem; font-size: 0.8rem; color: var(--muted); }
 
   /* Money-specific */
@@ -148,6 +149,17 @@
   }
   .balance-tile.total .field-label { color: rgba(247, 241, 230, 0.75); }
   .balance-tile.trading { border-color: rgba(181, 106, 76, 0.35); }
+  .balance-tile.in { border-color: rgba(90, 107, 72, 0.4); }
+  .balance-tile.out { border-color: rgba(181, 106, 76, 0.4); }
+  .balance-tile.due { border-color: rgba(181, 106, 76, 0.35); }
+  .balance-tile.readout .balance-input { cursor: default; color: var(--olive-deep); }
+  .balance-formula {
+    font-size: 0.68rem;
+    color: var(--muted);
+    margin-top: 0.15rem;
+    line-height: 1.35;
+  }
+  .balance-tile.total .balance-formula { color: rgba(247, 241, 230, 0.65); }
   .balance-input {
     font-family: Georgia, "Times New Roman", serif;
     font-size: 1.75rem;
@@ -177,6 +189,311 @@
     font-size: 0.8rem;
     color: var(--muted);
     margin: -0.35rem 0 0.9rem;
+  }
+  .money-flow-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin: 0.35rem 0 0.65rem;
+  }
+  .money-flow-row {
+    display: grid;
+    grid-template-columns: 6.5rem 7.75rem 1fr auto;
+    gap: 0.45rem;
+    align-items: center;
+    background: linear-gradient(160deg, #fffdf9, var(--cream));
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 0.4rem 0.5rem 0.4rem 0.55rem;
+  }
+  .money-flow-row input {
+    border: 0 !important;
+    background: transparent !important;
+    padding: 0.3rem 0 !important;
+    box-shadow: none !important;
+    outline: none !important;
+    width: 100%;
+    font: inherit;
+    color: inherit;
+  }
+  .money-flow-row .money-amt {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--olive-deep);
+  }
+  .money-flow-row .money-avenue {
+    font-size: 0.92rem;
+  }
+  select.money-account {
+    appearance: none;
+    border: 1px solid var(--line);
+    background: #fffdf9;
+    border-radius: 8px;
+    padding: 0.28rem 0.45rem;
+    font: inherit;
+    font-size: 0.78rem;
+    color: var(--ink);
+    width: 100%;
+    cursor: pointer;
+  }
+  select.money-account:focus {
+    outline: 2px solid rgba(90, 107, 72, 0.35);
+    outline-offset: 1px;
+  }
+  .balance-opening {
+    margin-top: 0.45rem;
+  }
+  .balance-opening .field-label {
+    font-size: 0.68rem;
+    margin-bottom: 0.15rem;
+    opacity: 0.85;
+  }
+  .balance-opening-input {
+    width: 100%;
+    border: 1px dashed var(--line);
+    background: rgba(255, 253, 249, 0.7);
+    border-radius: 8px;
+    padding: 0.28rem 0.4rem;
+    font: inherit;
+    font-size: 0.92rem;
+    color: var(--ink);
+  }
+  .balance-tile.total .balance-opening-input {
+    color: #f7f1e8;
+    border-color: rgba(247, 241, 230, 0.35);
+    background: rgba(0, 0, 0, 0.12);
+  }
+  .money-flow-del {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0.2rem 0.35rem;
+    border-radius: 8px;
+  }
+  .money-flow-del:hover { color: var(--terracotta); background: rgba(181, 106, 76, 0.08); }
+  .money-flow-add {
+    margin-top: 0.15rem;
+  }
+  .money-flow-totals {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+  }
+  .money-flow-total-tile {
+    background: linear-gradient(160deg, #fffdf9, var(--cream));
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 0.85rem 0.95rem;
+  }
+  .money-flow-total-tile .field-label { margin-bottom: 0.25rem; }
+  .money-flow-total-tile .money-flow-sum {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.35rem;
+    font-weight: 500;
+    color: var(--olive-deep);
+  }
+  .money-flow-total-tile.in { border-color: rgba(90, 107, 72, 0.4); }
+  .money-flow-total-tile.out { border-color: rgba(181, 106, 76, 0.4); }
+  .money-flow-total-tile.net {
+    background: linear-gradient(160deg, var(--olive), var(--olive-deep));
+    border-color: var(--olive-deep);
+    color: #f7f1e8;
+  }
+  .money-flow-total-tile.net .field-label { color: rgba(247, 241, 230, 0.75); }
+  .money-flow-total-tile.net .money-flow-sum { color: #f7f1e8; }
+  .money-flow-total-tile.net.neg {
+    background: linear-gradient(160deg, var(--terracotta), #8f4f38);
+    border-color: #8f4f38;
+  }
+  .money-due-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin: 0.35rem 0 0.65rem;
+  }
+  .money-due-row {
+    display: grid;
+    grid-template-columns: 6.25rem 1fr auto auto;
+    gap: 0.4rem;
+    align-items: center;
+    background: linear-gradient(160deg, #fffdf9, var(--cream));
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 0.4rem 0.45rem 0.4rem 0.55rem;
+  }
+  .money-due-row.paid {
+    opacity: 0.58;
+  }
+  .money-due-row.paid .money-due-label {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .money-due-row input {
+    border: 0 !important;
+    background: transparent !important;
+    padding: 0.3rem 0 !important;
+    box-shadow: none !important;
+    outline: none !important;
+    width: 100%;
+    font: inherit;
+    color: inherit;
+  }
+  .money-due-row .money-amt {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--olive-deep);
+  }
+  .money-due-row .money-due-label {
+    font-size: 0.92rem;
+  }
+  select.money-due-status {
+    appearance: none;
+    border: 1px solid var(--line);
+    background: #fffdf9;
+    color: var(--ink);
+    border-radius: 10px;
+    padding: 0.28rem 0.5rem;
+    font-size: 0.75rem;
+    min-width: 5.5rem;
+    cursor: pointer;
+  }
+  select.money-due-status:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+  select.money-due-status.unpaid { border-color: rgba(181, 106, 76, 0.45); color: var(--terracotta); }
+  select.money-due-status.partial { border-color: rgba(196, 165, 116, 0.65); color: #8a7340; }
+  select.money-due-status.paid { border-color: rgba(90, 107, 72, 0.45); color: var(--olive); }
+  .money-due-total {
+    margin-top: 0.35rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: 12px;
+    border: 1px solid rgba(181, 106, 76, 0.35);
+    background: linear-gradient(160deg, #fffdf9, var(--cream));
+  }
+  .money-due-total .field-label { margin-bottom: 0.2rem; }
+  .money-due-total .money-flow-sum {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--olive-deep);
+  }
+  .money-due-total .hint {
+    margin: 0.2rem 0 0;
+    font-size: 0.72rem;
+  }
+  .money-archive {
+    margin-top: 0.85rem;
+    padding: 0.75rem 0.85rem;
+    border-radius: 12px;
+    border: 1px dashed var(--line);
+    background: rgba(246, 240, 230, 0.45);
+    font-size: 0.85rem;
+    color: var(--muted);
+    white-space: pre-wrap;
+  }
+  .money-archive strong {
+    display: block;
+    color: var(--olive-deep);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.35rem;
+  }
+  /* Cash on hand + US trading — compact Venus strip (no FX) */
+  .money-venus-strip {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.85rem;
+    align-items: center;
+    margin-top: 0.85rem;
+    padding: 0.75rem 0.95rem;
+    border-radius: 14px;
+    border: 1px solid rgba(196, 165, 116, 0.55);
+    background:
+      linear-gradient(135deg, rgba(196, 165, 116, 0.18), rgba(181, 106, 76, 0.08)),
+      linear-gradient(160deg, #fffdf9, var(--cream));
+    box-shadow: 0 0 0 1px rgba(196, 165, 116, 0.12);
+  }
+  .money-venus-strip .mv-glyph {
+    font-size: 1.55rem;
+    line-height: 1;
+    color: var(--terracotta);
+    width: 2.5rem;
+    height: 2.5rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(196, 165, 116, 0.22);
+  }
+  .money-venus-strip .mv-copy .kicker {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #8a7340;
+    margin: 0;
+  }
+  .money-venus-strip .mv-copy .mv-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.02rem;
+    color: var(--olive-deep);
+    margin: 0.1rem 0 0.15rem;
+  }
+  .money-venus-strip .mv-copy .hint {
+    margin: 0;
+    font-size: 0.72rem;
+  }
+  .money-venus-strip .mv-amounts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem 0.85rem;
+    justify-content: flex-end;
+    align-items: baseline;
+  }
+  .money-venus-strip .mv-amt {
+    text-align: right;
+    min-width: 5.5rem;
+  }
+  .money-venus-strip .mv-amt .field-label {
+    margin-bottom: 0.1rem;
+    color: #8a7340;
+  }
+  .money-venus-strip .mv-amt .mv-num {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--olive-deep);
+    line-height: 1.2;
+  }
+  .money-venus-strip .mv-amt .currency {
+    margin-top: 0;
+    font-size: 0.68rem;
+    color: var(--gold);
+  }
+  .money-venus-strip .mv-plus {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.1rem;
+    color: var(--gold);
+    align-self: center;
+    padding: 0 0.1rem;
+  }
+  @media (max-width: 900px) {
+    .grid-money-flow { grid-template-columns: 1fr; }
+    .money-venus-strip { grid-template-columns: auto 1fr; }
+    .money-venus-strip .mv-amounts { grid-column: 1 / -1; justify-content: flex-start; }
+    .money-flow-totals { grid-template-columns: 1fr; }
+    .money-flow-row { grid-template-columns: 5.25rem 1fr auto; }
+    .money-flow-row select.money-account { grid-column: 1 / -1; }
+    .money-due-row { grid-template-columns: 5.25rem 1fr auto; }
+    .money-due-row .money-flow-del { grid-column: 3; grid-row: 1; }
+    .money-due-row select.money-due-status { grid-column: 1 / -1; }
   }
   .tool-block {
     border: 1px solid var(--line);
@@ -247,7 +564,7 @@
     .shell { grid-template-columns: 1fr; }
     aside { position: relative; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
     nav { flex-direction: row; flex-wrap: wrap; }
-    .grid-2, .grid-3, .grid-4, .split-row { grid-template-columns: 1fr; }
+    .grid-2, .grid-3, .grid-4, .grid-money-flow, .split-row { grid-template-columns: 1fr; }
     main { padding: 1.5rem 1.15rem 2.5rem; }
   }
 
@@ -708,15 +1025,18 @@ const INTENTION_DEFAULTS = {
 };
 
 const MONEY_DEFAULTS = {
-  bank: "89.95",
-  trading: "44",
+  bank: "",
+  trading: "",
   cash: "",
   bufferTarget: "",
   bufferNote: "",
-  periodIn: "Period from 22 Sep\nStarted trading: 51 USD\nWins: 67.77 + 99.50 + 59.70 = 226.97 BBD",
-  periodOut: "Supermarket 89.35\nEsso cooking gas + vehicle gas 66.82\nTotal out: 156.17 BBD",
+  periodIn: "",
+  periodOut: "",
+  inLines: [],
+  outLines: [],
   comingDue: "",
-  streams: "Trading (PainX / GainX)",
+  comingDueLines: [],
+  streams: "",
   tradingRules: "",
   toolNotes: "",
   check1: "",
@@ -724,8 +1044,8 @@ const MONEY_DEFAULTS = {
   check3: "",
   healthy: "",
   broken: "",
-  updatedNote: "23 Sep — live: CIBC 89.95 BBD · Trading 44 USD. Period log kept (start 51 USD; made 226.97; spent 156.17).",
-  snapshotVersion: 4
+  updatedNote: "",
+  snapshotVersion: 9
 };
 
 const OFFER_DEFAULTS = {
@@ -1122,17 +1442,72 @@ function load() {
       raw.offer.offerSnapshot = 4;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(raw));
     }
-    // Apply Art's money log; v4 = live CIBC 89.95 + trading 44 USD
+    // v4: historical seed for balances/period (kept for already-migrated stores)
     if ((raw.money.snapshotVersion || 0) < 4) {
-      raw.money.bank = MONEY_DEFAULTS.bank;
-      raw.money.trading = MONEY_DEFAULTS.trading;
-      raw.money.periodIn = MONEY_DEFAULTS.periodIn;
-      raw.money.periodOut = MONEY_DEFAULTS.periodOut;
-      raw.money.streams = MONEY_DEFAULTS.streams || raw.money.streams;
-      raw.money.updatedNote = MONEY_DEFAULTS.updatedNote;
+      if (raw.money.bank == null || raw.money.bank === "") raw.money.bank = "89.95";
+      if (raw.money.trading == null || raw.money.trading === "") raw.money.trading = "44";
+      if (!String(raw.money.periodIn || "").trim()) {
+        raw.money.periodIn = "Period from 22 Sep\nStarted trading: 51 USD\nWins: 67.77 + 99.50 + 59.70 = 226.97 BBD";
+      }
+      if (!String(raw.money.periodOut || "").trim()) {
+        raw.money.periodOut = "Supermarket 89.35\nEsso cooking gas + vehicle gas 66.82\nTotal out: 156.17 BBD";
+      }
+      if (!String(raw.money.streams || "").trim()) raw.money.streams = "Trading (PainX / GainX)";
+      if (!String(raw.money.updatedNote || "").trim()) {
+        raw.money.updatedNote = "23 Sep — live: CIBC 89.95 BBD · Trading 44 USD. Period log kept (start 51 USD; made 226.97; spent 156.17).";
+      }
       raw.money.snapshotVersion = 4;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(raw));
     }
+    // v5: structured money in/out lines; do not invent or wipe balances
+    if ((raw.money.snapshotVersion || 0) < 5) {
+      raw.money.inLines = normalizeMoneyLines(raw.money.inLines);
+      raw.money.outLines = normalizeMoneyLines(raw.money.outLines);
+      if (!raw.money.inLines.length && String(raw.money.periodIn || "").trim()) {
+        raw.money.inLines = migratePeriodTextToLines(raw.money.periodIn);
+      }
+      if (!raw.money.outLines.length && String(raw.money.periodOut || "").trim()) {
+        raw.money.outLines = migratePeriodTextToLines(raw.money.periodOut);
+      }
+      raw.money.snapshotVersion = 5;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(raw));
+    }
+    // v6: structured Coming Due lines; migrate old free-text when present
+    if ((raw.money.snapshotVersion || 0) < 6) {
+      raw.money.comingDueLines = normalizeComingDueLines(raw.money.comingDueLines);
+      if (!raw.money.comingDueLines.length && String(raw.money.comingDue || "").trim()) {
+        raw.money.comingDueLines = migrateComingDueText(raw.money.comingDue);
+      }
+      raw.money.snapshotVersion = 6;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(raw));
+    }
+    // v7: live snapshot auto-calcs money in/out + liquid total (UI only; no balance invent)
+    if ((raw.money.snapshotVersion || 0) < 7) {
+      raw.money.snapshotVersion = 7;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(raw));
+    }
+    // v8: account tags on in/out lines; bank/trading/cash stay opening/base; live = base + tagged in − tagged out
+    if ((raw.money.snapshotVersion || 0) < 8) {
+      raw.money.inLines = normalizeMoneyLines(raw.money.inLines).map((row) => ({
+        ...row,
+        account: guessMoneyAccount(row.account, row.avenue, "cibc")
+      }));
+      raw.money.outLines = normalizeMoneyLines(raw.money.outLines).map((row) => ({
+        ...row,
+        account: guessMoneyAccount(row.account, row.avenue, "cibc")
+      }));
+      raw.money.snapshotVersion = 8;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(raw));
+    }
+
+    // v9: Venus strip — cash on hand (BBD) + US trading (USD); dual-currency, no FX
+    if ((raw.money.snapshotVersion || 0) < 9) {
+      raw.money.snapshotVersion = 9;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(raw));
+    }
+    raw.money.inLines = normalizeMoneyLines(raw.money.inLines);
+    raw.money.outLines = normalizeMoneyLines(raw.money.outLines);
+    raw.money.comingDueLines = normalizeComingDueLines(raw.money.comingDueLines);
     return raw;
   } catch (e) {
     return { intention: { ...INTENTION_DEFAULTS }, money: { ...MONEY_DEFAULTS }, offer: { ...OFFER_DEFAULTS }, classes: { ...CLASSES_DEFAULTS }, body: { ...BODY_DEFAULTS }, time: { ...TIME_DEFAULTS } };
@@ -1144,6 +1519,432 @@ function save() {
   localStorage.setItem("arlette-os-active", active);
   const el = document.getElementById("saveStatus");
   el.textContent = "Saved · " + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+
+const MONEY_ACCOUNTS = [
+  { id: "cibc", label: "CIBC (BBD)" },
+  { id: "trading", label: "Trading (USD)" },
+  { id: "cash", label: "Cash (BBD)" },
+  { id: "other", label: "Other / unassigned" }
+];
+
+const MONEY_ACCOUNT_IDS = { cibc: 1, trading: 1, cash: 1, other: 1 };
+const MONEY_BASE_KEY = { cibc: "bank", trading: "trading", cash: "cash" };
+
+function normalizeMoneyAccount(val, fallback) {
+  const s = String(val || "").trim().toLowerCase();
+  if (MONEY_ACCOUNT_IDS[s]) return s;
+  if (s === "bank" || s === "cibc (bbd)") return "cibc";
+  return MONEY_ACCOUNT_IDS[fallback] ? fallback : "other";
+}
+
+function guessMoneyAccount(existing, avenueText, fallback) {
+  // Only trust an explicit account tag; empty/unknown falls through to note heuristics.
+  const raw = String(existing || "").trim().toLowerCase();
+  if (raw && MONEY_ACCOUNT_IDS[raw]) return raw;
+  if (raw === "bank" || raw === "cibc (bbd)") return "cibc";
+  const t = String(avenueText || "").toLowerCase();
+  if (/\b(trad(e|ing)|painx|gainx|usd)\b/.test(t)) return "trading";
+  if (/\bcash\b/.test(t)) return "cash";
+  if (/\b(cibc|bank|bbd)\b/.test(t)) return "cibc";
+  return normalizeMoneyAccount(fallback, "cibc");
+}
+
+function normalizeMoneyLines(val) {
+  if (!Array.isArray(val)) return [];
+  return val.map((item) => {
+    if (item && typeof item === "object") {
+      const avenue = item.avenue != null ? String(item.avenue) : (item.note != null ? String(item.note) : "");
+      const hasAccount = item.account != null && String(item.account).trim() !== "";
+      return {
+        id: item.id || uid(),
+        amount: item.amount != null ? String(item.amount) : "",
+        avenue: avenue,
+        account: hasAccount
+          ? normalizeMoneyAccount(item.account, "cibc")
+          : guessMoneyAccount("", avenue, "cibc")
+      };
+    }
+    const avenue = String(item || "");
+    return { id: uid(), amount: "", avenue: avenue, account: guessMoneyAccount("", avenue, "cibc") };
+  });
+}
+
+function migratePeriodTextToLines(text) {
+  return String(text || "").split(/\n+/).map((line) => line.trim()).filter(Boolean).map((line) => {
+    const m = line.match(/^(.+?)\s+(\$?[\d,]+(?:\.\d{1,2})?)\s*(?:BBD|USD)?\s*$/i);
+    if (m && m[1].trim() && !/^(total|period from|started|wins)\b/i.test(m[1].trim())) {
+      const avenue = m[1].replace(/[:\s]+$/, "").trim();
+      return {
+        id: uid(),
+        amount: String(m[2]).replace(/[$,]/g, ""),
+        avenue: avenue,
+        account: guessMoneyAccount("", avenue, "cibc")
+      };
+    }
+    return { id: uid(), amount: "", avenue: line, account: guessMoneyAccount("", line, "cibc") };
+  });
+}
+
+function moneyLinesGet(key) {
+  return normalizeMoneyLines(moneyGet(key));
+}
+
+function moneyLinesSet(key, list) {
+  moneySet(key, normalizeMoneyLines(list));
+}
+
+function moneyLinesSum(key) {
+  return moneyLinesGet(key).reduce((sum, row) => sum + parseAmt(row.amount), 0);
+}
+
+function moneyLinesSumForAccount(key, accountId) {
+  const acc = normalizeMoneyAccount(accountId, "other");
+  return moneyLinesGet(key).reduce((sum, row) => {
+    return sum + (row.account === acc ? parseAmt(row.amount) : 0);
+  }, 0);
+}
+
+function liveMoneyBalance(accountId) {
+  // Live = opening/base + money-in tagged to account − money-out tagged to account.
+  const baseKey = MONEY_BASE_KEY[accountId];
+  if (!baseKey) return 0;
+  const base = parseAmt(moneyGet(baseKey));
+  return base + moneyLinesSumForAccount("inLines", accountId) - moneyLinesSumForAccount("outLines", accountId);
+}
+
+function moneyFlowNet() {
+  return moneyLinesSum("inLines") - moneyLinesSum("outLines");
+}
+
+function setAmtDisplay(el, n) {
+  if (!el) return;
+  const s = formatAmt(n);
+  if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") el.value = s;
+  else el.textContent = s;
+}
+
+function refreshMoneyLiveSnapshot() {
+  // Liquid BBD = live CIBC + live Cash. Trading is USD and stays out (no FX field).
+  const liveCibc = liveMoneyBalance("cibc");
+  const liveTrading = liveMoneyBalance("trading");
+  const liveCash = liveMoneyBalance("cash");
+  const liquid = liveCibc + liveCash;
+  const inSum = moneyLinesSum("inLines");
+  const outSum = moneyLinesSum("outLines");
+  const net = inSum - outSum;
+  const dueOpen = comingDueOpenSum();
+
+  setAmtDisplay(document.getElementById("moneyLiveCibcDisplay"), liveCibc);
+  setAmtDisplay(document.getElementById("moneyLiveTradingDisplay"), liveTrading);
+  setAmtDisplay(document.getElementById("moneyLiveCashDisplay"), liveCash);
+  setAmtDisplay(document.getElementById("moneyTotalDisplay"), liquid);
+  setAmtDisplay(document.getElementById("moneyVenusCashDisplay"), liveCash);
+  setAmtDisplay(document.getElementById("moneyVenusTradingDisplay"), liveTrading);
+  setAmtDisplay(document.getElementById("moneyInSnapDisplay"), inSum);
+  setAmtDisplay(document.getElementById("moneyOutSnapDisplay"), outSum);
+  setAmtDisplay(document.getElementById("comingDueSnapDisplay"), dueOpen);
+  setAmtDisplay(document.getElementById("moneyInTotalDisplay"), inSum);
+  setAmtDisplay(document.getElementById("moneyOutTotalDisplay"), outSum);
+  setAmtDisplay(document.getElementById("moneyNetTotalDisplay"), net);
+  setAmtDisplay(document.getElementById("comingDueOpenTotalDisplay"), dueOpen);
+
+  const netTile = document.getElementById("moneyNetTile");
+  if (netTile) netTile.classList.toggle("neg", net < 0);
+}
+
+function refreshMoneyFlowTotals() {
+  refreshMoneyLiveSnapshot();
+}
+
+function accountSelectEl(current, onChange) {
+  const sel = document.createElement("select");
+  sel.className = "money-account";
+  sel.setAttribute("aria-label", "Account");
+  MONEY_ACCOUNTS.forEach((opt) => {
+    const o = document.createElement("option");
+    o.value = opt.id;
+    o.textContent = opt.label;
+    if (opt.id === current) o.selected = true;
+    sel.appendChild(o);
+  });
+  sel.addEventListener("change", () => onChange(normalizeMoneyAccount(sel.value, "other")));
+  return sel;
+}
+
+function renderMoneyFlowList(card, key, avenueLabel, defaultAccount) {
+  const wrap = document.createElement("div");
+  wrap.className = "money-flow-list";
+  const fallbackAccount = normalizeMoneyAccount(defaultAccount, key === "outLines" ? "cibc" : "cibc");
+
+  function redraw() {
+    const list = moneyLinesGet(key);
+    wrap.innerHTML = "";
+    if (!list.length) {
+      const empty = document.createElement("p");
+      empty.className = "hint";
+      empty.style.margin = "0.25rem 0 0.5rem";
+      empty.textContent = "No lines yet. Add one below — pick the account each line hits.";
+      wrap.appendChild(empty);
+    }
+    list.forEach((row, idx) => {
+      const rowEl = document.createElement("div");
+      rowEl.className = "money-flow-row";
+
+      const amt = document.createElement("input");
+      amt.type = "text";
+      amt.inputMode = "decimal";
+      amt.className = "money-amt";
+      amt.placeholder = "0.00";
+      amt.setAttribute("aria-label", "Amount");
+      amt.value = row.amount;
+      amt.addEventListener("input", () => {
+        const next = moneyLinesGet(key);
+        if (!next[idx]) return;
+        next[idx].amount = amt.value;
+        moneyLinesSet(key, next);
+        refreshMoneyFlowTotals();
+      });
+
+      const account = accountSelectEl(row.account || fallbackAccount, (acc) => {
+        const next = moneyLinesGet(key);
+        if (!next[idx]) return;
+        next[idx].account = acc;
+        moneyLinesSet(key, next);
+        refreshMoneyFlowTotals();
+      });
+
+      const avenue = document.createElement("input");
+      avenue.type = "text";
+      avenue.className = "money-avenue";
+      avenue.placeholder = avenueLabel;
+      avenue.setAttribute("aria-label", avenueLabel);
+      avenue.value = row.avenue;
+      avenue.addEventListener("input", () => {
+        const next = moneyLinesGet(key);
+        if (!next[idx]) return;
+        next[idx].avenue = avenue.value;
+        moneyLinesSet(key, next);
+      });
+
+      const del = document.createElement("button");
+      del.type = "button";
+      del.className = "money-flow-del";
+      del.setAttribute("aria-label", "Remove line");
+      del.textContent = "×";
+      del.addEventListener("click", () => {
+        const next = moneyLinesGet(key).filter((_, i) => i !== idx);
+        moneyLinesSet(key, next);
+        redraw();
+        refreshMoneyFlowTotals();
+      });
+
+      rowEl.appendChild(amt);
+      rowEl.appendChild(account);
+      rowEl.appendChild(avenue);
+      rowEl.appendChild(del);
+      wrap.appendChild(rowEl);
+    });
+  }
+
+  redraw();
+  card.appendChild(wrap);
+
+  const addBtn = document.createElement("button");
+  addBtn.type = "button";
+  addBtn.className = "btn money-flow-add";
+  addBtn.textContent = "Add line";
+  addBtn.addEventListener("click", () => {
+    const next = moneyLinesGet(key);
+    next.push({ id: uid(), amount: "", avenue: "", account: fallbackAccount });
+    moneyLinesSet(key, next);
+    redraw();
+    refreshMoneyFlowTotals();
+    const inputs = wrap.querySelectorAll(".money-amt");
+    const last = inputs[inputs.length - 1];
+    if (last) last.focus();
+  });
+  card.appendChild(addBtn);
+}
+
+function normalizeComingDueLines(val) {
+  if (!Array.isArray(val)) return [];
+  const ok = { paid: 1, unpaid: 1, partial: 1 };
+  return val.map((item) => {
+    if (item && typeof item === "object") {
+      const st = String(item.status || "").toLowerCase();
+      return {
+        id: item.id || uid(),
+        amount: item.amount != null ? String(item.amount) : "",
+        label: item.label != null ? String(item.label) : (item.avenue != null ? String(item.avenue) : (item.note != null ? String(item.note) : "")),
+        status: ok[st] ? st : ""
+      };
+    }
+    return { id: uid(), amount: "", label: String(item || ""), status: "" };
+  });
+}
+
+function migrateComingDueText(text) {
+  return String(text || "").split(/\n+/).map((line) => line.trim()).filter(Boolean).map((line) => {
+    // "Label 12.50" / "Label: $12.50 BBD" / "$12.50 Label"
+    let amount = "";
+    let label = line;
+    const trail = line.match(/^(.+?)[:\s]+(\$?[\d,]+(?:\.\d{1,2})?)\s*(?:BBD|USD)?\s*$/i);
+    const lead = line.match(/^(\$?[\d,]+(?:\.\d{1,2})?)\s*(?:BBD|USD)?\s+[–\-—:]?\s*(.+)$/i);
+    if (trail && trail[1].trim() && !/^(total|coming due)\b/i.test(trail[1].trim())) {
+      label = trail[1].replace(/[:\s]+$/, "").trim();
+      amount = String(trail[2]).replace(/[$,]/g, "");
+    } else if (lead) {
+      amount = String(lead[1]).replace(/[$,]/g, "");
+      label = lead[2].trim();
+    }
+    return { id: uid(), amount: amount, label: label, status: "unpaid" };
+  });
+}
+
+function comingDueLinesGet() {
+  return normalizeComingDueLines(moneyGet("comingDueLines"));
+}
+
+function comingDueLinesSet(list) {
+  moneySet("comingDueLines", normalizeComingDueLines(list));
+}
+
+function comingDueOpenSum() {
+  // Unpaid + partial only (paid and blank status excluded)
+  return comingDueLinesGet().reduce((sum, row) => {
+    if (row.status === "unpaid" || row.status === "partial") return sum + parseAmt(row.amount);
+    return sum;
+  }, 0);
+}
+
+function refreshComingDueTotal() {
+  refreshMoneyLiveSnapshot();
+}
+
+function renderComingDueList(card) {
+  const wrap = document.createElement("div");
+  wrap.className = "money-due-list";
+
+  function redraw() {
+    const list = comingDueLinesGet();
+    wrap.innerHTML = "";
+    if (!list.length) {
+      const empty = document.createElement("p");
+      empty.className = "hint";
+      empty.style.margin = "0.25rem 0 0.5rem";
+      empty.textContent = "No lines yet. Add one below.";
+      wrap.appendChild(empty);
+    }
+    list.forEach((row, idx) => {
+      const rowEl = document.createElement("div");
+      rowEl.className = "money-due-row" + (row.status === "paid" ? " paid" : "");
+
+      const amt = document.createElement("input");
+      amt.type = "text";
+      amt.inputMode = "decimal";
+      amt.className = "money-amt";
+      amt.placeholder = "0.00";
+      amt.setAttribute("aria-label", "Amount due");
+      amt.value = row.amount;
+      amt.addEventListener("input", () => {
+        const next = comingDueLinesGet();
+        if (!next[idx]) return;
+        next[idx].amount = amt.value;
+        comingDueLinesSet(next);
+        refreshComingDueTotal();
+      });
+
+      const label = document.createElement("input");
+      label.type = "text";
+      label.className = "money-due-label";
+      label.placeholder = "What is due (bill, top-up…)";
+      label.setAttribute("aria-label", "What is due");
+      label.value = row.label;
+      label.addEventListener("input", () => {
+        const next = comingDueLinesGet();
+        if (!next[idx]) return;
+        next[idx].label = label.value;
+        comingDueLinesSet(next);
+      });
+
+      const status = document.createElement("select");
+      status.className = "money-due-status" + (row.status ? " " + row.status : "");
+      status.setAttribute("aria-label", "Payment status");
+      [
+        ["", "—"],
+        ["unpaid", "Unpaid"],
+        ["partial", "Partial"],
+        ["paid", "Paid"]
+      ].forEach(([val, lab]) => {
+        const opt = document.createElement("option");
+        opt.value = val;
+        opt.textContent = lab;
+        if (row.status === val) opt.selected = true;
+        status.appendChild(opt);
+      });
+      status.addEventListener("change", () => {
+        const next = comingDueLinesGet();
+        if (!next[idx]) return;
+        next[idx].status = status.value;
+        comingDueLinesSet(next);
+        redraw();
+        refreshComingDueTotal();
+      });
+
+      const del = document.createElement("button");
+      del.type = "button";
+      del.className = "money-flow-del";
+      del.setAttribute("aria-label", "Remove line");
+      del.textContent = "×";
+      del.addEventListener("click", () => {
+        const next = comingDueLinesGet().filter((_, i) => i !== idx);
+        comingDueLinesSet(next);
+        redraw();
+        refreshComingDueTotal();
+      });
+
+      rowEl.appendChild(amt);
+      rowEl.appendChild(label);
+      rowEl.appendChild(status);
+      rowEl.appendChild(del);
+      wrap.appendChild(rowEl);
+    });
+  }
+
+  redraw();
+  card.appendChild(wrap);
+
+  const addBtn = document.createElement("button");
+  addBtn.type = "button";
+  addBtn.className = "btn money-flow-add";
+  addBtn.textContent = "Add line";
+  addBtn.addEventListener("click", () => {
+    const next = comingDueLinesGet();
+    next.push({ id: uid(), amount: "", label: "", status: "unpaid" });
+    comingDueLinesSet(next);
+    redraw();
+    refreshComingDueTotal();
+    const inputs = wrap.querySelectorAll(".money-amt");
+    const last = inputs[inputs.length - 1];
+    if (last) last.focus();
+  });
+  card.appendChild(addBtn);
+
+  const total = document.createElement("div");
+  total.className = "money-due-total";
+  total.innerHTML = "<div class=\"field-label\">Still owed (unpaid + partial)</div>";
+  const sum = document.createElement("div");
+  sum.className = "money-flow-sum";
+  sum.id = "comingDueOpenTotalDisplay";
+  sum.textContent = formatAmt(comingDueOpenSum());
+  total.appendChild(sum);
+  const hint = document.createElement("p");
+  hint.className = "hint";
+  hint.textContent = "Paid lines stay on the list but drop out of this total.";
+  total.appendChild(hint);
+  card.appendChild(total);
 }
 
 function moneyGet(key) {
@@ -1166,8 +1967,8 @@ function formatAmt(n) {
 }
 
 function moneyTotal() {
-  // Bank + cash only (BBD). Trading is USD and stays separate.
-  return parseAmt(moneyGet("bank")) + parseAmt(moneyGet("cash"));
+  // Liquid BBD = live CIBC + live cash. Trading is USD — no FX field, so not converted.
+  return liveMoneyBalance("cibc") + liveMoneyBalance("cash");
 }
 
 function bindMoneyField(el, key, onAfter) {
@@ -1180,52 +1981,125 @@ function bindMoneyField(el, key, onAfter) {
 function renderMoney(panel) {
   const hero = document.createElement("div");
   hero.className = "hero";
-  hero.innerHTML = "<h1>Money</h1><p>Live balances you update by hand. CIBC is BBD. Trading is USD and stays out of the BBD total.</p>";
+  hero.innerHTML = "<h1>Money</h1><p>Opening balances stay what you type. Live CIBC / Trading / Cash update from money in and out tagged to that account. Liquid BBD = live CIBC + live cash. Venus strip shows cash on hand (BBD) + US trading (USD) together — no FX on file.</p>";
   panel.appendChild(hero);
 
   // Snapshot
   const snap = document.createElement("div");
   snap.className = "card";
-  snap.innerHTML = "<h2>Live snapshot</h2><p class=\"hint\">Tap a number and type the new amount. Total updates itself.</p>";
+  snap.innerHTML = "<h2>Live snapshot</h2><p class=\"hint\">Set each opening balance once. Tag every money-in / money-out line to CIBC, Trading, Cash, or Other — live totals recalc themselves.</p>";
   const tiles = document.createElement("div");
   tiles.className = "grid-4";
 
-  function makeBalance(label, key, extraClass, readOnly, currency) {
+  function makeLiveAccount(label, liveId, baseKey, extraClass, currency, formula) {
     const tile = document.createElement("div");
-    tile.className = "balance-tile" + (extraClass ? " " + extraClass : "");
+    tile.className = "balance-tile readout" + (extraClass ? " " + extraClass : "");
     const lab = document.createElement("div");
     lab.className = "field-label";
     lab.textContent = label;
     const input = document.createElement("input");
     input.type = "text";
-    input.inputMode = "decimal";
+    input.readOnly = true;
     input.className = "balance-input";
     input.setAttribute("aria-label", label);
-    if (readOnly) {
-      input.readOnly = true;
-      input.value = formatAmt(moneyTotal());
-      input.id = "moneyTotalDisplay";
-    } else {
-      input.value = moneyGet(key);
-      bindMoneyField(input, key, () => {
-        const t = document.getElementById("moneyTotalDisplay");
-        if (t) t.value = formatAmt(moneyTotal());
-      });
-    }
+    input.id = liveId;
+    input.value = "0";
     const cur = document.createElement("div");
     cur.className = "currency";
     cur.textContent = currency || "BBD";
     tile.appendChild(lab);
     tile.appendChild(input);
     tile.appendChild(cur);
+    if (formula) {
+      const f = document.createElement("div");
+      f.className = "balance-formula";
+      f.textContent = formula;
+      tile.appendChild(f);
+    }
+    const openWrap = document.createElement("div");
+    openWrap.className = "balance-opening";
+    const openLab = document.createElement("div");
+    openLab.className = "field-label";
+    openLab.textContent = "Opening / base";
+    const openInput = document.createElement("input");
+    openInput.type = "text";
+    openInput.inputMode = "decimal";
+    openInput.className = "balance-opening-input";
+    openInput.setAttribute("aria-label", label + " opening");
+    openInput.placeholder = "0.00";
+    openInput.value = moneyGet(baseKey);
+    bindMoneyField(openInput, baseKey, () => refreshMoneyLiveSnapshot());
+    openWrap.appendChild(openLab);
+    openWrap.appendChild(openInput);
+    tile.appendChild(openWrap);
     return tile;
   }
 
-  tiles.appendChild(makeBalance("CIBC", "bank", null, false, "BBD"));
-  tiles.appendChild(makeBalance("Trading account", "trading", "trading", false, "USD"));
-  tiles.appendChild(makeBalance("Cash on hand", "cash", null, false, "BBD"));
-  tiles.appendChild(makeBalance("Total (BBD only)", "total", "total", true, "BBD"));
+  function makeReadout(label, id, extraClass, currency, formula) {
+    const tile = document.createElement("div");
+    tile.className = "balance-tile readout" + (extraClass ? " " + extraClass : "");
+    const lab = document.createElement("div");
+    lab.className = "field-label";
+    lab.textContent = label;
+    const input = document.createElement("input");
+    input.type = "text";
+    input.readOnly = true;
+    input.className = "balance-input";
+    input.setAttribute("aria-label", label);
+    input.id = id;
+    input.value = "0";
+    const cur = document.createElement("div");
+    cur.className = "currency";
+    cur.textContent = currency || "BBD";
+    tile.appendChild(lab);
+    tile.appendChild(input);
+    tile.appendChild(cur);
+    if (formula) {
+      const f = document.createElement("div");
+      f.className = "balance-formula";
+      f.textContent = formula;
+      tile.appendChild(f);
+    }
+    return tile;
+  }
+
+  tiles.appendChild(makeLiveAccount("CIBC live", "moneyLiveCibcDisplay", "bank", null, "BBD", "opening + in − out (CIBC)"));
+  tiles.appendChild(makeLiveAccount("Trading live", "moneyLiveTradingDisplay", "trading", "trading", "USD", "opening + in − out (Trading)"));
+  tiles.appendChild(makeLiveAccount("Cash live", "moneyLiveCashDisplay", "cash", null, "BBD", "opening + in − out (Cash)"));
+  tiles.appendChild(makeReadout("Total liquid (BBD)", "moneyTotalDisplay", "total", "BBD", "live CIBC + live cash · trading stays USD"));
   snap.appendChild(tiles);
+
+  const venusStrip = document.createElement("div");
+  venusStrip.className = "money-venus-strip";
+  venusStrip.setAttribute("aria-label", "Cash on hand plus US trading account");
+  venusStrip.innerHTML =
+    "<div class=\"mv-glyph\" aria-hidden=\"true\">♀</div>" +
+    "<div class=\"mv-copy\">" +
+      "<div class=\"kicker\">Venus · values on hand</div>" +
+      "<div class=\"mv-title\">Cash on hand + US trading</div>" +
+      "<p class=\"hint\">Live cash (BBD) and live trading (USD) from the account-linked snapshot. Shown separately — no FX conversion.</p>" +
+    "</div>" +
+    "<div class=\"mv-amounts\">" +
+      "<div class=\"mv-amt\">" +
+        "<div class=\"field-label\">Cash on hand</div>" +
+        "<div class=\"mv-num\" id=\"moneyVenusCashDisplay\">0</div>" +
+        "<div class=\"currency\">BBD</div>" +
+      "</div>" +
+      "<div class=\"mv-plus\" aria-hidden=\"true\">+</div>" +
+      "<div class=\"mv-amt\">" +
+        "<div class=\"field-label\">US trading</div>" +
+        "<div class=\"mv-num\" id=\"moneyVenusTradingDisplay\">0</div>" +
+        "<div class=\"currency\">USD</div>" +
+      "</div>" +
+    "</div>";
+  snap.appendChild(venusStrip);
+
+  const flowTiles = document.createElement("div");
+  flowTiles.className = "grid-money-flow";
+  flowTiles.appendChild(makeReadout("Money in", "moneyInSnapDisplay", "in", "BBD", "Sum of all money-in lines"));
+  flowTiles.appendChild(makeReadout("Money out", "moneyOutSnapDisplay", "out", "BBD", "Sum of all money-out lines"));
+  flowTiles.appendChild(makeReadout("Still owed", "comingDueSnapDisplay", "due", "BBD", "Unpaid + partial coming due"));
+  snap.appendChild(flowTiles);
 
   const updated = document.createElement("label");
   updated.className = "field";
@@ -1240,7 +2114,68 @@ function renderMoney(panel) {
   snap.appendChild(updated);
   panel.appendChild(snap);
 
-  // Buffer + period
+  // Money in / money out — structured lines + auto totals
+  const flow = document.createElement("div");
+  flow.className = "split-row";
+
+  const inCard = document.createElement("div");
+  inCard.className = "card";
+  inCard.innerHTML = "<h2>Money in</h2><p class=\"hint\">Amount + account it hits + where it came from. New lines default to CIBC — switch to Trading when profit lands there.</p>";
+  renderMoneyFlowList(inCard, "inLines", "From where (job, client, trading…)", "cibc");
+  flow.appendChild(inCard);
+
+  const outCard = document.createElement("div");
+  outCard.className = "card";
+  outCard.innerHTML = "<h2>Money out</h2><p class=\"hint\">Amount + account it leaves + where it goes. New lines default to CIBC (BBD spends).</p>";
+  renderMoneyFlowList(outCard, "outLines", "Where it goes (license, rent, gas…)", "cibc");
+  flow.appendChild(outCard);
+  panel.appendChild(flow);
+
+  const totalsCard = document.createElement("div");
+  totalsCard.className = "card";
+  totalsCard.innerHTML = "<h2>This period totals</h2><p class=\"hint\">Updates as you type dollar amounts.</p>";
+  const totals = document.createElement("div");
+  totals.className = "money-flow-totals";
+
+  function makeFlowTotal(id, label, extraClass, valueId) {
+    const tile = document.createElement("div");
+    tile.className = "money-flow-total-tile" + (extraClass ? " " + extraClass : "");
+    if (id) tile.id = id;
+    const lab = document.createElement("div");
+    lab.className = "field-label";
+    lab.textContent = label;
+    const sum = document.createElement("div");
+    sum.className = "money-flow-sum";
+    sum.id = valueId;
+    sum.textContent = "0";
+    tile.appendChild(lab);
+    tile.appendChild(sum);
+    return tile;
+  }
+
+  totals.appendChild(makeFlowTotal(null, "Money in", "in", "moneyInTotalDisplay"));
+  totals.appendChild(makeFlowTotal(null, "Money out", "out", "moneyOutTotalDisplay"));
+  totals.appendChild(makeFlowTotal("moneyNetTile", "Net", "net", "moneyNetTotalDisplay"));
+  totalsCard.appendChild(totals);
+
+  const archivedIn = String(moneyGet("periodIn") || "").trim();
+  const archivedOut = String(moneyGet("periodOut") || "").trim();
+  const hasStructured = moneyLinesGet("inLines").length || moneyLinesGet("outLines").length;
+  if ((archivedIn || archivedOut) && hasStructured) {
+    const arch = document.createElement("div");
+    arch.className = "money-archive";
+    let archText = "";
+    if (archivedIn) archText += "Earlier in notes:\n" + archivedIn;
+    if (archivedIn && archivedOut) archText += "\n\n";
+    if (archivedOut) archText += "Earlier out notes:\n" + archivedOut;
+    arch.innerHTML = "<strong>Earlier period notes (kept)</strong>";
+    arch.appendChild(document.createTextNode(archText));
+    totalsCard.appendChild(arch);
+  }
+  panel.appendChild(totalsCard);
+  refreshMoneyFlowTotals();
+
+  // Buffer + coming due
   const mid = document.createElement("div");
   mid.className = "split-row";
 
@@ -1251,28 +2186,27 @@ function renderMoney(panel) {
   bufferCard.appendChild(textField("bufferNote", "Buffer notes", true));
   mid.appendChild(bufferCard);
 
-  const periodCard = document.createElement("div");
-  periodCard.className = "card";
-  periodCard.innerHTML = "<h2>This period</h2><p class=\"hint\">Week or month — whatever rhythm you are using.</p>";
-  periodCard.appendChild(textField("periodIn", "Money in", true));
-  periodCard.appendChild(textField("periodOut", "Money out", true));
-  mid.appendChild(periodCard);
-  panel.appendChild(mid);
-
-  // Coming due + streams
-  const mid2 = document.createElement("div");
-  mid2.className = "split-row";
   const due = document.createElement("div");
   due.className = "card";
-  due.innerHTML = "<h2>Coming due</h2>";
-  due.appendChild(textField("comingDue", "Bills, top-ups, must-pays", true));
-  mid2.appendChild(due);
+  due.innerHTML = "<h2>Coming due</h2><p class=\"hint\">Amount + what it is + Paid / Unpaid / Partial. Add a line per bill or must-pay.</p>";
+  renderComingDueList(due);
+  const archivedDue = String(moneyGet("comingDue") || "").trim();
+  if (archivedDue) {
+    const archDue = document.createElement("div");
+    archDue.className = "money-archive";
+    archDue.innerHTML = "<strong>Earlier coming-due notes (kept)</strong>";
+    archDue.appendChild(document.createTextNode(archivedDue));
+    due.appendChild(archDue);
+  }
+  mid.appendChild(due);
+  panel.appendChild(mid);
+  refreshComingDueTotal();
+
   const streams = document.createElement("div");
   streams.className = "card";
   streams.innerHTML = "<h2>Streams</h2>";
   streams.appendChild(textField("streams", "Where money can come from", true));
-  mid2.appendChild(streams);
-  panel.appendChild(mid2);
+  panel.appendChild(streams);
 
   // Trading desk — tools + rules
   const trade = document.createElement("div");
@@ -2739,16 +3673,45 @@ function exportText() {
     out += lab + ":\n" + (String(intentionGet(k) || "").trim() || "(empty)") + "\n\n";
   });
   out += "\nMONEY\n-----\n";
-  out += "Bank / account: " + moneyGet("bank") + "\n";
-  out += "Trading: " + moneyGet("trading") + "\n";
-  out += "Cash on hand: " + moneyGet("cash") + "\n";
-  out += "Total: " + formatAmt(moneyTotal()) + "\n\n";
+  out += "Opening CIBC: " + moneyGet("bank") + "\n";
+  out += "Opening Trading: " + moneyGet("trading") + "\n";
+  out += "Opening Cash: " + moneyGet("cash") + "\n";
+  out += "Live CIBC: " + formatAmt(liveMoneyBalance("cibc")) + "\n";
+  out += "Live Trading: " + formatAmt(liveMoneyBalance("trading")) + "\n";
+  out += "Live Cash: " + formatAmt(liveMoneyBalance("cash")) + "\n";
+  out += "Total liquid (BBD): " + formatAmt(moneyTotal()) + "\n";
+  out += "Cash on hand + US trading: " + formatAmt(liveMoneyBalance("cash")) + " BBD + " + formatAmt(liveMoneyBalance("trading")) + " USD (no FX)\n\n";
+  out += "Money in:\n";
+  const inRows = moneyLinesGet("inLines");
+  if (!inRows.length) out += "(empty)\n";
+  else inRows.forEach((r) => {
+    const acc = (MONEY_ACCOUNTS.find((a) => a.id === r.account) || { label: r.account || "Other" }).label;
+    out += "- " + (r.amount || "0") + " · " + acc + " · " + (r.avenue || "(no source)") + "\n";
+  });
+  out += "Money in total: " + formatAmt(moneyLinesSum("inLines")) + "\n\n";
+  out += "Money out:\n";
+  const outRows = moneyLinesGet("outLines");
+  if (!outRows.length) out += "(empty)\n";
+  else outRows.forEach((r) => {
+    const acc = (MONEY_ACCOUNTS.find((a) => a.id === r.account) || { label: r.account || "Other" }).label;
+    out += "- " + (r.amount || "0") + " · " + acc + " · " + (r.avenue || "(no destination)") + "\n";
+  });
+  out += "Money out total: " + formatAmt(moneyLinesSum("outLines")) + "\n";
+  out += "Net: " + formatAmt(moneyFlowNet()) + "\n\n";
+  out += "Coming due:\n";
+  const dueRows = comingDueLinesGet();
+  if (!dueRows.length) out += "(empty)\n";
+  else dueRows.forEach((r) => {
+    const st = r.status ? r.status : "—";
+    out += "- " + (r.amount || "0") + " · " + (r.label || "(no label)") + " · " + st + "\n";
+  });
+  out += "Still owed (unpaid + partial): " + formatAmt(comingDueOpenSum()) + "\n\n";
   [
     ["bufferTarget", "Buffer target"],
     ["bufferNote", "Buffer notes"],
-    ["periodIn", "Money in"],
-    ["periodOut", "Money out"],
-    ["comingDue", "Coming due"],
+    ["periodIn", "Earlier period in notes"],
+    ["periodOut", "Earlier period out notes"],
+    ["comingDue", "Earlier coming-due notes"],
     ["streams", "Streams"],
     ["tradingRules", "Trading rules"],
     ["toolNotes", "Tool notes"],
@@ -2759,7 +3722,7 @@ function exportText() {
     ["broken", "Broken"],
     ["updatedNote", "Updated note"]
   ].forEach(([k, lab]) => {
-    out += lab + ":\n" + (moneyGet(k).trim() || "(empty)") + "\n\n";
+    out += lab + ":\n" + (String(moneyGet(k) || "").trim() || "(empty)") + "\n\n";
   });
   out += "\nOFFER & WORK\n------------\n";
   [1,2,3,4].forEach((n) => {
