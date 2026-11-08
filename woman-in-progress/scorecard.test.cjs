@@ -1,0 +1,21 @@
+const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict');
+const original=fs.readFileSync(require('path').join(__dirname,'index.html'),'utf8');
+const score=original.slice(original.indexOf('// Additive scorecard data;'),original.indexOf('initLearning();\nrenderNav();'));
+const assignments=original.slice(original.indexOf('function checked('),original.indexOf('function goto('));
+const habits=original.slice(original.indexOf('const habits='),original.indexOf('const workouts='));
+const context=vm.createContext({console});
+vm.runInContext(`const start=new Date(2026,9,25);const days=Array.from({length:75},(_,i)=>{let d=new Date(start);d.setDate(start.getDate()+i);return d});let data={checks:{}};${habits}${assignments}${score.slice(0,score.indexOf('function scoreBadge'))};globalThis.api={scoreStatus,scoreRows,scorePeriod,scoreRange,scoreDate,days,setData:v=>data=v};`,context);
+const a=context.api,checks={};let tests=0;
+function test(name,fn){fn();tests++;console.log('PASS '+name)}
+test('exact thresholds and no evidence',()=>{assert.equal(a.scoreStatus(null)[1],'Not enough evidence');assert.equal(a.scoreStatus(59.99)[1],'In the Red');assert.equal(a.scoreStatus(60)[1],'Maintaining');assert.equal(a.scoreStatus(84.99)[1],'Maintaining');assert.equal(a.scoreStatus(85)[1],'Excelling');});
+test('legacy entries remain intact and category score is weighted by commitments',()=>{a.setData({checks:{'0:read':true,'0:a0':true},notes:{wins:'keep'}});const p=a.scorePeriod(0,0);assert.equal(p.total,7);assert.equal(p.done,2);assert.equal(p.behaviour,2/7*100);assert.equal(p.accomplishment,null);});
+test('rest excluded; no zero denominator score invented',()=>{const exceptions=Object.fromEntries(a.scoreRows().filter(r=>r.original===0).map(r=>[r.key,{type:'rest',reason:'planned'}]));a.setData({checks:{},scorecard:{exceptions,milestones:[]}});assert.equal(a.scorePeriod(0,0).behaviour,null)});
+test('rescheduled commitment leaves original day and appears only once on new due date',()=>{a.setData({checks:{'0:read':true},scorecard:{exceptions:{'0:read':{type:'rescheduled',to:2}},milestones:[]}});assert.equal(a.scorePeriod(0,0).total,6);assert.equal(a.scorePeriod(2,2).total,8);assert.equal(a.scorePeriod(2,2).done,1);assert.equal(a.scorePeriod(0,2).total,21)});
+test('future milestones do not affect current score',()=>{a.setData({checks:{},scorecard:{exceptions:{},milestones:[{due:'2026-10-25',completedOn:'2026-10-25'},{due:'2026-10-26',completedOn:'2026-10-28'},{due:'2026-11-01',completedOn:null}]}});const p=a.scorePeriod(0,1);assert.equal(p.milestones.length,2);assert.equal(p.accomplishment,50)});
+test('completion after report cutoff cannot earn historical credit',()=>{a.setData({checks:{},scorecard:{exceptions:{},milestones:[{due:'2026-10-25',completedOn:'2026-10-27'}]}});assert.equal(a.scorePeriod(0,0).accomplishment,0);assert.equal(a.scorePeriod(0,2).accomplishment,100)});
+test('all recorded completions yield 100 and no inflation from future check-offs',()=>{const checks=Object.fromEntries(a.scoreRows().map(r=>[r.key,true]));a.setData({checks});assert.equal(a.scorePeriod(0,0).behaviour,100);assert.equal(a.scorePeriod(0,0).total,7)});
+test('short windows clamp at challenge start',()=>{a.setData({checks:{}});const p=a.scoreRange(30,3);assert.equal(p.from,0);assert.equal(p.to,3);assert.equal(p.total,28)});
+const updated=original;
+test('all legacy reflection fields and cloud configuration retained',()=>{for(const field of ['experiment','conditions','results','wins','barriers','adjustment'])assert.ok(updated.includes('data-note="'+field+'"'));assert.ok(updated.includes("const KEY='woman-progress-75-v3'"));assert.ok(updated.includes('save_my_app_state'));assert.ok(updated.includes('p_expected_revision:expected'));});
+test('full inline application parses',()=>{const scripts=[...updated.matchAll(/<script>([\s\S]*?)<\/script>/g)];new vm.Script(scripts.at(-1)[1]);});
+console.log(tests+' tests passed');
