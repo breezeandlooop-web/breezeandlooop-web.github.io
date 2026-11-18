@@ -84,7 +84,7 @@ summary{cursor:pointer}
 .ls-nav button[aria-current="page"]{border-bottom:2px solid #533c31;font-weight:700}
 #rbHomePhotos .ls-nav{margin-top:20px}
 </style><style>[hidden]{display:none!important} #diarySyncStatus:empty{display:none}</style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script></head><body><div class="app"><aside class="sidebar"><div class="logo">The Woman<br><em>in Progress.</em></div><div class="subtitle">75 DAYS OF BECOMING</div><nav class="nav" id="nav" aria-label="Main sections"></nav><div class="foot">OCT 25, 2026 — JAN 7, 2027<p>A life built through action, not perfection.</p></div></aside><main><nav class="mobile" id="mobile" aria-label="Main sections"></nav><header class="hero"><div class="hero-inner"><div class="eyebrow">THE WOMAN IN PROGRESS</div><h1 id="heroTitle" tabindex="-1">Today</h1><p id="heroText">Make a little room for what matters.</p></div></header><div class="container"><nav class="tabs section-nav" id="sectionNav" aria-label="Within this section" hidden></nav>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script><link rel="manifest" href="./manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Living Diary"><link rel="icon" href="./diary-icon.svg"></head><body><div class="app"><aside class="sidebar"><div class="logo">The Woman<br><em>in Progress.</em></div><div class="subtitle">75 DAYS OF BECOMING</div><nav class="nav" id="nav" aria-label="Main sections"></nav><div class="foot">OCT 25, 2026 — JAN 7, 2027<p>A life built through action, not perfection.</p></div></aside><main><nav class="mobile" id="mobile" aria-label="Main sections"></nav><header class="hero"><div class="hero-inner"><div class="eyebrow">THE WOMAN IN PROGRESS</div><h1 id="heroTitle" tabindex="-1">Today</h1><p id="heroText">Make a little room for what matters.</p></div></header><div class="container"><nav class="tabs section-nav" id="sectionNav" aria-label="Within this section" hidden></nav>
 <section class="view active today-layout" id="v-today">
 <div class="day-strip"><div><p class="eyebrow" id="phase"></p><h2 id="dayName"></h2></div><div class="buttons" aria-label="Change day"><button class="btn outline" id="prev" aria-label="Previous day">←</button><button class="btn outline" data-current>Today</button><button class="btn outline" id="next" aria-label="Next day">→</button></div></div>
 <div class="card priority-card"><div class="eyebrow">YOUR PLAN FOR THE DAY</div><h3>My priorities</h3><p class="muted">Choose one thing worth doing. Add up to three if you have room.</p>
@@ -444,7 +444,7 @@ function renderWeekActivity(week,rows){
 }
 function renderHealth(){let w=workouts[days[selected].getDay()];$('workTitle').textContent=w[0];$('workDescription').textContent=w[1];$('workSteps').innerHTML=w[2].map(x=>'<div class="task"><div>✓</div><div>'+esc(x)+'</div></div>').join('');renderHealthExtras();$('meals').innerHTML=meals.map(([type,name,recipe])=>'<div class="card c4"><div class="eyebrow">'+type+'</div><h3>'+name+'</h3><p class="small muted">'+recipe+'</p></div>').join('')}
 function projectWriting(id,field,label,value,placeholder,type){return '<label class="field"><span>'+esc(label)+'</span>'+(type?'<input type="'+type+'" data-project-writing="'+esc(id)+'" data-project-field="'+field+'" value="'+esc(value||'')+'">':'<textarea rows="4" data-project-writing="'+esc(id)+'" data-project-field="'+field+'" placeholder="'+esc(placeholder||'')+'">'+esc(value||'')+'</textarea>')+'<small class="tiny muted" role="status">Saves as you type in this browser.</small></label>'}
-function projectWrite(change,status){const before=JSON.stringify(data);try{change();save();if(status)status.textContent='Saved in this browser.';return true}catch(e){data=JSON.parse(before);if(status)status.textContent='Unable to save. Copy this writing before leaving this page.';return false}}
+function projectWrite(change,status){const before=JSON.stringify(data);try{change();save();if(status)status.textContent='Saved on this device. Cloud status appears above.';return true}catch(e){data=JSON.parse(before);if(status)status.textContent='Unable to save. Copy this writing before leaving this page.';return false}}
 function bindProjectWriting(root){$(root).querySelectorAll('[data-project-writing]').forEach(el=>el.addEventListener('input',()=>{projectWrite(()=>{if(!data.projectWork)data.projectWork={};const id=el.dataset.projectWriting;if(!data.projectWork[id])data.projectWork[id]={};data.projectWork[id][el.dataset.projectField]=el.value},el.closest('label').querySelector('[role="status"]'))}))}
 function renderProjects(){
 $('projectTabs').innerHTML=[['home','Home & Interiors','home'],['projects','Wardrobe projects','style'],['future','Future Independence','future'],['skills','Skills & Creative Work','skills']].map(([route,label,key])=>'<button data-go="'+route+'" class="'+(key===tab?'active':'')+'">'+label+'</button>').join('');
@@ -782,7 +782,7 @@ const passportChapters=[['The Coast','Cliffs, bays, ocean sound and the movement
 const visitFields=["place", "status", "planned", "time", "purpose", "angle", "logistics", "permission", "questions", "prep", "shots", "audio", "instagram", "igStage", "igDate", "igLink", "tiktok", "ttStage", "ttDate", "ttLink", "substack", "ssStage", "ssDate", "ssLink", "next", "followup", "actual", "reflection", "media"];
 let visitEditing=null;
 function visitData(){return Array.isArray(data.visitPlans)?data.visitPlans:[]}
-function visitWrite(change,status){const before=JSON.stringify(data);try{change();save();if(status)$(status).textContent='Saved in this browser.';return true}catch(e){data=JSON.parse(before);if(status)$(status).textContent='Unable to save. Copy your plan before closing.';return false}}
+function visitWrite(change,status){const before=JSON.stringify(data);try{change();save();if(status)$(status).textContent='Saved on this device. Cloud status appears above.';return true}catch(e){data=JSON.parse(before);if(status)$(status).textContent='Unable to save. Copy your plan before closing.';return false}}
 function visitValues(){const r={};visitFields.forEach(k=>r[k]=$('visit-'+k).value);return r}
 function openVisitPlan(id,seed){const draft=data.visitPlanDraft;if(draft&&(seed||draft.id!==id)&&!confirm('A saved draft is waiting. Replace it with this plan?'))return;visitEditing=id;const existing=visitData().find(r=>r.id===id);$('visitForm').reset();const values=seed||((draft&&draft.id===id)?draft.values:existing)||{};visitFields.forEach(k=>{if(values[k]!==undefined)$('visit-'+k).value=values[k]});$('visitEditorTitle').textContent=id?'Edit visit & content plan':'Plan my visit';$('visitEditor').classList.remove('hidden');$('visitSaveStatus').textContent='';visitWrite(()=>data.visitPlanDraft={id:visitEditing,values:visitValues()},'visitSaveStatus');$('visitEditor').scrollIntoView({behavior:'smooth',block:'start'});$('visit-place').focus()}
 function visitHistory(r){return (r.history||[]).map(h=>'<p class="small" style="white-space:pre-wrap">'+esc(h.created)+' · '+esc(h.text)+'</p>').join('')}
@@ -811,7 +811,7 @@ function renderStudio(){if(!Array.isArray(data.substackPosts))data.substackPosts
 const emmaUnits=[["vision", "A life you can describe", "Vision and practical trade-offs", "Your independence, paid work, creative expression and calmer surroundings need a shared direction.", "Write a three-sentence picture of an ordinary day you want to be living. Name one change in work, home and how you spend your time.", "Choose one realistic step for this week and put it on a date. Keep the first attempt small enough for a difficult day.", "What do I want because it matters to me, rather than because it proves something to someone else?", "author"], ["conditions", "Change one condition", "Responsibility with self-forgiveness", "Your conversations about conditioning and determinism raise a useful question: what condition can change the next action? Accountability does not make every circumstance your fault.", "Name one obstacle you can influence: an unclear next step, a distracting space, missing information or a task that is too large.", "Prepare one thing that makes action easier: open the proposal, put the book beside your chair or clear a small working surface.", "What is within reach, what needs support, and what is outside my control today?", "publisher"], ["emotions", "Let feelings inform the next step", "Managing emotions and recovering after failure", "On a heavy day, use a lighter action and a pause before consequential decisions. You do not have to turn sadness into productivity.", "Write the observable event, the feeling it brought up and the conclusion you started drawing about your future. Keep these separate.", "Choose a pause, rest or one small practical action. If reviewing trading, review a past decision without making a new trade part of this exercise.", "What happened? What am I feeling? What conclusion is not yet established by the facts?", "publisher"], ["oldthoughts", "Question a familiar story", "Inherited beliefs about ambition and possibility", "A familiar explanation of your life can feel final. Examine it against present evidence without pretending barriers do not exist.", "Choose a thought such as \u201cI must feel confident first\u201d only if it fits you. Identify where it came from and one counterexample.", "Replace the rule with a test: I can prepare one useful paragraph before I feel ready. Record what actually happens.", "Which part is evidence, which is an inherited rule, and what experiment could tell me more?", "publisher"], ["career", "Move one opportunity forward", "Applying ambition to work", "You already have job opportunities and prospects. The useful measure is the next completed step, rather than more possibilities in the pipeline.", "Choose one existing opportunity: an application, interview preparation or a Village Grocer conversation. Define the result you want from the next contact.", "Draft a specific next message or improve one relevant CV section. Choose the follow-up date in Career & Income; send only when you decide it is ready.", "What would move this relationship forward, and what can I do before hearing back?", "adaptation"], ["money", "Make earning concrete", "Examining beliefs around money", "Your wish for greater independence benefits from clearly described paid offers and visible costs. Financial results do not measure your worth.", "Write the service, deliverable and boundary of one paid offer. Keep employment income, client income and uncertain outcomes distinct in your planning.", "Clarify one proposal: what is included, what the client receives, the price and currency, and what still needs agreement.", "Am I avoiding a clear conversation about scope or price? What information would help me have it?", "adaptation"], ["breeze", "Give Breeze & Loop one clear job", "Business ambition put into practice", "For Breeze & Loop, craftsmanship and premium Caribbean positioning should guide what you make and share.", "Choose one existing piece and one objective: sales, trust, education, brand story or community. Describe who it is for and the value it offers.", "Photograph one craftsmanship detail and draft a caption that explains it. Choose one clear invitation: enquire, save, share or tell a related story.", "What can a customer understand or appreciate after seeing this that they could not see before?", "adaptation"], ["creative", "Finish a small creative piece", "Making room for your own ambitions", "Your podcast, filmmaking and Honey Pot ideas can become small finished works without every idea becoming a new obligation.", "Choose one idea already captured. Define a deliberately small finished version: a short voice memo, a three-shot sequence or a private rough cut.", "Make that version using the tools you have. Decide afterward whether to develop it, share it or leave it as practice.", "What would count as finished for this version, and what can wait?", "adaptation"], ["boundaries", "Choose a useful trade-off", "Aligning time with your vision", "Time for reading, work and rest needs space. A boundary can protect that space without requiring an argument or someone else\u2019s agreement about your ambitions.", "Choose one commitment to shorten, defer or decline this week, and name what you are protecting instead.", "Write a calm boundary in your own words and reserve one manageable block for the priority it supports.", "What am I saying yes to by making this trade-off? Is the plan realistic within my circumstances?", "author"], ["review", "Keep evidence, then adjust", "Reviewing your direction regularly", "Your 75-day journal already makes progress visible. Let reading support lived changes instead of adding another standard to meet.", "Review one attempt from this guide: the action, the conditions, what happened and what it taught you. A missed attempt is also useful information.", "Keep one helpful action, reduce one that is too demanding and choose the next experiment. Leave room for pleasure reading and rest.", "What helped? What got in the way? What would make the next attempt easier?", "author"]];
 const emmaSources={"publisher": ["Publisher overview", "https://www.simonandschuster.com/books/Start-With-Yourself/Emma-Grede/9781668085486"], "author": ["Emma on vision and weekly review", "https://www.goldmansachs.com/insights/talks-at-gs/emma-grede-2026"], "adaptation": ["Book context and themes", "https://www.simonandschuster.com/books/Start-With-Yourself/Emma-Grede/9781668085486"]};
 function emmaData(){return data.readingApplications?.emmaGrede||{}}
-function emmaWrite(change){const before=JSON.stringify(data);try{if(!data.readingApplications)data.readingApplications={};if(!data.readingApplications.emmaGrede)data.readingApplications.emmaGrede={};change(data.readingApplications.emmaGrede);save();$('emmaReadingStatus').textContent='Saved in this browser.';return true}catch(e){data=JSON.parse(before);$('emmaReadingStatus').textContent='Unable to save. Keep this page open and copy your writing before closing.';return false}}
+function emmaWrite(change){const before=JSON.stringify(data);try{if(!data.readingApplications)data.readingApplications={};if(!data.readingApplications.emmaGrede)data.readingApplications.emmaGrede={};change(data.readingApplications.emmaGrede);save();$('emmaReadingStatus').textContent='Saved on this device. Cloud status appears above.';return true}catch(e){data=JSON.parse(before);$('emmaReadingStatus').textContent='Unable to save. Keep this page open and copy your writing before closing.';return false}}
 function emmaHistory(id){const entries=emmaData()[id]?.history||[];return entries.length?entries.map(h=>'<div class="record"><div><strong>'+esc(h.date)+'</strong><p style="white-space:pre-wrap;overflow-wrap:anywhere">'+esc(h.text)+'</p></div></div>').join(''):'<p class="small muted">No attempts recorded. You can reflect before taking action.</p>'}
 function emmaAnswer(id,field,label,value,placeholder){return '<label class="field"><span>'+esc(label)+'</span><textarea data-emma-id="'+id+'" data-emma-field="'+field+'" rows="5" placeholder="'+esc(placeholder)+'">'+esc(value)+'</textarea><small class="tiny muted" role="status">Answers save as you type in this browser.</small></label>'}
 function renderEmmaReading(){
@@ -823,7 +823,7 @@ $('emmaAddBook').onclick=()=>{const books=Array.isArray(data.books)?data.books:[
 }
 
 function actionData(){return data.actionSystem||{direction:{},weeks:{},commitments:[],reviews:[],decisions:[]}}
-function actionSave(change,status){const before=JSON.stringify(data);try{if(!data.actionSystem)data.actionSystem={direction:{},weeks:{},commitments:[],reviews:[],decisions:[]};change(data.actionSystem);save();if(status)$(status).textContent='Saved in this browser.';return true}catch(e){data=JSON.parse(before);if(status)$(status).textContent='Unable to save. Copy your writing before closing.';return false}}
+function actionSave(change,status){const before=JSON.stringify(data);try{if(!data.actionSystem)data.actionSystem={direction:{},weeks:{},commitments:[],reviews:[],decisions:[]};change(data.actionSystem);save();if(status)$(status).textContent='Saved on this device. Cloud status appears above.';return true}catch(e){data=JSON.parse(before);if(status)$(status).textContent='Unable to save. Copy your writing before closing.';return false}}
 function actionDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function actionWeek(date){const d=new Date(date+'T12:00:00');d.setDate(d.getDate()-((d.getDay()+6)%7));return actionDate(d)}
 function actionSelected(){return actionDate(days[selected])}
@@ -946,7 +946,7 @@ function renderMorning(){
   const archived=Boolean(archivePage);
   $('morningDate').textContent='Pages for '+(archived?key:dateStr(days[selected]));
   $('morningText').value=data.morningPages?.[key]||'';
-  $('morningStatus').textContent=$('morningText').value?'Saved in this browser.':'Your writing saves as you type in this browser.';
+  $('morningStatus').textContent=$('morningText').value?'Saved on this device. Cloud status appears above.':'Your writing saves as you type. Check the cloud status above before closing.';
   $('pagesPrev').disabled=selected===0;
   $('pagesNext').disabled=selected===days.length-1;
   const entries=Object.entries(data.morningPages||{}).filter(([,value])=>String(value).trim()).sort(([a],[b])=>b.localeCompare(a));
@@ -962,6 +962,35 @@ function renderMorning(){
     $('morningText').focus();
   });
 }
+function mergeDiaryValues(base,local,remote,path='diary'){
+  const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+  if(equal(local,remote)||equal(base,remote))return local;
+  if(equal(base,local))return remote;
+  const object=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
+  if(object(local)&&object(remote)&&(base===undefined||object(base))){
+    const merged={};
+    for(const key of new Set([...Object.keys(base||{}),...Object.keys(local),...Object.keys(remote)])){
+      const value=mergeDiaryValues(base?.[key],local[key],remote[key],path+'.'+key);
+      if(value!==undefined)merged[key]=value;
+    }
+    return merged;
+  }
+  if(Array.isArray(local)&&Array.isArray(remote)&&(base===undefined||Array.isArray(base))){
+    const rows=[...(base||[]),...local,...remote];
+    if(rows.every(row=>object(row)&&typeof row.id==='string')){
+      const maps=[base||[],local,remote].map(list=>new Map(list.map(row=>[row.id,row])));
+      const ids=new Set([...local.map(row=>row.id),...remote.map(row=>row.id)]);
+      const merged=[];
+      for(const id of ids){
+        const row=mergeDiaryValues(maps[0].get(id),maps[1].get(id),maps[2].get(id),path+'.'+id);
+        if(row!==undefined)merged.push(row);
+      }
+      return merged;
+    }
+  }
+  throw Error('Both devices changed '+path+'. Export this device’s backup before choosing which version to keep.');
+}
+
 function diaryCloudChanged(){}
 function initCloudMorning(){
   const endpoint='https://wqqoioivalayqbhabcvx.supabase.co';
@@ -996,6 +1025,33 @@ function initCloudMorning(){
   const retry=$('diaryRetry');
   const pendingKey='living-diary-pending-v1';
   const revisions={};
+  const bases={};
+  const generations={records:0,media:0};
+  let ownerId;
+  const cacheReady=new Promise((resolve,reject)=>{
+    const open=indexedDB.open('living-diary-sync-cache-v1',1);
+    open.onupgradeneeded=()=>open.result.createObjectStore('snapshots');
+    open.onsuccess=()=>resolve(open.result);
+    open.onerror=()=>reject(open.error);
+  });
+  async function cache(method,key,value){
+    const db=await cacheReady;
+    return new Promise((resolve,reject)=>{
+      const tx=db.transaction('snapshots',method==='get'?'readonly':'readwrite');
+      const store=tx.objectStore('snapshots');
+      const request=method==='get'?store.get(key):store.put(value,key);
+      tx.oncomplete=()=>resolve(request.result);
+      tx.onerror=()=>reject(tx.error);
+    });
+  }
+  let cacheQueue=Promise.resolve();
+  function queueLocal(){
+    cacheQueue=cacheQueue.catch(()=>{}).then(async()=>{
+      const media=await $('mediaImport').exportDiaryMedia();
+      await cache('put',ownerId,{data:JSON.parse(JSON.stringify(data)),media,revisions:{...revisions},bases,dirty:[...dirty]});
+    });
+    return cacheQueue;
+  }
   const dirty=new Set();
   let persistPending=()=>{};
   let token,refresh,expires=0,busy=false,timer;
@@ -1025,13 +1081,23 @@ function initCloudMorning(){
     return response.json();
   }
   async function write(kind,payload){
-    const revision=revisions[kind]||0;
-    const next=revision+1;
-    const rows=revision
-      ? await request(table+'?kind=eq.'+kind+'&revision=eq.'+revision,'PATCH',{revision:next,payload})
-      : await request(table,'POST',{kind,revision:next,payload});
-    if(rows.length!==1)throw Error('A newer diary copy is in Supabase. Export your local changes before reopening the cloud copy.');
-    revisions[kind]=next;
+    for(let attempt=0;attempt<3;attempt++){
+      const revision=revisions[kind]||0;
+      const rows=revision
+        ? await request(table+'?kind=eq.'+kind+'&revision=eq.'+revision,'PATCH',{revision:revision+1,payload})
+        : await request(table,'POST',{kind,revision:1,payload});
+      if(rows.length===1){
+        revisions[kind]=rows[0].revision;
+        bases[kind]=JSON.parse(JSON.stringify(payload));
+        return payload;
+      }
+      const current=await request(table+'?kind=eq.'+kind+'&select=revision,payload');
+      if(current.length!==1)throw Error('Cannot find the current cloud diary.');
+      payload=mergeDiaryValues(bases[kind],payload,current[0].payload,kind);
+      revisions[kind]=current[0].revision;
+      bases[kind]=current[0].payload;
+    }
+    throw Error('The diary changed repeatedly on another device. Your edits are kept here. Retry sync.');
   }
   function schedule(){
     clearTimeout(timer);
@@ -1039,6 +1105,7 @@ function initCloudMorning(){
   }
   async function flush(){
     if(busy||!dirty.size)return;
+    if(!navigator.onLine){retry.hidden=false;status.textContent='Offline. Changes are saved on this device and will sync when connected.';return;}
     busy=true;
     retry.hidden=true;
     status.textContent='Saving to Supabase…';
@@ -1047,11 +1114,22 @@ function initCloudMorning(){
       for(const kind of [...dirty]){
         dirty.delete(kind);
         try{
+          const generation=generations[kind];
           const payload=kind==='records'
             ? {app:'woman-in-progress',version:3,data}
             : await $('mediaImport').exportDiaryMedia();
-          await write(kind,payload);
+          await queueLocal();
+          const saved=await write(kind,payload);
+          if(generations[kind]===generation){
+            if(kind==='records'){
+              data={...blank(),...saved.data};
+              localStorage.setItem(KEY,JSON.stringify(data));
+            }else{
+              await $('mediaImport').restoreDiaryMedia(saved,false,true);
+            }
+          }else dirty.add(kind);
           persistPending();
+          await queueLocal();
         }catch(error){dirty.add(kind);persistPending();throw error}
       }
       if(!dirty.size)localStorage.removeItem(pendingKey);
@@ -1082,6 +1160,18 @@ function initCloudMorning(){
     finally{recovery.elements.password.value=''}
   };
   $('diaryRecovery').querySelector('.small').textContent='Use Reset password above, then follow the newest email link to this page.';
+  const out=document.createElement('button');
+  out.className='btn outline';
+  out.textContent='Sign out';
+  out.hidden=true;
+  panel.append(out);
+  out.onclick=async()=>{
+    if(busy)return;
+    if(dirty.size){await flush();if(dirty.size){status.textContent='Wait for your changes to sync before signing out.';return}}
+    const {error}=await client.auth.signOut();
+    if(error){status.textContent=error.message;return}
+    location.reload();
+  };
   const reset=document.createElement('button');
   reset.type='button';
   reset.className='btn outline';
@@ -1109,13 +1199,18 @@ function initCloudMorning(){
       if(session)await useSession(session);else await login(credentials,'password');
       const pendingRaw=localStorage.getItem(pendingKey);
       const pending=pendingRaw?JSON.parse(pendingRaw):null;
-      const user=(await client.auth.getUser()).data.user;
+      const user=!navigator.onLine&&session?.user?session.user:(await client.auth.getUser()).data.user;
       if(!user)throw Error('Your sign-in expired.');
-      const states=await request(table+'?select=kind,revision,payload');
+      ownerId=user.id;
+      const cached=await cache('get',ownerId);
+      if(!navigator.onLine&&!cached)throw Error('Open this diary online once before using it offline.');
+      const states=navigator.onLine
+        ? await request(table+'?select=kind,revision,payload')
+        : ['records','media'].map(kind=>({kind,revision:cached.revisions[kind],payload:kind==='records'?{app:'woman-in-progress',version:3,data:cached.data}:cached.media}));
       const existing=new Map(states.map(row=>[row.kind,row]));
       for(const kind of ['records','media']){
         const row=existing.get(kind);
-        if(row){revisions[kind]=row.revision;continue}
+        if(row){revisions[kind]=row.revision;bases[kind]=row.payload;continue}
         const filename=kind==='records'?'woman-in-progress-backup-2026-11-16-2.json':'woman-in-progress-media-2026-11-16.json';
         let payload=await request(files+filename);
         if(kind==='records'){
@@ -1137,12 +1232,18 @@ function initCloudMorning(){
       const records=existing.get('records').payload;
       if(records.app!=='woman-in-progress'||!records.data||typeof records.data!=='object')throw Error('The cloud records file is invalid.');
       if(pending&&pending.user_id!==user.id)throw Error('This browser has pending edits for another account. Export them before continuing.');
-      if(pending&&Object.entries(pending.revisions||{}).some(([kind,revision])=>revisions[kind]!==revision)){
-        if(root)root.hidden=false;
-        throw Error('This device has unsynced edits and the cloud changed. Export records and media before continuing.');
+      if(pending&&navigator.onLine){
+        if(!cached)throw Error('Unsynced edits need recovery. Export your local records and media before continuing.');
+        const localRecords={app:'woman-in-progress',version:3,data};
+        const localMedia=await $('mediaImport').exportDiaryMedia();
+        for(const kind of pending.dirty||[]){
+          const merged=mergeDiaryValues(cached.bases[kind],kind==='records'?localRecords:localMedia,existing.get(kind).payload,kind);
+          existing.get(kind).payload=merged;
+          dirty.add(kind);
+        }
       }
-      if(!pending){
-        await $('mediaImport').restoreDiaryMedia(existing.get('media').payload,false,false);
+      {
+        await $('mediaImport').restoreDiaryMedia(existing.get('media').payload,false,true);
         localStorage.setItem('living-diary-before-cloud-v1',JSON.stringify(data));
         data={...blank(),...records.data};
         save();
@@ -1151,6 +1252,8 @@ function initCloudMorning(){
       const remember=()=>localStorage.setItem(pendingKey,JSON.stringify({user_id:user.id,revisions:{...revisions},dirty:[...dirty]}));
       diaryCloudChanged=kind=>{
         dirty.add(kind);
+        generations[kind]++;
+        queueLocal().catch(error=>{status.textContent='Local recovery copy failed. Keep this page open.'});
         try{remember()}catch(error){status.textContent='Browser backup unavailable. Keep this tab open until cloud saving completes.'}
         status.textContent='Changes waiting to sync…';
         schedule();
@@ -1158,9 +1261,12 @@ function initCloudMorning(){
       persistPending=remember;
       if(pending)for(const kind of pending.dirty||[])dirty.add(kind);
       form.hidden=true;
+      out.hidden=false;
+      $('diaryRecovery').hidden=true;
       if(root)root.hidden=false;
-      status.textContent='Connected to Supabase.';
+      status.textContent=navigator.onLine?'Connected to Supabase.':'Offline. Your saved diary is available on this device.';
       if(dirty.size)schedule();
+      await queueLocal();
     }catch(error){status.textContent=error.message}
     finally{busy=false}
   };
@@ -1181,6 +1287,29 @@ function initCloudMorning(){
     if(recovering){showRecovery();return}
     if(auth.session)await openDiary(auth.session);
   },0);
+  async function refreshCloud(){
+    if(!ownerId||busy||dirty.size||document.hidden||document.activeElement?.matches('input,textarea,select'))return;
+    busy=true;
+    try{
+      const rows=await request(table+'?select=kind,revision,payload');
+      if(dirty.size)return;
+      let changed=false;
+      for(const row of rows){
+        if(revisions[row.kind]===row.revision)continue;
+        if(row.kind==='records'){
+          data={...blank(),...row.payload.data};
+          localStorage.setItem(KEY,JSON.stringify(data));
+        }else await $('mediaImport').restoreDiaryMedia(row.payload,false,true);
+        revisions[row.kind]=row.revision;
+        bases[row.kind]=row.payload;
+        changed=true;
+      }
+      if(changed){render();await queueLocal();status.textContent='Updated from Supabase.'}
+    }catch(error){status.textContent='Cloud refresh unavailable. Your local copy is available.'}
+    finally{busy=false}
+  }
+  window.addEventListener('focus',refreshCloud);
+  setInterval(refreshCloud,30000);
   window.addEventListener('diary-media-changed',()=>diaryCloudChanged('media'));
 }
 initCloudMorning();
@@ -1192,7 +1321,7 @@ $('honeyList').querySelectorAll('[data-honey-done]').forEach(b=>b.onchange=()=>{
 $('honeyList').querySelectorAll('[data-honey-delete]').forEach(b=>b.onclick=()=>{if(!confirm('Remove this idea and its creative task?'))return;data.honeyPot=honeyData().filter(r=>r.id!==b.dataset.honeyDelete);if(honeyEditing===b.dataset.honeyDelete)resetHoney();save();renderHoney()})}
 function resetHoney(){honeyEditing=null;$('honeyForm').reset();$('honeyFormTitle').textContent='Capture an idea';$('honeyStatus').textContent=''}
 function initHoney(){
-$('morningText').oninput=()=>{if(!data.morningPages||typeof data.morningPages!=='object')data.morningPages={};data.morningPages[archivePage||morningKey()]=$('morningText').value;try{save();$('morningStatus').textContent='Saved in this browser.'}catch(e){$('morningStatus').textContent='Unable to save. Copy your writing before closing this page.'}};
+$('morningText').oninput=()=>{if(!data.morningPages||typeof data.morningPages!=='object')data.morningPages={};data.morningPages[archivePage||morningKey()]=$('morningText').value;try{save();$('morningStatus').textContent='Saved on this device. Cloud status appears above.'}catch(e){$('morningStatus').textContent='Unable to save. Copy your writing before closing this page.'}};
 $('honeyCancel').onclick=resetHoney;$('honeySearch').oninput=renderHoney;$('honeyFilter').onchange=renderHoney;
 $('honeyExample').onclick=()=>{resetHoney();$('honeyTitle').value='Film a cinematic opening shot of my books';$('honeyNote').value='Inspired by a YouTube opening scene: capture just my books. Explore morning light, close-up textures and a slow camera movement to set the mood.';$('honeyTags').value='books, filmmaking, opening scene';$('honeyTitle').focus()};
 $('honeyForm').onsubmit=e=>{e.preventDefault();const title=$('honeyTitle').value.trim(),url=$('honeyUrl').value.trim();if(!title)return;if(url&&!honeyLink(url)){alert('Use an http or https inspiration link.');return}const existing=honeyData().find(r=>r.id===honeyEditing);const r={...(existing||{id:Date.now().toString(36)+Math.random().toString(36).slice(2),created:new Date().toISOString()}),title,note:$('honeyNote').value.trim(),tags:[...new Set($('honeyTags').value.split(',').map(t=>t.trim()).filter(Boolean))],url};if(existing)Object.assign(existing,r);else honeyData().push(r);try{save();resetHoney();$('honeyStatus').textContent='Idea saved in this browser.';renderHoney()}catch(e){$('honeyStatus').textContent='Unable to save. Copy your idea before closing this page.'}};
@@ -1597,7 +1726,7 @@ function initWeekAhead() {
     if (error) {$('planFormStatus').textContent=error;return}
     $('planDialog').close();
     renderWeekAhead();
-    $('planStatus').textContent = 'Saved in this browser.';
+    $('planStatus').textContent = 'Saved on this device. Cloud status appears above.';
   };
   $('planEditOutcomes').onclick = () => {
     const monday = actionWeek(planDate);
@@ -1670,7 +1799,7 @@ function initWeekAhead() {
     const [status,note] = changes[action];
     if (actionSave(()=>{record.status=status;planHistory(record,note)},'planStatus')) {
       renderWeekAhead();
-      $('planStatus').textContent = action==='keep' ? 'Kept open on '+record.date+'.' : 'Saved in this browser.';
+      $('planStatus').textContent = action==='keep' ? 'Kept open on '+record.date+'.' : 'Saved on this device. Cloud status appears above.';
     }
   });
 }
@@ -1761,7 +1890,7 @@ function status(message,idea){
     if(feedback.dataset.attachmentStatus===idea)feedback.textContent=message;
   }
 }
-const ready=new Promise((resolve,reject)=>{const req=indexedDB.open('woman-progress-media-v1',1);req.onupgradeneeded=()=>req.result.createObjectStore('items',{keyPath:'id'});req.onsuccess=()=>{db=req.result;resolve(db)};req.onerror=()=>reject(req.error)});
+const ready=new Promise((resolve,reject)=>{const req=indexedDB.open('living-diary-cloud-media-v2',1);req.onupgradeneeded=()=>req.result.createObjectStore('items',{keyPath:'id'});req.onsuccess=()=>{db=req.result;resolve(db)};req.onerror=()=>reject(req.error)});
 async function transaction(mode,fn){await ready;return new Promise((resolve,reject)=>{const tx=db.transaction('items',mode);let result;fn(tx.objectStore('items'),v=>result=v);tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Storage operation cancelled'))})}
 const all=()=>transaction('readonly',(store,set)=>{const q=store.getAll();q.onsuccess=()=>set(q.result)});
 const mediaChanged=()=>window.dispatchEvent(new Event('diary-media-changed'));
@@ -1859,4 +1988,8 @@ $('mediaImport').onchange=async event=>{
 const observer=new MutationObserver(()=>{render().catch(e=>status('Media unavailable: '+e.message))});observer.observe($('honeyList'),{childList:true});observer.observe($('leCollection'),{childList:true});ready.then(render).catch(e=>status('Media storage unavailable in this browser: '+e.message));
 })();
 </script>
-</body></html>
+<script>
+if('serviceWorker' in navigator&&location.protocol==='https:'){
+  navigator.serviceWorker.register('./service-worker.js',{scope:'./'}).catch(()=>{});
+}
+</script></body></html>
