@@ -1015,7 +1015,7 @@ function initCloudMorning(){
       <p class="small">Copy the link from a fresh recovery email and paste it here without opening it.</p>
       <p role="status" id="diaryRecoveryStatus"></p>
     </details>
-    <button class="btn outline" id="diaryRetry" hidden>Retry sync</button>
+    <button class="btn outline" id="diaryRetry" hidden>Sync now</button>
     <p id="diarySyncStatus" role="status"></p>`;
   document.body.prepend(panel);
   const root=$('morningText').closest('main')?.parentElement;
@@ -1047,8 +1047,7 @@ function initCloudMorning(){
   let cacheQueue=Promise.resolve();
   function queueLocal(){
     cacheQueue=cacheQueue.catch(()=>{}).then(async()=>{
-      const media=await $('mediaImport').exportDiaryMedia();
-      await cache('put',ownerId,{data:JSON.parse(JSON.stringify(data)),media,revisions:{...revisions},bases,dirty:[...dirty]});
+      await cache('put',ownerId,{data:JSON.parse(JSON.stringify(data)),media:bases.media,revisions:{...revisions},bases,dirty:[...dirty]});
     });
     return cacheQueue;
   }
@@ -1105,7 +1104,7 @@ function initCloudMorning(){
   }
   async function flush(){
     if(!dirty.size)return;
-    if(busy){schedule();return;}
+    if(busy){status.textContent='Finishing the current operation. Your changes will sync next.';schedule();return;}
     if(!navigator.onLine){retry.hidden=false;status.textContent='Offline. Changes are saved on this device and will sync when connected.';return;}
     busy=true;
     retry.hidden=true;
@@ -1253,6 +1252,7 @@ function initCloudMorning(){
       const remember=()=>localStorage.setItem(pendingKey,JSON.stringify({user_id:user.id,revisions:{...revisions},dirty:[...dirty]}));
       diaryCloudChanged=kind=>{
         dirty.add(kind);
+        retry.hidden=false;
         generations[kind]++;
         queueLocal().catch(error=>{status.textContent='Local recovery copy failed. Keep this page open.'});
         try{remember()}catch(error){status.textContent='Browser backup unavailable. Keep this tab open until cloud saving completes.'}
@@ -1262,6 +1262,7 @@ function initCloudMorning(){
       persistPending=remember;
       if(pending)for(const kind of pending.dirty||[])dirty.add(kind);
       form.hidden=true;
+      retry.hidden=false;
       out.hidden=false;
       $('diaryRecovery').hidden=true;
       if(root)root.hidden=false;
