@@ -1,0 +1,11 @@
+{
+  "id": "/woman-in-progress/",
+  "name": "Arlette’s Living Diary",
+  "short_name": "Living Diary",
+  "start_url": "/woman-in-progress/",
+  "scope": "/woman-in-progress/",
+  "display": "standalone",
+  "background_color": "#f8f5ed",
+  "theme_color": "#29483a",
+  "icons": [{"src":"diary-icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]
+}
