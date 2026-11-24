@@ -84,7 +84,11 @@ summary{cursor:pointer}
 .ls-nav button[aria-current="page"]{border-bottom:2px solid #533c31;font-weight:700}
 #rbHomePhotos .ls-nav{margin-top:20px}
 </style><style>[hidden]{display:none!important} #diarySyncStatus:empty{display:none}</style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script><link rel="manifest" href="./manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Living Diary"><link rel="icon" href="./diary-icon.svg"></head><body><div class="app"><aside class="sidebar"><div class="logo">The Woman<br><em>in Progress.</em></div><div class="subtitle">75 DAYS OF BECOMING</div><nav class="nav" id="nav" aria-label="Main sections"></nav><div class="foot">OCT 25, 2026 — JAN 7, 2027<p>A life built through action, not perfection.</p></div></aside><main><nav class="mobile" id="mobile" aria-label="Main sections"></nav><header class="hero"><div class="hero-inner"><div class="eyebrow">THE WOMAN IN PROGRESS</div><h1 id="heroTitle" tabindex="-1">Today</h1><p id="heroText">Make a little room for what matters.</p></div></header><div class="container"><nav class="tabs section-nav" id="sectionNav" aria-label="Within this section" hidden></nav>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script><link rel="manifest" href="./manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Living Diary"><link rel="icon" href="./diary-icon.svg"><style>
+/* Keep the diary in place as autosave shows and hides its retry control. */
+.diary-sync-panel[data-diary-open="true"] #diaryRetry[hidden]{display:inline-block!important;visibility:hidden;pointer-events:none}
+.diary-sync-panel[data-diary-open="true"] #diarySyncStatus{display:block;min-height:4.5em}
+</style></head><body><div class="app"><aside class="sidebar"><div class="logo">The Woman<br><em>in Progress.</em></div><div class="subtitle">75 DAYS OF BECOMING</div><nav class="nav" id="nav" aria-label="Main sections"></nav><div class="foot">OCT 25, 2026 — JAN 7, 2027<p>A life built through action, not perfection.</p></div></aside><main><nav class="mobile" id="mobile" aria-label="Main sections"></nav><header class="hero"><div class="hero-inner"><div class="eyebrow">THE WOMAN IN PROGRESS</div><h1 id="heroTitle" tabindex="-1">Today</h1><p id="heroText">Make a little room for what matters.</p></div></header><div class="container"><nav class="tabs section-nav" id="sectionNav" aria-label="Within this section" hidden></nav>
 <section class="view active today-layout" id="v-today">
 <div class="day-strip"><div><p class="eyebrow" id="phase"></p><h2 id="dayName"></h2></div><div class="buttons" aria-label="Change day"><button class="btn outline" id="prev" aria-label="Previous day">←</button><button class="btn outline" data-current>Today</button><button class="btn outline" id="next" aria-label="Next day">→</button></div></div>
 <div class="card priority-card"><div class="eyebrow">YOUR PLAN FOR THE DAY</div><h3>My priorities</h3><p class="muted">Choose one thing worth doing. Add up to three if you have room.</p>
@@ -998,7 +1002,7 @@ function initCloudMorning(){
   const table='/rest/v1/living_diary_state';
   const files='/storage/v1/object/authenticated/private-diary-recovery/';
   const panel=document.createElement('section');
-  panel.className='card';
+  panel.className='card diary-sync-panel';
   panel.innerHTML=`<h2>Private diary</h2>
     <form id="diarySignIn">
       <label class="field">Email <input name="email" type="email" autocomplete="username" required></label>
@@ -1261,6 +1265,7 @@ function initCloudMorning(){
       };
       persistPending=remember;
       if(pending)for(const kind of pending.dirty||[])dirty.add(kind);
+      panel.dataset.diaryOpen='true';
       form.hidden=true;
       retry.hidden=false;
       out.hidden=false;
@@ -1289,12 +1294,16 @@ function initCloudMorning(){
     if(recovering){showRecovery();return}
     if(auth.session)await openDiary(auth.session);
   },0);
+  function cloudEditorActive(){
+    return Boolean(document.querySelector('dialog[open]') ||
+      document.activeElement?.matches('input,textarea,select,[contenteditable="true"]'));
+  }
   async function refreshCloud(){
-    if(!ownerId||busy||dirty.size||document.hidden||document.activeElement?.matches('input,textarea,select'))return;
+    if(!ownerId||busy||dirty.size||document.hidden||cloudEditorActive())return;
     busy=true;
     try{
       const rows=await request(table+'?select=kind,revision,payload');
-      if(dirty.size)return;
+      if(dirty.size||cloudEditorActive())return;
       let changed=false;
       for(const row of rows){
         if(revisions[row.kind]===row.revision)continue;
